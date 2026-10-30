@@ -1,4 +1,4 @@
-# Vitrine Zap
+# Zap Catálogo
 
 Plataforma de vitrines para o link da bio: catálogo com fotos e vídeos, pedido pronto no WhatsApp, Pix com QR Code e assinatura mensal.
 

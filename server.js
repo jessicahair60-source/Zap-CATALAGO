@@ -1,4 +1,4 @@
-// Vitrine Zap: servidor da plataforma (vitrines, painel da lojista, painel da dona, assinatura).
+// Zap Catálogo: servidor da plataforma (vitrines, painel da lojista, painel da dona, assinatura).
 require('./lib/env');
 const path = require('path');
 const fs = require('fs');
@@ -12,7 +12,7 @@ const wa = require('./lib/whatsapp');
 const { createBot, TEMPLATE: WA_TEMPLATE } = require('./lib/wabot');
 
 const CFG = {
-  brand: process.env.BRAND_NAME || 'Vitrine Zap',
+  brand: process.env.BRAND_NAME || 'Zap Catálogo',
   publicUrl: (process.env.PUBLIC_URL || 'http://localhost:3000').replace(/\/$/, ''),
   baseDomain: (process.env.BASE_DOMAIN || '').toLowerCase(),
   proPrice: parseFloat(process.env.PLAN_PRICE || '47.00'),
