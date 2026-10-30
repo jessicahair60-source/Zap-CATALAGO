@@ -251,10 +251,10 @@ const proOk = () =>""")
 rep("""applyColors(); show('loja');
 idb.loadAll().then(() => { if (!$('#view-loja').hidden) renderLoja(); else renderPainel(); });""",
 """if (MODE === 'panel') { $('#brandtag').textContent = BOOT.brand; $('#logout').hidden = false; }
-applyColors(); show(MODE === 'panel' ? 'painel' : 'loja');
+applyColors(); show(MODE === 'panel' && !PV ? 'painel' : 'loja');
 if (MODE === 'demo') idb.loadAll().then(() => { if (!$('#view-loja').hidden) renderLoja(); else renderPainel(); });
 if (MODE === 'store') track('view');
-if (MODE === 'panel' && FRESH) save();
+if (MODE === 'panel' && FRESH && !PV) save();
 if (MODE === 'panel' && /assinatura=ok/.test(location.search)) { toast('Pagamento recebido. Assim que o Mercado Pago confirmar, o Pro é ativado.'); history.replaceState(null, '', '/painel'); }""")
 
 # exemplo carregado: liga as mídias
@@ -320,7 +320,7 @@ async function pollWa() {
   if (document.hidden || sync.busy) return;
   try { const j = await api('GET', '/api/wa/new?since=' + sync.base); mergeWa(j.products, j.cats); j.products.forEach(p => { sync.base = Math.max(sync.base, p.waAt); }); } catch (e) {}
 }
-if (MODE === 'panel') setInterval(pollWa, 20000);
+if (MODE === 'panel' && !PV) setInterval(pollWa, 20000);
 let WA = null;
 async function loadWa(force) {
   const box = $('#wabox'); if (!box) return;

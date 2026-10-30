@@ -580,6 +580,78 @@ body.painel .stats { margin: 14px 0 6px; }
   .sheet { max-width: 680px; }
   .slide { width: min(46%, 300px); }
 }
+
+/* Painel simples: o básico aparece, o resto fica em Mais opções */
+#view-painel details[hidden], #view-painel h3[hidden] { display: none !important; }
+.mainc { display: flex; flex-wrap: wrap; gap: 10px; }
+.sw1 { width: 38px; height: 38px; border-radius: 50%; border: 3px solid var(--p-surface); box-shadow: 0 0 0 1.5px var(--p-line); padding: 0; cursor: pointer; }
+.sw1[aria-pressed="true"] { box-shadow: 0 0 0 2.5px var(--p-fg); }
+.sw1.other { display: grid; place-items: center; background: var(--p-soft); color: var(--p-fg); font-size: 20px; font-weight: 600; position: relative; overflow: hidden; }
+.sw1.other input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.fine { margin-top: 16px; border-top: 1px solid var(--p-line); padding-top: 12px; }
+.fine > summary { cursor: pointer; font-size: 13px; font-weight: 600; color: var(--p-muted); }
+.moreopts { margin: 18px 0 4px; }
+
+/* Prévia ao vivo no painel */
+.is-pv .topbar, .is-pv body::before { display: none; }
+.pv-tab { position: fixed; z-index: 70; right: 16px; bottom: 16px; display: none; align-items: center; gap: 8px; border: 0; border-radius: 999px; padding: 11px 16px;
+  background: var(--p-fg); color: #fff; font-size: 13px; font-weight: 600; box-shadow: 0 8px 24px rgba(36,24,30,.25); }
+.pv-tab svg { flex: none; }
+body.painel .pv-tab { display: flex; }
+body.painel.pv-on .pv-tab { display: none; }
+.pv { position: fixed; z-index: 70; right: 16px; bottom: 16px; display: none; --k: .36; }
+body.painel.pv-on .pv { display: block; animation: pvIn .25s cubic-bezier(.2,.7,.2,1); }
+@keyframes pvIn { from { opacity: 0; transform: translateY(12px) scale(.97); } }
+.pv-card { background: var(--p-surface); border: 1px solid var(--p-line); border-radius: 22px; padding: 8px; box-shadow: 0 14px 40px rgba(36,24,30,.18); }
+.pv-head { display: flex; align-items: center; gap: 6px; padding: 2px 4px 8px 6px; }
+.pv-head b { font-size: 12px; font-weight: 600; color: var(--p-fg); margin-right: auto; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.pv-head b i { width: 7px; height: 7px; border-radius: 50%; background: #2BB673; box-shadow: 0 0 0 3px rgba(43,182,115,.18); }
+.pv-head button { border: 0; background: var(--p-soft); color: var(--p-fg); width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; padding: 0; }
+.pv-phone { width: calc(390px * var(--k)); height: calc(800px * var(--k)); border-radius: calc(46px * var(--k) + 6px); border: 6px solid #1d1418; overflow: hidden;
+  background: #fff; position: relative; box-sizing: content-box; }
+.pv-phone::before { content: ""; position: absolute; z-index: 2; top: calc(10px * var(--k)); left: 50%; width: calc(110px * var(--k)); height: calc(30px * var(--k)); transform: translateX(-50%);
+  border-radius: 999px; background: #1d1418; pointer-events: none; }
+.pv-phone iframe { width: 390px; height: 800px; border: 0; transform: scale(var(--k)); transform-origin: 0 0; display: block; background: #fff; }
+.pv-mini .pv-phone iframe { pointer-events: none; }
+.pv-mini .pv-phone { cursor: zoom-in; }
+.pv-hint { font-size: 11px; color: var(--p-muted); text-align: center; padding: 8px 4px 2px; max-width: calc(390px * var(--k) + 12px); }
+.pv .only-big, .pv.big .only-mini { display: none; }
+.pv.pv-mini:not(.big) .pv-hint { display: none; }
+.pv.big .only-big { display: grid; }
+.pv.big { inset: 0; right: 0; bottom: 0; background: rgba(20,12,16,.55); display: grid; place-items: center; padding: 16px; }
+.pv.big .pv-card { border-radius: 26px; }
+.pv.big .pv-phone iframe { pointer-events: auto; }
+.pv.big .pv-phone { cursor: auto; }
+@media (min-width: 1100px) {
+  .pv-tab { top: 50%; bottom: auto; right: 0; transform: translateY(-50%); border-radius: 14px 0 0 14px; writing-mode: vertical-rl; padding: 16px 10px; }
+  .pv-tab svg { transform: rotate(90deg); }
+  .pv:not(.big) { top: 76px; bottom: auto; right: 24px; --k: .74; }
+  .pv:not(.big) .pv-phone iframe { pointer-events: auto; }
+  .pv:not(.big) .pv-phone { cursor: auto; }
+  .pv:not(.big) .only-mini { display: none; }
+  body.painel.pv-on #view-painel { margin-left: max(24px, calc((100vw - 860px - 380px) / 2)); margin-right: 380px; }
+}
+
+@media (max-width: 1099px) {
+  .pv:not(.big) { top: var(--tb, 50px); left: 0; right: 0; bottom: auto; z-index: 19; }
+  body.painel.pv-on .pv:not(.big) { animation: none; }
+  .pv:not(.big) .pv-card { position: relative; border-radius: 0 0 22px 22px; border-width: 0 0 1px; padding: 10px 12px 12px; display: flex; justify-content: center;
+    box-shadow: 0 10px 24px rgba(36,24,30,.10); background: var(--p-bg); }
+  .pv:not(.big) .pv-head { position: absolute; inset: 10px 12px auto; padding: 0; pointer-events: none; }
+  .pv:not(.big) .pv-head > * { pointer-events: auto; }
+  .pv:not(.big) .pv-head b i { display: inline-block; margin-right: 6px; vertical-align: 1px; }
+  .pv:not(.big) .pv-head b::after { display: block; margin-top: 4px; }
+  .pv:not(.big) .pv-head b { display: block; font-size: 11px; color: var(--p-muted); white-space: normal; max-width: 90px; line-height: 1.3; }
+  .pv:not(.big) .pv-head b::after { content: "Toque no celular para ver grande"; font-weight: 400; font-size: 10.5px; }
+  .pv:not(.big) .pv-head { flex-wrap: wrap; align-items: flex-start; }
+  .pv:not(.big) .pv-head button { width: 32px; height: 32px; background: var(--p-surface); border: 1px solid var(--p-line); }
+  .pv:not(.big) .pv-phone { border-width: 4px; border-radius: calc(46px * var(--k) + 4px); transition: width .2s ease, height .2s ease; }
+  .pv:not(.big) .pv-phone iframe { transition: transform .2s ease; }
+  .pv.typing:not(.big) .pv-head b::after { content: "Encolhida enquanto você digita"; }
+  body.painel.pv-on #view-painel { padding-top: calc(var(--pvh, 0px) + 10px); }
+}
+@media (min-width: 1100px) and (max-height: 760px) { .pv:not(.big) { --k: .62; } }
+
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
 
@@ -595,6 +667,18 @@ body.painel .stats { margin: 14px 0 6px; }
 <main id="view-painel" class="wrap panel" hidden></main>
 
 <div class="cartbar" id="cartbar" hidden><button id="cartbtn"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M2 3h3l2.7 12.4a2 2 0 0 0 2 1.6h7.7a2 2 0 0 0 2-1.6L21 7H6"/></svg>Ver pedido <span class="cnt" id="cartcnt">0</span><span class="tot" id="carttot">R$ 0,00</span></button></div>
+<button class="pv-tab" id="pvtab" aria-controls="pv"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg><span>Ver prévia</span></button>
+<aside class="pv" id="pv" aria-label="Prévia da vitrine">
+  <div class="pv-card">
+    <div class="pv-head"><b><i></i>Prévia ao vivo</b>
+      <button class="only-mini" id="pvbig" aria-label="Aumentar prévia" title="Aumentar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>
+      <button class="only-big" id="pvsmall" aria-label="Diminuir prévia" title="Diminuir"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/></svg></button>
+      <button id="pvclose" aria-label="Esconder prévia" title="Esconder"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <div class="pv-phone" id="pvphone"></div>
+    <div class="pv-hint">Muda sozinha enquanto você edita.</div>
+  </div>
+</aside>
 <div class="scrim" id="scrim" hidden></div>
 <div class="sheet" id="sheet" hidden role="dialog" aria-modal="true"></div>
 <div class="player" id="player" hidden role="dialog" aria-modal="true" aria-label="Vídeo do produto"></div>
@@ -642,6 +726,7 @@ const TITLE_FONTS = {
   cormorant: ['Luxo clássico', '"Cormorant Garamond", Garamond, Georgia, serif', true],
   montserrat: ['Clean', '"Montserrat", "Helvetica Neue", Arial, sans-serif', false]
 };
+const MAIN_COLORS = ['#B9476F', '#E0457B', '#D4AF37', '#E06A00', '#1FA855', '#2F6FDE', '#6B4BB8', '#111111'];
 const RADII = { round: ['Arredondados', 16, 12, 999, 18], soft: ['Suaves', 8, 6, 10, 10], square: ['Retos', 0, 0, 0, 0] };
 const THEMES = {
   rosa: { label: 'Rosa Chic', font: 'bricolage', radius: 'round', ig: true, colors: {} },
@@ -744,6 +829,9 @@ const DEFAULT = {
   products: EXAMPLES.moda.products.map(normP)
 };
 
+const PV = window.name === 'vzpreview';
+if (PV) document.documentElement.classList.add('is-pv');
+const PV_SRC = PV || window.__BOOT__ ? '' : '<!doctype html>' + document.documentElement.outerHTML;
 const KEY = 'vitrinezap5';
 let S;
 try { S = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { S = null; }
@@ -1155,7 +1243,7 @@ function renderPainel() {
       <button data-go="prod"><span>${ICONS.plus}</span>Novo produto</button>
       <button data-go="lista"><span>${ICONS.grid}</span>Meus produtos</button>
       <button data-go="banner"><span>${ICONS.img}</span>Banner</button>
-      <button data-go="cores"><span>${ICONS.drop}</span>Cores</button>
+      <button data-go="tema"><span>${ICONS.drop}</span>Cores</button>
     </div>
     <div class="stats">
       <div class="stat"><b>${active}</b><span>produtos ativos</span></div>
@@ -1225,16 +1313,20 @@ function renderPainel() {
       ${f('sname', 'Nome da loja (embaixo do banner)', s.name)}
       <div class="field"><label for="sbio">Frase embaixo do nome</label><textarea class="in" id="sbio" rows="2">${esc(s.bio)}</textarea></div>
       ${f('scattitle', 'Título acima da busca ({loja} vira o nome da loja; vazio = esconder)', s.catalogTitle ?? 'Conheça nossos produtos')}`)}
-    ${sec('tema', 'Tema e estilo', `${(THEMES[s.theme] || {}).label || 'Personalizado'} · fonte ${TITLE_FONTS[s.titleFont][0].toLowerCase()} · cantos ${RADII[s.radius][0].toLowerCase()}`, `
-      <p class="note" style="margin:0 0 8px">Um toque aplica cores, fonte e cantos combinando. Depois você ainda pode ajustar cada cor em Cores.</p>
+    ${sec('tema', 'Cores', `${(THEMES[s.theme] || {}).label || 'Personalizado'}`, `
+      <p class="note" style="margin:0 0 8px">1. Escolha um tema. Ele já vem com tudo combinando.</p>
       <div class="themes">${Object.entries(THEMES).map(([k, t]) => { const c = { ...DEFAULT_COLORS, ...t.colors }; const r = RADII[t.radius];
         return `<button class="theme" data-theme="${k}" aria-pressed="${s.theme === k}"><span class="tp" style="background:${c.bg};border-radius:${Math.min(r[1], 10)}px">
           <b style="font-family:${TITLE_FONTS[t.font][1].replace(/"/g, "'")};color:${c.title}">Aa</b><span><i style="background:${c.cardBg};border:1px solid ${c.cardBorder};border-radius:${r[2]}px"></i><i style="background:${c.cardBg};border:1px solid ${c.cardBorder};border-radius:${r[2]}px"></i></span>
           <i style="background:${c.buyBg};border-radius:${r[2]}px"></i></span>${t.label}</button>`; }).join('')}</div>
+      <p class="note" style="margin:16px 0 8px">2. Se quiser, troque a cor dos botões.</p>
+      <div class="mainc">${MAIN_COLORS.map(c => `<button class="sw1" data-main="${c}" style="background:${c}" aria-label="Cor ${c}" aria-pressed="${S.colors.buyBg.toLowerCase() === c.toLowerCase()}"></button>`).join('')}
+        <label class="sw1 other" title="Outra cor"><input type="color" id="smain" value="${S.colors.buyBg}" aria-label="Outra cor">+</label></div>
+      <details class="fine" ${pui.fine ? 'open' : ''}><summary>Ajustar fonte e cantos</summary>
       <div class="field"><label for="stfont">Fonte dos títulos</label><select class="in" id="stfont">${Object.entries(TITLE_FONTS).map(([k, v]) => `<option value="${k}" ${s.titleFont === k ? 'selected' : ''} style="font-family:${v[1].replace(/"/g, "'")}">${v[0]}</option>`).join('')}</select></div>
       <div class="field"><label>Cantos</label><div class="radios">${Object.entries(RADII).map(([k, v]) => `<button class="tg" data-radius="${k}" aria-pressed="${s.radius === k}" style="padding:8px 14px;border-radius:${Math.min(v[2], 10)}px;${s.radius === k ? 'border-color:var(--p-acc);color:var(--p-acc)' : ''}">${v[0]}</button>`).join('')}</div></div>
-      ${ck('sanim', 'Animação suave ao abrir a vitrine', s.anim)}`)}
-    ${sec('cores', 'Cores', 'Uma cor para cada parte da vitrine', `
+      ${ck('sanim', 'Animação suave ao abrir a vitrine', s.anim)}</details>`)}
+    ${sec('cores', 'Todas as cores', 'Uma cor para cada parte da vitrine', `
       ${COLOR_GROUPS.map(([g, items]) => `<div class="cgroup"><h4>${g}</h4>
         ${items.map(([k, label]) => `<label class="crow"><span>${label}</span><code id="hx-${k}">${S.colors[k].toUpperCase()}</code><input type="color" data-color="${k}" value="${S.colors[k]}" aria-label="${label}"></label>`).join('')}
         ${g === 'Busca e categorias' ? ck('sigring', 'Usar o degradê do Instagram no anel da categoria', s.igRing) : ''}
@@ -1317,6 +1409,12 @@ function renderPainel() {
     applyColors(); save(); renderPainel(); toast(`Tema ${t.label} aplicado`); });
   $('#stfont').onchange = e => { s.titleFont = e.target.value; applyColors(); save(); renderPainel(); };
   document.querySelectorAll('[data-radius]').forEach(b => b.onclick = () => { s.radius = b.dataset.radius; applyColors(); save(); renderPainel(); });
+  const setMain = c => { const n = parseInt(c.slice(1), 16), lum = .299 * (n >> 16) + .587 * (n >> 8 & 255) + .114 * (n & 255);
+    Object.assign(S.colors, { buyBg: c, catRing: c, videoRing: c, buyText: lum > 170 ? '#111111' : '#FFFFFF' }); Object.assign(s, { igRing: false, igVideo: false, theme: 'custom' });
+    applyColors(); save(); renderPainel(); };
+  document.querySelectorAll('[data-main]').forEach(b => b.onclick = () => setMain(b.dataset.main));
+  $('#smain').onchange = e => setMain(e.target.value);
+  document.querySelector('details.fine').ontoggle = e => { pui.fine = e.target.open; };
   bind('stesti', 'testiTitle');
   document.querySelectorAll('[data-tname]').forEach(el => el.oninput = () => { S.testimonials[+el.dataset.tname].name = el.value; save(); });
   document.querySelectorAll('[data-ttext]').forEach(el => el.oninput = () => { S.testimonials[+el.dataset.ttext].text = el.value; save(); });
@@ -1429,6 +1527,89 @@ function show(view) {
   closeSheet(); loja ? renderLoja() : renderPainel();
   updateCartBar(); window.scrollTo(0, 0);
 }
+
+/* Painel simples: quem está começando vê só o básico; "Mais opções" mostra o resto */
+const ADV_SECS = new Set(['estoque', 'selos', 'cores', 'layout', 'depo', 'rodape', 'modelo', 'marketing', 'dominio']);
+try { pui.adv = localStorage.getItem('vz-adv') === '1'; } catch (e) {}
+function applySimple() {
+  const box = $('#view-painel');
+  box.querySelectorAll('details[data-sec]').forEach(d => { d.hidden = !pui.adv && ADV_SECS.has(d.dataset.sec) && !d.open; });
+  box.querySelectorAll('h3.pgroup').forEach(h => { let n = h.nextElementSibling, any = false;
+    for (; n && !n.matches('h3.pgroup'); n = n.nextElementSibling) if (n.matches('details') && !n.hidden) any = true; h.hidden = !any; });
+  const at = [...box.querySelectorAll('h3.pgroup')].find(h => /^(Sua conta|Ajuda)/.test(h.textContent));
+  if (!at) return;
+  const b = document.createElement('button'); b.className = 'pbtn ghost moreopts';
+  b.textContent = pui.adv ? 'Mostrar menos opções' : 'Mais opções: estoque, selos, depoimentos, todas as cores...';
+  b.onclick = () => { pui.adv = !pui.adv; try { localStorage.setItem('vz-adv', pui.adv ? '1' : '0'); } catch (e) {} renderPainel(); };
+  at.before(b);
+}
+{ const rp0 = renderPainel; renderPainel = function () { rp0.apply(this, arguments); applySimple(); }; }
+
+/* Prévia ao vivo: a mesma página roda num mini celular e recebe os dados a cada mudança */
+const pv = { frame: null, t: 0 };
+// dentro da prévia nada é salvo; no painel, cada save() também atualiza a prévia
+if (PV) save = () => {}; else { const save0 = save; save = function () { pvPush(); return save0.apply(this, arguments); }; }
+function pvState() {
+  const c = JSON.parse(JSON.stringify(S));
+  const d = pui.draft;
+  if (d && String(d.name || '').trim()) {
+    const n = v => { const x = parseFloat(String(v ?? '').replace(/\./g, '').replace(',', '.')); return x > 0 ? x : 0; };
+    const p = { ...JSON.parse(JSON.stringify(d)), id: pui.editId || -1, price: n(d.price), old: n(d.old), stock: d.stock === '' ? '' : +d.stock };
+    const i = c.products.findIndex(x => x.id === pui.editId);
+    if (i >= 0) c.products[i] = p; else c.products.unshift(p);
+  }
+  const m = {}; for (const k in MEDIA) if (String(MEDIA[k]).startsWith('blob:')) m[k] = MEDIA[k];
+  return { t: 'vzS', S: c, M: m };
+}
+function pvPush() {
+  if (PV || !pv.frame) return;
+  clearTimeout(pv.t); pv.t = setTimeout(() => { try { pv.frame.contentWindow.postMessage(pvState(), '*'); } catch (e) {} }, 120);
+}
+function pvFit() {
+  const box = $('#pv'); const mob = innerWidth < 1100;
+  document.body.style.setProperty('--tb', $('.topbar').offsetHeight + 'px');
+  if (box.classList.contains('big')) box.style.setProperty('--k', Math.min((innerWidth - 60) / 390, (innerHeight - 120) / 800, 1).toFixed(3));
+  else if (mob) box.style.setProperty('--k', (box.classList.contains('typing') ? Math.max(.16, innerHeight * .15 / 800) : Math.min(.36, innerHeight * .3 / 800)).toFixed(3));
+  else box.style.removeProperty('--k');
+  requestAnimationFrame(() => document.body.style.setProperty('--pvh', mob && document.body.classList.contains('pv-on') && !box.classList.contains('big') ? box.offsetHeight + 'px' : '0px'));
+  setTimeout(() => document.body.style.setProperty('--pvh', mob && document.body.classList.contains('pv-on') && !box.classList.contains('big') ? box.offsetHeight + 'px' : '0px'), 260);
+}
+function pvOpen(on) {
+  document.body.classList.toggle('pv-on', on);
+  try { localStorage.setItem('vz-pv', on ? '1' : '0'); } catch (e) {}
+  if (!on) { $('#pv').classList.remove('big'); pvFit(); return; }
+  if (!pv.frame) {
+    pv.frame = document.createElement('iframe'); pv.frame.name = 'vzpreview'; pv.frame.title = 'Prévia da vitrine'; pv.frame.tabIndex = -1;
+    pv.frame.onload = pvPush; if (window.__BOOT__) pv.frame.src = location.pathname; else pv.frame.srcdoc = PV_SRC; $('#pvphone').appendChild(pv.frame);
+  } else pvPush();
+  $('#pv').classList.toggle('pv-mini', innerWidth < 1100); pvFit();
+}
+if (PV) {
+  addEventListener('message', e => {
+    if (e.source !== parent || !e.data || e.data.t !== 'vzS') return;
+    Object.assign(MEDIA, e.data.M || {}); S = e.data.S; applyColors(); renderLoja(); updateCartBar();
+  });
+} else {
+  $('#pvtab').onclick = () => pvOpen(true);
+  $('#pvclose').onclick = () => pvOpen(false);
+  const big = on => { $('#pv').classList.toggle('big', on); pvFit(); };
+  $('#pvbig').onclick = () => big(true);
+  $('#pvsmall').onclick = () => big(false);
+  $('#pvphone').onclick = () => { if ($('#pv').classList.contains('pv-mini') && !$('#pv').classList.contains('big')) big(true); };
+  $('#pv').onclick = e => { if (e.target.id === 'pv') big(false); };
+  addEventListener('resize', () => { pvFit(); $('#pv').classList.toggle('pv-mini', innerWidth < 1100); });
+  // a barra do topo muda de altura quando o painel carrega: a prévia acompanha
+  if (window.ResizeObserver) new ResizeObserver(() => { if (document.body.classList.contains('pv-on')) pvFit(); }).observe($('.topbar'));
+  // rascunho do produto e campos sem save() também atualizam a prévia
+  const typing = () => { const a = document.activeElement; return !!(a && a.closest('#view-painel') && (a.matches('textarea, select') || (a.matches('input') && !/checkbox|radio|file|color|range/.test(a.type)))); };
+  document.addEventListener('focusin', () => { const t = typing(); if (t !== $('#pv').classList.contains('typing')) { $('#pv').classList.toggle('typing', t); pvFit(); } });
+  document.addEventListener('focusout', () => setTimeout(() => { const t = typing(); if (t !== $('#pv').classList.contains('typing')) { $('#pv').classList.toggle('typing', t); pvFit(); } }, 120));
+  document.addEventListener('input', e => { if (e.target.closest('#view-painel')) pvPush(); });
+  document.addEventListener('change', e => { if (e.target.closest('#view-painel')) pvPush(); });
+  let pref = '1'; try { pref = localStorage.getItem('vz-pv') ?? pref; } catch (e) {}
+  if (pref === '1') pvOpen(true);
+}
+
 $('#tab-loja').onclick = () => show('loja');
 $('#tab-painel').onclick = () => show('painel');
 applyColors(); show('loja');

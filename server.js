@@ -149,7 +149,7 @@ function sendApp(res, html, extraScriptHosts = '') {
     `default-src 'self'`, `script-src 'nonce-${nonce}' ${extraScriptHosts}`.trim(), `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
     `font-src https://fonts.gstatic.com`, `img-src 'self' data: blob: https:`, `media-src 'self' data: blob:`,
     `connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://connect.facebook.net https://www.facebook.com`,
-    `frame-src https://www.facebook.com`, `object-src 'none'`, `base-uri 'none'`, `form-action 'self'`, `frame-ancestors 'self'`
+    `frame-src 'self' https://www.facebook.com`, `object-src 'none'`, `base-uri 'none'`, `form-action 'self'`, `frame-ancestors 'self'`
   ].join('; '));
   res.type('html').send(html.replace(/<script(?=[\s>])/g, `<script nonce="${nonce}"`));
 }
