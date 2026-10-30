@@ -103,7 +103,7 @@ rep("""  if (s.online === false) { $('#view-loja').innerHTML = `<div class="offb
 rep("""    $('#goon').onclick = () => show('painel'); return; }""", """    if ($('#goon')) $('#goon').onclick = () => show('painel'); return; }""")
 rep("""    ${s.footer ? `<p class="foot">${esc(s.footer)}</p>` : ''}`;""",
     """    ${s.footer ? `<p class="foot">${esc(s.footer)}</p>` : ''}
-    ${MODE !== 'demo' && !(BOOT.store.pro || (MODE === 'panel' && BOOT.store.plan !== 'free')) ? `<p class="madewith"><a href="${esc(BOOT.home)}" target="_blank" rel="noopener">Feito com ${esc(BOOT.brand)}</a></p>` : ''}`;""")
+    `;""")
 rep("""function openProduct(id) {
   const p = prod(id);""", """function openProduct(id) {
   const p = prod(id); track('pview', id);""")
@@ -167,14 +167,14 @@ rep("""    <h3 class="pgroup">Vendas e contato<small>WhatsApp, links e depoiment
       <div class="two">${f('spixname', 'Nome do recebedor', s.pixName || '')}${f('spixcity', 'Cidade', s.pixCity || '')}</div>
       <p class="note">A forma de pagamento precisa ter a palavra Pix (veja em Carrinho e pedido no WhatsApp).</p>`)}""")
 rep("""    <h3 class="pgroup">Ajuda<small>Tamanhos ideais e exemplos prontos</small></h3>""",
-"""    ${MODE === 'panel' ? `<h3 class="pgroup">Recursos Pro<small>Divulgação e endereço próprio</small></h3>
-    ${sec('marketing', 'Pixel do Meta e Google Analytics', proOk() ? (s.metaPixel || s.gaId ? 'Ativo' : 'Meça os resultados dos seus anúncios') : 'Disponível no plano Pro', `
-      ${proOk() ? '' : '<p class="pronote">Assine o Pro para medir visitas e vendas dos seus anúncios no Instagram, Facebook e Google.</p>'}
+"""    ${MODE === 'panel' ? `<h3 class="pgroup">Divulgação<small>Anúncios e endereço próprio</small></h3>
+    ${sec('marketing', 'Pixel do Meta e Google Analytics', proOk() ? (s.metaPixel || s.gaId ? 'Ativo' : 'Meça os resultados dos seus anúncios') : 'Disponível com a assinatura ativa', `
+      ${proOk() ? '' : '<p class="pronote">Assine para medir visitas e vendas dos seus anúncios no Instagram, Facebook e Google.</p>'}
       ${f('spixel', 'ID do Pixel do Meta (só números)', s.metaPixel || '', proOk() ? 'inputmode="numeric" placeholder="123456789012345"' : 'disabled')}
       ${f('sga', 'ID do Google Analytics (começa com G-)', s.gaId || '', proOk() ? 'placeholder="G-XXXXXXXXXX"' : 'disabled')}
       <p class="note">A vitrine envia visita, produto visto, clique no Eu quero e pedido enviado.</p>`)}
-    ${sec('dominio', 'Domínio próprio', proOk() ? (BOOT.store.customDomain ? esc(BOOT.store.customDomain) : 'Use o endereço da sua marca') : 'Disponível no plano Pro', `
-      ${proOk() ? '' : '<p class="pronote">Com o Pro, sua vitrine pode abrir em www.sualoja.com.br.</p>'}
+    ${sec('dominio', 'Domínio próprio', proOk() ? (BOOT.store.customDomain ? esc(BOOT.store.customDomain) : 'Use o endereço da sua marca') : 'Disponível com a assinatura ativa', `
+      ${proOk() ? '' : '<p class="pronote">Com a assinatura ativa, sua vitrine pode abrir em www.sualoja.com.br.</p>'}
       <div class="field"><label for="sdomain">Seu domínio</label><div class="slugrow"><input class="in" id="sdomain" value="${esc(BOOT.store.customDomain || '')}" placeholder="minhaloja.com.br" ${proOk() ? '' : 'disabled'}><button class="tg" id="savedomain" ${proOk() ? '' : 'disabled'}>Salvar</button></div></div>
       <p class="err" id="domerr" hidden></p>
       <ol class="steps"><li>Compre o domínio (Registro.br, Hostinger, GoDaddy...).</li><li>No painel de onde comprou, crie um registro <b>CNAME</b> com nome <b>www</b> apontando para <b>${esc(new URL(BOOT.home).hostname)}</b>.</li><li>Salve o domínio aqui. A mudança pode levar algumas horas para valer.</li></ol>`)}` : ''}
@@ -192,17 +192,15 @@ rep("""    <button class="pbtn ghost" id="reset">Voltar ao exemplo original</but
 rep("""  $('#reset').onclick = () =>""", """  if ($('#reset')) $('#reset').onclick = () =>""")
 rep("""  document.querySelectorAll('details[data-sec]').forEach(el => el.ontoggle""", """  if (MODE === 'panel') bindPanelExtras(s);
   document.querySelectorAll('details[data-sec]').forEach(el => el.ontoggle""")
-rep("""function show(view) {""", """const proOk = () => MODE === 'demo' || BOOT.store.plan !== 'free';
+rep("""function show(view) {""", """const proOk = () => MODE === 'demo' || BOOT.store.plan !== 'expired';
 const fmtDate = t => new Date(t).toLocaleDateString('pt-BR');
 function planCard() {
-  const st = BOOT.store; const active = S.products.filter(p => p.active).length;
-  const over = st.plan === 'free' && active > st.freeLimit;
-  const label = st.plan === 'pro' ? 'Plano Pro' : st.plan === 'trial' ? 'Teste grátis do Pro' : 'Plano Grátis';
-  const sub = st.plan === 'pro' ? `${st.subscribed ? 'Renova' : 'Vale'} até ${fmtDate(st.proUntil)}` : st.plan === 'trial' ? `Termina em ${fmtDate(st.trialUntil)}. Depois, volta para o plano Grátis.` : `Até ${st.freeLimit} produtos na vitrine`;
+  const st = BOOT.store;
+  const label = st.plan === 'pro' ? 'Assinatura ativa' : st.plan === 'trial' ? 'Teste grátis' : 'Assinatura vencida';
+  const sub = st.plan === 'pro' ? `${st.subscribed ? 'Renova' : 'Vale'} até ${fmtDate(st.proUntil)}` : st.plan === 'trial' ? `Termina em ${fmtDate(st.trialUntil)}. Assine para a vitrine continuar no ar.` : 'Sua vitrine está fora do ar para as clientes.';
   return `<section class="plan plan-${st.plan}"><div class="plan-top"><div><b>${label}</b><small>${sub}</small></div>
-    ${st.plan === 'pro' && st.subscribed ? '<button class="tg" id="plancancel">Cancelar</button>' : `<button class="hcopy" id="planbuy">${st.plan === 'pro' ? 'Renovar' : 'Assinar Pro'} · ${brl(st.proPrice)}/mês</button>`}</div>
-    ${st.plan !== 'pro' ? `<ul class="plan-list"><li>Produtos ilimitados</li><li>Sem a marca ${esc(st.brand)} no rodapé</li><li>Pixel do Meta e Google Analytics</li><li>Domínio próprio</li></ul>` : ''}
-    ${over ? `<p class="plan-warn">Você tem ${active} produtos ativos, mas só os ${st.freeLimit} primeiros aparecem na vitrine no plano Grátis.</p>` : ''}
+    ${st.plan === 'pro' && st.subscribed ? '<button class="tg" id="plancancel">Cancelar</button>' : `<button class="hcopy" id="planbuy">${st.plan === 'pro' ? 'Renovar' : 'Assinar'} · ${brl(st.proPrice)}/mês</button>`}</div>
+    ${st.plan === 'expired' ? '<p class="plan-warn">Assine para colocar a vitrine de volta no ar. Seus produtos e configurações continuam salvos.</p>' : ''}
     ${st.payments === 'teste' ? '<p class="note" style="margin:6px 0 0">Modo de teste: o pagamento é simulado.</p>' : ''}</section>`;
 }
 async function api(method, url, body) {
@@ -214,9 +212,9 @@ function bindPanelExtras(s) {
   const bindS = (id, key) => { const el = $('#' + id); if (el) el.oninput = () => { s[key] = el.value.trim(); save(); }; };
   bindS('spixkey', 'pixKey'); bindS('spixname', 'pixName'); bindS('spixcity', 'pixCity'); bindS('spixel', 'metaPixel'); bindS('sga', 'gaId');
   if ($('#planbuy')) $('#planbuy').onclick = async () => { $('#planbuy').disabled = true;
-    try { const j = await api('POST', '/api/billing/checkout'); if (j.url) { location.href = j.url; return; } if (j.store) { BOOT.store = { ...BOOT.store, ...j.store }; renderPainel(); renderLoja(); toast('Plano Pro ativado'); } }
+    try { const j = await api('POST', '/api/billing/checkout'); if (j.url) { location.href = j.url; return; } if (j.store) { BOOT.store = { ...BOOT.store, ...j.store }; renderPainel(); renderLoja(); toast('Assinatura ativada'); } }
     catch (e) { toast(e.message); $('#planbuy').disabled = false; } };
-  if ($('#plancancel')) $('#plancancel').onclick = async () => { if (!confirm('Cancelar a assinatura? O Pro continua até o fim do período já pago.')) return;
+  if ($('#plancancel')) $('#plancancel').onclick = async () => { if (!confirm('Cancelar a assinatura? A vitrine continua no ar até o fim do período já pago e depois sai do ar.')) return;
     try { const j = await api('POST', '/api/billing/cancel'); BOOT.store = { ...BOOT.store, ...j.store }; renderPainel(); toast('Assinatura cancelada'); } catch (e) { toast(e.message); } };
   if ($('#savedomain')) $('#savedomain').onclick = async () => { $('#domerr').hidden = true;
     try { const j = await api('PUT', '/api/domain', { domain: $('#sdomain').value }); BOOT.store = { ...BOOT.store, ...j.store }; renderPainel(); toast('Domínio salvo'); }
@@ -242,6 +240,13 @@ async function loadStats() {
 
 function show(view) {""")
 
+# assinatura vencida: o cartão do topo avisa que a vitrine está fora do ar
+rep("""<b>${s.online === false ? 'Vitrine fora do ar' : 'Vitrine no ar'}</b><small>${s.online === false ? 'As clientes veem um aviso de pausa' : 'Suas clientes já podem ver e pedir'}</small>""",
+    """<b>${expired() ? 'Vitrine fora do ar' : s.online === false ? 'Vitrine fora do ar' : 'Vitrine no ar'}</b><small>${expired() ? 'Assinatura vencida: assine para voltar' : s.online === false ? 'As clientes veem um aviso de pausa' : 'Suas clientes já podem ver e pedir'}</small>""")
+rep("""<section class="hero ${s.online === false ? 'is-off' : ''}">""", """<section class="hero ${s.online === false || expired() ? 'is-off' : ''}">""")
+rep("""const proOk = () =>""", """const expired = () => MODE === 'panel' && BOOT.store.plan === 'expired';
+const proOk = () =>""")
+
 # ---------- inicialização ----------
 rep("""applyColors(); show('loja');
 idb.loadAll().then(() => { if (!$('#view-loja').hidden) renderLoja(); else renderPainel(); });""",
@@ -266,7 +271,7 @@ rep("""/* Cards sem moldura */""", """/* Versão com servidor */
 .savest[data-st="err"] { color: #C0392B; font-weight: 700; }
 .madewith { text-align: center; margin: 18px 0 0; font-size: 12px; } .madewith a { color: var(--c-muted); text-decoration: none; }
 .plan { margin-top: 14px; background: var(--p-surface); border: 1px solid var(--p-line); border-radius: 18px; padding: 14px 16px; }
-.plan-pro { border-color: #1FA855; }
+.plan-pro { border-color: #1FA855; } .plan-expired { border-color: #C0392B; }
 .plan-top { display: flex; align-items: center; gap: 12px; justify-content: space-between; }
 .plan-top b { display: block; font-size: 15px; } .plan-top small { color: var(--p-muted); font-size: 12px; }
 .plan-list { margin: 10px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; font-size: 12px; color: var(--p-muted); }

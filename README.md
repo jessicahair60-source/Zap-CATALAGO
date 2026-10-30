@@ -5,10 +5,10 @@ Plataforma de vitrines para o link da bio: catálogo com fotos e vídeos, pedido
 ## O que tem
 
 - **Página de vendas** (`/`), **cadastro e login** (`/cadastro`, `/entrar`), **termos** e **privacidade**.
-- **Vitrine de cada loja** em `/nome-da-loja`, em `nome-da-loja.SEU_DOMINIO` (com `BASE_DOMAIN`) ou no domínio próprio da lojista (plano Pro).
+- **Vitrine de cada loja** em `/nome-da-loja`, em `nome-da-loja.SEU_DOMINIO` (com `BASE_DOMAIN`) ou no domínio próprio da lojista.
 - **Painel da lojista** (`/painel`): link da vitrine com copiar e compartilhar, chave no ar e fora do ar, produtos, fotos e vídeos, banner, cores, Pix, relatórios, Pixel do Meta, Google Analytics, domínio próprio, assinatura e troca de senha.
-- **Painel da plataforma** (`/admin`, só para os e-mails em `ADMIN_EMAILS`): receita mensal, lojas por plano, busca, ver vitrine, dar Pro, passar para Grátis, gerar senha nova, bloquear e desbloquear, e pagamentos recentes.
-- **Planos**: Grátis (limite de produtos e marca no rodapé) e Pro (mensal pelo Mercado Pago). Contas novas ganham dias de teste do Pro. Quando o Pro vence ou não é pago, a loja volta para o Grátis sem perder nada.
+- **Painel da plataforma** (`/admin`, só para os e-mails em `ADMIN_EMAILS`): receita mensal, lojas pagas, em teste e vencidas, busca, ver vitrine, liberar 30 dias, encerrar acesso, gerar senha nova, bloquear e desbloquear, e pagamentos recentes.
+- **Assinatura**: um plano só, mensal pelo Mercado Pago (R$ 47 por padrão), com dias de teste para contas novas. Quando vence ou não é pago, a vitrine sai do ar para as clientes até o pagamento. A lojista continua entrando no painel e não perde nada.
 
 ## Rodar no computador
 
@@ -19,7 +19,7 @@ npm start               # abre em http://localhost:3000
 npm test                # testes automáticos
 ```
 
-Sem `MP_ACCESS_TOKEN` e fora de produção, o botão "Assinar Pro" simula o pagamento, para testar.
+Sem `MP_ACCESS_TOKEN` e fora de produção, o botão "Assinar" simula o pagamento, para testar.
 
 ## Colocar no ar
 

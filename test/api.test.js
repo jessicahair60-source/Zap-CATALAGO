@@ -8,7 +8,6 @@ const path = require('path');
 process.env.DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'vz-test-'));
 process.env.ADMIN_EMAILS = 'dona@teste.com';
 process.env.PUBLIC_URL = 'http://localhost';
-process.env.FREE_PRODUCT_LIMIT = '2';
 delete process.env.MP_ACCESS_TOKEN;
 const app = require('../server');
 const { crc16, pixPayload } = require('../lib/pix');
@@ -76,7 +75,6 @@ test('fluxo completo da lojista', async () => {
   r = await c('PUT', '/api/store', { state: bad }); assert.strictEqual(r.json.state.products[0].link, '');
   r = await c('PUT', '/api/store', { state: st }); assert.strictEqual(r.status, 200);
 
-  // teste do Pro: todos os produtos aparecem; depois de passar para grátis, só o limite
   assert.strictEqual((r.text.match(/"name":"Produto \d"/g) || []).length, 3);
 
   // link: reservado, inválido e válido
@@ -94,7 +92,7 @@ test('fluxo completo da lojista', async () => {
   assert.deepStrictEqual(r.json.totals, { view: 2, pview: 1, click: 1, order: 1 }); assert.strictEqual(r.json.top[0].id, '2'); assert.strictEqual(r.json.series.length, 7);
 
   // assinatura em modo de teste
-  r = await c('POST', '/api/billing/checkout'); assert.strictEqual(r.status, 200); assert.strictEqual(r.json.simulated, true); assert.strictEqual(r.json.store.plan, 'pro');
+  r = await c('POST', '/api/billing/checkout'); assert.strictEqual(r.status, 200); assert.strictEqual(r.json.simulated, true); assert.strictEqual(r.json.store.plan, 'pro'); assert.strictEqual(r.json.store.proPrice, 47);
 
   // domínio próprio (Pro) e acesso pelo domínio
   r = await c('PUT', '/api/domain', { domain: 'https://www.anamodas.com.br/' }); assert.strictEqual(r.status, 200); assert.strictEqual(r.json.store.customDomain, 'anamodas.com.br');
@@ -116,11 +114,12 @@ test('painel da dona da plataforma', async () => {
   const ana = r.json.stores.find(s => s.slug === 'ana-modas'); assert.ok(ana); assert.strictEqual(ana.plan, 'pro');
   assert.ok(r.json.metrics.mrr > 0); assert.strictEqual(r.json.payments.length, 1);
 
-  // passar para grátis: só os primeiros produtos aparecem e o domínio para
-  r = await dona('POST', `/api/admin/stores/${ana.id}`, { action: 'setFree' }); assert.strictEqual(r.status, 200);
+  // encerrar acesso: vitrine e domínio saem do ar; liberar 30 dias volta
+  r = await dona('POST', `/api/admin/stores/${ana.id}`, { action: 'expire' }); assert.strictEqual(r.status, 200);
   const pub = client();
-  r = await pub('GET', '/ana-modas'); assert.strictEqual((r.text.match(/"name":"Produto \d"/g) || []).length, 2);
+  r = await pub('GET', '/ana-modas'); assert.strictEqual(r.status, 402); assert.doesNotMatch(r.text, /Produto 1/);
   r = await pub('GET', '/', null, { 'X-Forwarded-Host': 'anamodas.com.br' }); assert.strictEqual(r.status, 402);
+  r = await dona('POST', `/api/admin/stores/${ana.id}`, { action: 'givePro', days: 30 }); assert.strictEqual(r.status, 200);
 
   // bloquear tira a vitrine do ar
   r = await dona('POST', `/api/admin/stores/${ana.id}`, { action: 'block', reason: 'teste' }); assert.strictEqual(r.status, 200);

@@ -13,8 +13,7 @@ const CFG = {
   brand: process.env.BRAND_NAME || 'Vitrine Zap',
   publicUrl: (process.env.PUBLIC_URL || 'http://localhost:3000').replace(/\/$/, ''),
   baseDomain: (process.env.BASE_DOMAIN || '').toLowerCase(),
-  proPrice: parseFloat(process.env.PLAN_PRO_PRICE || '29.90'),
-  freeLimit: parseInt(process.env.FREE_PRODUCT_LIMIT || '10', 10),
+  proPrice: parseFloat(process.env.PLAN_PRICE || '47.00'),
   trialDays: parseInt(process.env.TRIAL_DAYS || '7', 10),
   admins: (process.env.ADMIN_EMAILS || '').toLowerCase().split(',').map(s => s.trim()).filter(Boolean),
   fakePayments: !mp.enabled() && process.env.NODE_ENV !== 'production'
@@ -46,19 +45,19 @@ function uniqueSlug(base) {
   return candidate;
 }
 
-// Plano em vigor: Pro pago, Pro em teste grátis, ou Grátis
+// Situação da assinatura: paga, em teste grátis, ou vencida (vitrine sai do ar até pagar)
 function planOf(store) {
   if (store.pro_until && store.pro_until > now()) return 'pro';
   if (store.trial_until && store.trial_until > now()) return 'trial';
-  return 'free';
+  return 'expired';
 }
-const isPro = store => planOf(store) !== 'free';
+const isPro = store => planOf(store) !== 'expired';
 
 function storeInfo(store) {
   return {
     id: store.id, slug: store.slug, name: store.name, plan: planOf(store), proUntil: store.pro_until, trialUntil: store.trial_until,
     subscribed: !!store.mp_preapproval, customDomain: store.custom_domain, blocked: !!store.blocked, blockedReason: store.blocked_reason,
-    publicUrl: publicUrlOf(store), freeLimit: CFG.freeLimit, proPrice: CFG.proPrice, brand: CFG.brand, payments: mp.enabled() ? 'mercadopago' : CFG.fakePayments ? 'teste' : 'off'
+    publicUrl: publicUrlOf(store), proPrice: CFG.proPrice, brand: CFG.brand, payments: mp.enabled() ? 'mercadopago' : CFG.fakePayments ? 'teste' : 'off'
   };
 }
 function publicUrlOf(store) {
@@ -163,14 +162,7 @@ function publicState(store) {
   let state = null;
   try { state = JSON.parse(store.state || 'null'); } catch (e) { state = null; }
   if (!state) return null;
-  const pro = isPro(store);
-  // Plano grátis: só os primeiros produtos ativos aparecem
-  if (!pro && Array.isArray(state.products)) {
-    let n = 0;
-    state.products = state.products.filter(p => p.active === false || n++ < CFG.freeLimit);
-  }
   if (state.store) {
-    if (!pro) { delete state.store.metaPixel; delete state.store.gaId; }
     delete state.store.p2; delete state.store.p3; delete state.store.p4; delete state.store.p5;
   }
   return state;
@@ -187,9 +179,10 @@ function trackingTags(st) {
 
 function renderStore(res, store) {
   if (store.blocked) return res.status(403).send(simplePage('Loja indisponível', 'Esta vitrine está temporariamente indisponível.'));
+  if (!isPro(store)) return res.status(402).send(simplePage(store.name, 'Esta vitrine está indisponível no momento. Volte em breve!'));
   const state = publicState(store);
   const st = (state && state.store) || {};
-  const boot = { mode: 'store', state, store: { slug: store.slug, name: store.name, pro: isPro(store), publicUrl: publicUrlOf(store) }, brand: CFG.brand, home: CFG.publicUrl };
+  const boot = { mode: 'store', state, store: { slug: store.slug, name: store.name, publicUrl: publicUrlOf(store) }, brand: CFG.brand, home: CFG.publicUrl };
   const title = escHtml(st.name || store.name);
   const desc = escHtml(st.bio || `Catálogo de ${store.name}`);
   const img = st.bannerImgM || st.bannerImg || st.logo || '';
@@ -316,7 +309,7 @@ app.put('/api/slug', jsonBody, auth, (req, res) => {
 
 app.put('/api/domain', jsonBody, auth, (req, res) => {
   const raw = String(req.body.domain || '').trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '').replace(/^www\./, '');
-  if (raw && !isPro(req.store)) return res.status(402).json({ error: 'Domínio próprio é um recurso do plano Pro.' });
+  if (raw && !isPro(req.store)) return res.status(402).json({ error: 'Sua assinatura está vencida. Assine para usar o domínio próprio.' });
   if (raw && !/^(?=.{4,253}$)([a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/.test(raw)) return res.status(400).json({ error: 'Domínio inválido. Exemplo: minhaloja.com.br' });
   if (raw && (raw === CFG.baseDomain || raw.endsWith('.' + CFG.baseDomain) && CFG.baseDomain)) return res.status(400).json({ error: 'Use um domínio seu, não o da plataforma.' });
   const other = raw && db.prepare('SELECT id FROM stores WHERE custom_domain = ?').get(raw);
@@ -379,7 +372,7 @@ app.post('/api/billing/checkout', auth, async (req, res) => {
   const s = req.store;
   try {
     if (mp.enabled()) {
-      const sub = await mp.createSubscription({ storeId: s.id, email: req.user.email, price: CFG.proPrice, reason: `${CFG.brand} Pro - ${s.name}`, backUrl: `${CFG.publicUrl}/painel?assinatura=ok` });
+      const sub = await mp.createSubscription({ storeId: s.id, email: req.user.email, price: CFG.proPrice, reason: `${CFG.brand} - ${s.name}`, backUrl: `${CFG.publicUrl}/painel?assinatura=ok` });
       db.prepare('UPDATE stores SET mp_preapproval = ?, updated_at = ? WHERE id = ?').run(sub.id, now(), s.id);
       return res.json({ url: sub.init_point });
     }
@@ -450,7 +443,7 @@ app.get('/api/admin/overview', adminOnly, (req, res) => {
   const views30 = db.prepare("SELECT COALESCE(SUM(n), 0) AS t FROM events WHERE type = 'view' AND day >= ?").get(new Date(now() - 29 * DAY).toISOString().slice(0, 10)).t;
   res.json({
     brand: CFG.brand, proPrice: CFG.proPrice,
-    metrics: { total: list.length, paying, trial: list.filter(s => s.plan === 'trial').length, free: list.filter(s => s.plan === 'free').length,
+    metrics: { total: list.length, paying, trial: list.filter(s => s.plan === 'trial').length, expired: list.filter(s => s.plan === 'expired').length,
       blocked: list.filter(s => s.blocked).length, newWeek: stores.filter(s => s.created_at > week).length, mrr: paying * CFG.proPrice, revenue30, views30 },
     stores: list,
     payments: db.prepare('SELECT p.*, s.name FROM payments p JOIN stores s ON s.id = p.store_id ORDER BY p.created_at DESC LIMIT 30').all()
@@ -466,7 +459,7 @@ app.post('/api/admin/stores/:id', adminOnly, jsonBody, (req, res) => {
   else if (a === 'givePro') {
     const days = Math.min(3650, Math.max(1, parseInt(req.body.days, 10) || 30));
     db.prepare('UPDATE stores SET pro_until = ?, updated_at = ? WHERE id = ?').run(Math.max(now(), s.pro_until || 0) + days * DAY, now(), s.id);
-  } else if (a === 'setFree') db.prepare('UPDATE stores SET pro_until = NULL, trial_until = NULL, updated_at = ? WHERE id = ?').run(now(), s.id);
+  } else if (a === 'expire') db.prepare('UPDATE stores SET pro_until = NULL, trial_until = NULL, updated_at = ? WHERE id = ?').run(now(), s.id);
   else if (a === 'resetPassword') {
     const temp = crypto.randomBytes(5).toString('hex');
     db.prepare('UPDATE users SET pass = ? WHERE id = ?').run(hashPass(temp), s.user_id);

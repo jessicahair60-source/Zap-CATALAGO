@@ -6,7 +6,7 @@
 <title>Vitrine Zap · Sua vitrine com pedido no WhatsApp</title>
 <meta name="description" content="Crie em minutos uma vitrine bonita para o link da bio, com catálogo, vídeos e pedidos direto no seu WhatsApp.">
 <meta property="og:title" content="Vitrine Zap · Sua vitrine com pedido no WhatsApp">
-<meta property="og:description" content="Link da bio com catálogo, vídeos e pedido pronto no WhatsApp. Teste 7 dias grátis.">
+<meta property="og:description" content="Link da bio com catálogo, vídeos e pedido pronto no WhatsApp. R$ 47 por mês, com 7 dias para testar.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="/static/site.css">
@@ -43,7 +43,7 @@
   .plans { display: grid; gap: 16px; margin-top: 26px; }
   .plan { background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: 24px; display: grid; gap: 12px; align-content: start; }
   .plan.pro { border: 2px solid var(--acc); position: relative; }
-  .plan.pro::after { content: "Mais escolhido"; position: absolute; top: -12px; right: 20px; background: var(--acc); color: #fff; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 99px; }
+  .plan.pro::after { content: "7 dias para testar"; position: absolute; top: -12px; right: 20px; background: var(--acc); color: #fff; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 99px; }
   .plan h3 { font-size: 20px; } .price { font: 800 34px var(--f-display); } .price small { font: 500 14px var(--f-body); color: var(--muted); }
   .plan ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 14.5px; }
   .plan li::before { content: "✓"; color: var(--acc); font-weight: 800; margin-right: 8px; }
@@ -59,7 +59,7 @@
     .hero { grid-template-columns: 1.15fr .85fr; padding-top: 50px; }
     .feats { grid-template-columns: repeat(3, 1fr); }
     .steps { grid-template-columns: repeat(3, 1fr); }
-    .plans { grid-template-columns: 1fr 1fr; max-width: 760px; }
+    .plans { max-width: 440px; }
   }
 </style>
 </head>
@@ -67,7 +67,7 @@
 <div class="container">
   <nav class="nav">
     <a class="logo" href="/"><i>V</i>Vitrine Zap</a>
-    <div class="nav-links"><a class="btn ghost" href="/entrar">Entrar</a><a class="btn" href="/cadastro">Criar grátis</a></div>
+    <div class="nav-links"><a class="btn ghost" href="/entrar">Entrar</a><a class="btn" href="/cadastro">Testar 7 dias</a></div>
   </nav>
 
   <header class="hero">
@@ -75,7 +75,7 @@
       <h1>Sua vitrine no link da bio, com pedido <em>direto no WhatsApp</em></h1>
       <p class="lead">Mostre seus produtos com fotos e vídeos, deixe a cliente escolher e receba o pedido pronto no seu WhatsApp. Sem site complicado, sem taxa por venda.</p>
       <div class="cta"><a class="btn big" href="/cadastro">Criar minha vitrine</a><a class="btn big soft" href="#planos">Ver planos</a>
-        <small>7 dias do plano Pro grátis. Não pedimos cartão para testar.</small></div>
+        <small>7 dias para testar sem pagar nada. Depois, R$ 47 por mês.</small></div>
     </div>
     <div class="phone" aria-hidden="true"><div class="screen">
       <div class="sb"><small>Nova coleção</small><b>Sua loja</b></div>
@@ -113,14 +113,11 @@
 
   <section class="blk" id="planos">
     <p class="eyebrow">Planos</p>
-    <h2>Comece grátis. Assine quando quiser crescer.</h2>
+    <h2>Um plano só, com tudo incluído</h2>
     <div class="plans">
-      <div class="plan"><h3>Grátis</h3><div class="price">R$ 0 <small>para sempre</small></div>
-        <ul><li>Até 10 produtos na vitrine</li><li>Pedido no WhatsApp e Pix</li><li>Fotos e vídeos</li><li>Relatórios de visitas</li></ul>
-        <a class="btn soft" href="/cadastro">Começar grátis</a></div>
-      <div class="plan pro"><h3>Pro</h3><div class="price">R$ 29,90 <small>por mês</small></div>
-        <ul><li>Produtos ilimitados</li><li>Sem a nossa marca no rodapé</li><li>Pixel do Meta e Google Analytics</li><li>Domínio próprio (www.sualoja.com.br)</li><li>Tudo do plano Grátis</li></ul>
-        <a class="btn" href="/cadastro">Testar 7 dias grátis</a></div>
+      <div class="plan pro"><h3>Vitrine Zap</h3><div class="price">R$ 47 <small>por mês</small></div>
+        <ul><li>Produtos, fotos e vídeos ilimitados</li><li>Pedido pronto no WhatsApp</li><li>Pix com QR Code no valor do pedido</li><li>Relatórios de visitas, cliques e pedidos</li><li>Pixel do Meta e Google Analytics</li><li>Domínio próprio (www.sualoja.com.br)</li><li>Sem taxa por venda</li></ul>
+        <a class="btn" href="/cadastro">Testar 7 dias</a><small class="note" style="text-align:center">Cancele quando quiser, direto no painel.</small></div>
     </div>
   </section>
 
@@ -128,16 +125,16 @@
     <p class="eyebrow">Dúvidas</p>
     <h2>Perguntas frequentes</h2>
     <div class="faq">
-      <details><summary>Vocês cobram taxa por venda?</summary><p>Não. Você paga só a mensalidade do plano Pro, se quiser. O pagamento da cliente vai direto para você.</p></details>
+      <details><summary>Vocês cobram taxa por venda?</summary><p>Não. Você paga só a mensalidade de R$ 47. O pagamento da cliente vai direto para você.</p></details>
       <details><summary>Preciso de CNPJ?</summary><p>Não. Funciona para quem vende como pessoa física ou como empresa.</p></details>
-      <details><summary>Como cancelo o Pro?</summary><p>No próprio painel, em um toque. Você continua com o Pro até o fim do mês pago e depois volta para o plano Grátis, sem perder seus produtos.</p></details>
+      <details><summary>Como cancelo?</summary><p>No próprio painel, em um toque. A vitrine fica no ar até o fim do mês pago. Seus produtos continuam salvos se quiser voltar.</p></details>
       <details><summary>Posso usar no computador?</summary><p>Sim. A vitrine e o painel se ajustam ao celular e ao computador.</p></details>
     </div>
   </section>
 
   <section class="final">
     <h2>Sua próxima venda começa no link da bio</h2>
-    <p>Crie sua vitrine agora e teste o Pro por 7 dias.</p>
+    <p>Crie sua vitrine agora e teste por 7 dias.</p>
     <a class="btn big" href="/cadastro">Criar minha vitrine</a>
   </section>
 
