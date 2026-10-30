@@ -1269,7 +1269,7 @@ function renderPainel() {
     ${MODE === 'panel' ? planCard() : ''}
     <div class="stats">
       <div class="stat"><b>${active}</b><span>produtos ativos</span></div>
-      <div class="stat"><b>${S.products.filter(p => p.stock <= 0).length}</b><span>sem estoque</span></div>
+      <div class="stat"><b>${S.products.filter(p => soldOut(p)).length}</b><span>sem estoque</span></div>
       <div class="stat"><b>${S.products.filter(p => firstVid(p)).length}</b><span>com vídeo</span></div>
     </div>
     <h3 class="pgroup">Produtos<small>Cadastre, organize e controle o estoque</small></h3>
