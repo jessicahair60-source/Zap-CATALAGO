@@ -8,6 +8,7 @@ Plataforma de vitrines para o link da bio: catálogo com fotos e vídeos, pedido
 - **Vitrine de cada loja** em `/nome-da-loja`, em `nome-da-loja.SEU_DOMINIO` (com `BASE_DOMAIN`) ou no domínio próprio da lojista.
 - **Painel da lojista** (`/painel`): link da vitrine com copiar e compartilhar, chave no ar e fora do ar, produtos, fotos e vídeos, banner, cores, Pix, relatórios, Pixel do Meta, Google Analytics, domínio próprio, assinatura e troca de senha.
 - **Painel da plataforma** (`/admin`, só para os e-mails em `ADMIN_EMAILS`): receita mensal, lojas pagas, em teste e vencidas, busca, ver vitrine, liberar 30 dias, encerrar acesso, gerar senha nova, bloquear e desbloquear, e pagamentos recentes.
+- **Cadastro pelo WhatsApp**: a lojista liga o celular dela no painel e manda foto + texto no modelo para o número do robô. O produto entra no catálogo na hora. Configuração em [WHATSAPP.md](WHATSAPP.md).
 - **Assinatura**: um plano só, mensal pelo Mercado Pago (R$ 47 por padrão), com dias de teste para contas novas. Quando vence ou não é pago, a vitrine sai do ar para as clientes até o pagamento. A lojista continua entrando no painel e não perde nada.
 
 ## Rodar no computador
@@ -53,9 +54,11 @@ Precisa de um servidor com Node.js 20 ou mais novo e um disco que não seja apag
 | `lib/db.js` | Banco SQLite (tabelas criadas sozinhas na primeira vez) |
 | `lib/pix.js` | Código Pix copia e cola |
 | `lib/mercadopago.js` | Assinatura mensal no Mercado Pago |
+| `lib/whatsapp.js` | WhatsApp oficial da Meta: receber e responder mensagens |
+| `lib/wabot.js` | Robô que lê o modelo de texto e cadastra o produto |
 | `public/app.html` | Vitrine e painel da lojista. **Gerado** por `npm run build` a partir de `tools/prototipo.html` (o protótipo aprovado) e `tools/build_app.py` |
 | `public/*.html` | Página de vendas, entrar, termos, privacidade e painel da plataforma |
-| `test/api.test.js` | Testes de ponta a ponta |
+| `test/*.test.js` | Testes de ponta a ponta |
 
 Para mudar o visual da vitrine ou do painel, edite `tools/prototipo.html` (ou as trocas em `tools/build_app.py`) e rode `npm run build`.
 

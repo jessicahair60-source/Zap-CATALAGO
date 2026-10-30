@@ -291,5 +291,71 @@ rep("""/* Cards sem moldura */""", """/* Versão com servidor */
 .pixcode { display: grid; gap: 8px; } .pixcode code { font-size: 10.5px; word-break: break-all; background: var(--c-bg); padding: 8px; border-radius: 8px; max-height: 64px; overflow: auto; }
 /* Cards sem moldura */""")
 
+# ---------- robô do WhatsApp: seção no painel e produtos que chegam enquanto o painel está aberto ----------
+rep("""const sync = { t: 0, busy: false, dirty: false };""", """const sync = { t: 0, busy: false, dirty: false, base: (BOOT.store && BOOT.store.savedAt) || 0 };""")
+rep("""body: JSON.stringify({ state: S }) });""", """body: JSON.stringify({ state: S, base: sync.base }) });""")
+rep("""    swapUrls(S, j.state); setSaveState""", """    swapUrls(S, j.state); mergeWa(j.state.products, j.state.cats); sync.base = j.savedAt || sync.base; setSaveState""")
+rep("""    <h3 class="pgroup">Produtos<small>Cadastre, organize e controle o estoque</small></h3>""",
+"""    <h3 class="pgroup">Produtos<small>Cadastre, organize e controle o estoque</small></h3>
+    ${MODE === 'panel' ? sec('whats', 'Cadastrar pelo WhatsApp', 'Mande foto e texto, o produto entra sozinho', '<div id="wabox"><p class="note">Carregando...</p></div>') : ''}""")
+rep("""  const rel = document.querySelector('details[data-sec="relatorio"]');""", """  const wsec = document.querySelector('details[data-sec="whats"]');
+  wsec.addEventListener('toggle', () => { if (wsec.open) loadWa(); }); if (wsec.open) loadWa();
+  const rel = document.querySelector('details[data-sec="relatorio"]');""")
+rep("""async function loadStats() {""", """// Produtos que o robô do WhatsApp cadastrou entram no painel sem recarregar a página
+function mergeWa(list, cats) {
+  let added = [];
+  (list || []).forEach(p => { if (!p.waAt) return;
+    const cur = S.products.find(x => String(x.id) === String(p.id));
+    if (!cur) { if (p.waAt > sync.base) { S.products.unshift(normP(p)); added.push(p.name); } }
+    else if (p.waAt > (cur.waAt || 0)) { cur.media = p.media; cur.waAt = p.waAt; } });
+  (cats || []).forEach(c => { if (!S.cats.includes(c) && S.products.some(p => p.cat === c)) S.cats.push(c); });
+  if (!added.length) return;
+  hydrateMedia();
+  toast(added.length === 1 ? `Chegou pelo WhatsApp: ${added[0]}` : `${added.length} produtos chegaram pelo WhatsApp`);
+  const a = document.activeElement;
+  if (!(a && a.closest && a.closest('#view-painel') && a.matches('input, textarea, select'))) { if ($('#view-painel').hidden) renderLoja(); else renderPainel(); }
+  if (typeof pvPush === 'function') pvPush();
+}
+async function pollWa() {
+  if (document.hidden || sync.busy) return;
+  try { const j = await api('GET', '/api/wa/new?since=' + sync.base); mergeWa(j.products, j.cats); j.products.forEach(p => { sync.base = Math.max(sync.base, p.waAt); }); } catch (e) {}
+}
+if (MODE === 'panel') setInterval(pollWa, 20000);
+let WA = null;
+async function loadWa(force) {
+  const box = $('#wabox'); if (!box) return;
+  try { if (!WA || force) WA = await api('GET', '/api/wa'); renderWa(); } catch (e) { box.innerHTML = `<p class="note">${esc(e.message)}</p>`; }
+}
+const fmtPhone = p => '+' + String(p).replace(/^(\\d{2})(\\d{2})(\\d{4,5})(\\d{4})$/, '$1 ($2) $3-$4');
+function renderWa() {
+  const box = $('#wabox'); if (!box || !WA) return;
+  if (!WA.enabled) { box.innerHTML = '<p class="note">O cadastro pelo WhatsApp ainda não foi ligado na plataforma. Em breve!</p>'; return; }
+  const link = WA.code && WA.number ? `https://wa.me/${WA.number}?text=${encodeURIComponent('ZAP-' + WA.code)}` : '';
+  box.innerHTML = `<p class="note" style="margin:0 0 12px">Mande a foto do produto com o texto no modelo para o WhatsApp ${WA.number ? `<b>${fmtPhone(WA.number)}</b>` : 'da plataforma'}. O produto aparece na sua vitrine na hora.</p>
+    ${WA.phones.length ? `<div class="opt-label">Números ligados à sua loja</div><div class="walist">${WA.phones.map(p => `<div class="warow"><span>${fmtPhone(p.phone)}</span><button class="tg danger" data-waoff="${esc(p.phone)}">Desligar</button></div>`).join('')}</div>` : ''}
+    ${WA.code ? `<div class="wacode"><small>Seu código</small><b>ZAP-${esc(WA.code)}</b><span>Mande este código, do seu celular, para o WhatsApp do robô. Vale por 30 minutos.</span>
+        ${link ? `<a class="pbtn" href="${link}" target="_blank" rel="noopener">Abrir o WhatsApp com o código</a>` : ''}<button class="tg" id="wacheck">Já mandei</button></div>`
+      : `<button class="pbtn ${WA.phones.length ? 'ghost' : ''}" id="wacode">${WA.phones.length ? 'Ligar outro número' : 'Ligar meu WhatsApp'}</button>`}
+    <div class="opt-label" style="margin-top:16px">Modelo da mensagem</div>
+    <pre class="watpl">${esc(WA.template)}</pre>
+    <button class="tg" id="watplcopy">Copiar modelo</button>
+    <p class="note">Nome e Preço são obrigatórios. Pode mandar várias fotos antes do texto. Fotos sem legenda logo depois do cadastro entram no mesmo produto.</p>`;
+  if ($('#wacode')) $('#wacode').onclick = async () => { try { WA = await api('POST', '/api/wa/code'); renderWa(); } catch (e) { toast(e.message); } };
+  if ($('#wacheck')) $('#wacheck').onclick = async () => { const n = WA.phones.length; await loadWa(true); toast(WA.phones.length > n ? 'WhatsApp ligado!' : 'Ainda não chegou. Confira se mandou o código certinho.'); };
+  $('#watplcopy').onclick = async () => toast(await copyText(WA.template) ? 'Modelo copiado' : 'Não deu para copiar');
+  box.querySelectorAll('[data-waoff]').forEach(b => b.onclick = async () => { if (!confirm('Desligar este número? Ele não vai mais cadastrar produtos na sua loja.')) return;
+    try { WA = await api('DELETE', '/api/wa/phone/' + b.dataset.waoff); renderWa(); toast('Número desligado'); } catch (e) { toast(e.message); } });
+}
+async function loadStats() {""")
+rep("""/* Cards sem moldura */""", """.walist { display: grid; gap: 6px; margin: 6px 0 12px; }
+.warow { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--p-soft); border-radius: 12px; padding: 8px 10px 8px 12px; font-size: 14px; font-variant-numeric: tabular-nums; }
+.wacode { display: grid; gap: 8px; text-align: center; background: var(--p-soft); border-radius: 16px; padding: 14px; }
+.wacode small { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--p-muted); }
+.wacode b { font-size: 28px; letter-spacing: .08em; font-variant-numeric: tabular-nums; }
+.wacode span { font-size: 12.5px; color: var(--p-muted); }
+.wacode a.pbtn { text-decoration: none; display: block; }
+.watpl { margin: 6px 0 8px; background: var(--p-soft); border-radius: 12px; padding: 10px 12px; font: 12.5px/1.5 ui-monospace, Menlo, Consolas, monospace; white-space: pre-wrap; }
+/* Cards sem moldura */""")
+
 open(os.path.join(ROOT, 'public', 'app.html'), 'w', encoding='utf-8').write(s)
 print('public/app.html gerado')

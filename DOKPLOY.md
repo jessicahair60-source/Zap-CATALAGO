@@ -51,6 +51,11 @@ TRIAL_DAYS=7
 MP_ACCESS_TOKEN=
 MP_WEBHOOK_SECRET=
 BASE_DOMAIN=
+WA_TOKEN=
+WA_PHONE_ID=
+WA_NUMBER=
+WA_VERIFY_TOKEN=
+WA_APP_SECRET=
 ```
 
 Deixe `BASE_DOMAIN` vazio por enquanto. Assim as lojas ficam em `seu-dominio.com.br/nome-da-loja`.
@@ -92,6 +97,10 @@ Abra `https://seu-dominio.com.br/cadastro` e crie a conta com o e-mail que está
 2. Em **Suas integrações > Webhooks**, cadastre a URL `https://seu-dominio.com.br/api/webhooks/mp` e marque os eventos de **Planos e assinaturas**.
 3. Copie a **assinatura secreta** do webhook.
 4. No Dokploy, aba Environment, preencha `MP_ACCESS_TOKEN` e `MP_WEBHOOK_SECRET`, salve e clique em **Deploy** de novo.
+
+## 10. Robô do WhatsApp (opcional)
+
+Siga o [WHATSAPP.md](WHATSAPP.md), preencha as variáveis `WA_` no Environment e clique em **Deploy**.
 
 ## Lojas em subdomínio (opcional)
 

@@ -8,6 +8,8 @@ const QRCode = require('qrcode');
 const { db, DATA_DIR } = require('./lib/db');
 const { pixPayload } = require('./lib/pix');
 const mp = require('./lib/mercadopago');
+const wa = require('./lib/whatsapp');
+const { createBot, TEMPLATE: WA_TEMPLATE } = require('./lib/wabot');
 
 const CFG = {
   brand: process.env.BRAND_NAME || 'Vitrine Zap',
@@ -57,7 +59,7 @@ function storeInfo(store) {
   return {
     id: store.id, slug: store.slug, name: store.name, plan: planOf(store), proUntil: store.pro_until, trialUntil: store.trial_until,
     subscribed: !!store.mp_preapproval, customDomain: store.custom_domain, blocked: !!store.blocked, blockedReason: store.blocked_reason,
-    publicUrl: publicUrlOf(store), proPrice: CFG.proPrice, brand: CFG.brand, payments: mp.enabled() ? 'mercadopago' : CFG.fakePayments ? 'teste' : 'off'
+    publicUrl: publicUrlOf(store), proPrice: CFG.proPrice, brand: CFG.brand, payments: mp.enabled() ? 'mercadopago' : CFG.fakePayments ? 'teste' : 'off', savedAt: store.updated_at
   };
 }
 function publicUrlOf(store) {
@@ -161,7 +163,7 @@ function safeLinks(v, key) {
 function publicState(store) {
   let state = null;
   try { state = JSON.parse(store.state || 'null'); } catch (e) { state = null; }
-  if (!state) return null;
+  if (!state || state.v !== 4) return null; // loja que ainda não abriu o painel
   if (state.store) {
     delete state.store.p2; delete state.store.p3; delete state.store.p4; delete state.store.p5;
   }
@@ -294,8 +296,23 @@ app.put('/api/store', jsonBody, auth, (req, res) => {
   if (!state || typeof state !== 'object' || !Array.isArray(state.products)) return res.status(400).json({ error: 'Dados inválidos.' });
   const clean = safeLinks(externalize(req.store.id, state));
   const name = String((clean.store && clean.store.name) || req.store.name).slice(0, 80);
-  db.prepare('UPDATE stores SET state = ?, name = ?, updated_at = ? WHERE id = ?').run(JSON.stringify(clean), name, now(), req.store.id);
-  res.json({ ok: true, state: clean });
+  const t = db.transaction(() => {
+    // Produtos que o robô do WhatsApp criou depois que o painel abriu não podem sumir com este salvamento
+    const base = Number(req.body.base) || 0;
+    const cur = db.prepare('SELECT state FROM stores WHERE id = ?').get(req.store.id);
+    let old = null; try { old = JSON.parse(cur.state || 'null'); } catch (e) {}
+    const have = new Set(clean.products.map(p => String(p.id)));
+    const added = ((old && old.products) || []).filter(p => p.waAt && p.waAt > base && !have.has(String(p.id)));
+    if (added.length) {
+      clean.products = [...added, ...clean.products];
+      clean.cats = Array.isArray(clean.cats) ? clean.cats : [];
+      added.forEach(p => { if (p.cat && !clean.cats.includes(p.cat)) clean.cats.push(p.cat); });
+    }
+    const at = now();
+    db.prepare('UPDATE stores SET state = ?, name = ?, updated_at = ? WHERE id = ?').run(JSON.stringify(clean), name, at, req.store.id);
+    return at;
+  });
+  res.json({ ok: true, state: clean, savedAt: t() });
 });
 
 app.put('/api/slug', jsonBody, auth, (req, res) => {
@@ -428,6 +445,53 @@ app.post('/api/webhooks/mp', express.json(), async (req, res) => {
   } catch (e) { console.error('webhook', e.message); }
 });
 
+/* ---------- WhatsApp: cadastro de produtos pelo robô ---------- */
+const bot = createBot({
+  db, now, brand: CFG.brand, panelUrl: `${CFG.publicUrl}/painel`,
+  send: (to, text) => wa.enabled() ? wa.sendText(to, text) : console.log(`[robô -> ${to}] ${text}`),
+  download: id => wa.download(id),
+  saveFile,
+  storeOk: store => store.blocked ? 'Sua loja está bloqueada. Fale com o suporte.' : !isPro(store) ? `Sua assinatura está vencida. Assine no painel (${CFG.publicUrl}/painel) para voltar a cadastrar pelo WhatsApp.` : ''
+});
+app.get('/api/webhooks/wa', (req, res) => {
+  const ok = req.query['hub.mode'] === 'subscribe' && process.env.WA_VERIFY_TOKEN && req.query['hub.verify_token'] === process.env.WA_VERIFY_TOKEN;
+  ok ? res.type('text/plain').send(String(req.query['hub.challenge'] || '')) : res.sendStatus(403);
+});
+app.post('/api/webhooks/wa', express.raw({ type: '*/*', limit: '2mb' }), async (req, res) => {
+  const raw = Buffer.isBuffer(req.body) ? req.body : Buffer.from('');
+  if (!wa.validSignature(raw, req.headers['x-hub-signature-256'])) return res.sendStatus(401);
+  res.sendStatus(200);
+  let body; try { body = JSON.parse(raw.toString('utf8')); } catch (e) { return; }
+  for (const entry of body.entry || []) for (const ch of entry.changes || []) {
+    for (const msg of (ch.value && ch.value.messages) || []) {
+      try { await bot.handle(msg); } catch (e) { console.error('wa bot', e.message); }
+    }
+  }
+});
+function waInfo(store) {
+  const phones = db.prepare('SELECT phone, created_at FROM wa_links WHERE store_id = ? ORDER BY created_at').all(store.id);
+  const c = db.prepare('SELECT code, expires_at FROM wa_codes WHERE store_id = ? AND expires_at > ? ORDER BY expires_at DESC').get(store.id, now());
+  return { enabled: wa.enabled() || CFG.fakePayments, number: wa.number(), phones, code: c ? c.code : null, codeUntil: c ? c.expires_at : null, template: WA_TEMPLATE };
+}
+app.get('/api/wa', auth, (req, res) => res.json(waInfo(req.store)));
+app.post('/api/wa/code', auth, (req, res) => {
+  db.prepare('DELETE FROM wa_codes WHERE store_id = ? OR expires_at < ?').run(req.store.id, now());
+  let code; do { code = String(crypto.randomInt(100000, 1000000)); } while (db.prepare('SELECT 1 FROM wa_codes WHERE code = ?').get(code));
+  db.prepare('INSERT INTO wa_codes (code, store_id, expires_at) VALUES (?, ?, ?)').run(code, req.store.id, now() + 30 * 60 * 1000);
+  res.json(waInfo(req.store));
+});
+app.delete('/api/wa/phone/:phone', auth, (req, res) => {
+  db.prepare('DELETE FROM wa_links WHERE store_id = ? AND phone = ?').run(req.store.id, String(req.params.phone).replace(/\D/g, ''));
+  res.json(waInfo(req.store));
+});
+// O painel pergunta de vez em quando se o robô cadastrou algo novo
+app.get('/api/wa/new', auth, (req, res) => {
+  const since = Number(req.query.since) || 0;
+  const row = db.prepare('SELECT state, updated_at FROM stores WHERE id = ?').get(req.store.id);
+  let st = null; try { st = JSON.parse(row.state || 'null'); } catch (e) {}
+  const products = ((st && st.products) || []).filter(p => p.waAt && p.waAt > since);
+  res.json({ products, cats: (st && st.cats) || [], savedAt: row.updated_at });
+});
 /* ---------- painel da dona da plataforma ---------- */
 app.get('/api/admin/overview', adminOnly, (req, res) => {
   const stores = db.prepare('SELECT s.*, u.name AS owner, u.email FROM stores s JOIN users u ON u.id = s.user_id ORDER BY s.created_at DESC').all();
