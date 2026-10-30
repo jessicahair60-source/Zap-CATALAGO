@@ -1,0 +1,290 @@
+# Gera public/app.html (vitrine + painel ligados ao servidor) a partir do protótipo aprovado.
+# Uso: python3 tools/build_app.py
+import os
+ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+s = open(os.path.join(ROOT, 'tools', 'prototipo.html'), encoding='utf-8').read()
+
+def rep(a, b, cnt=1):
+    global s
+    assert s.count(a) == cnt, (a[:100], s.count(a))
+    s = s.replace(a, b)
+
+# ---------- documento completo ----------
+rep('<title>Vitrine Zap</title>\n<meta name="claude:viewport-fit-sides" content="cover">\n',
+    '<!doctype html>\n<html lang="pt-BR">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n<!--HEAD-->\n')
+i = s.index('</style>') + len('</style>')
+s = s[:i] + '\n</head>\n<body>\n<!--BOOT-->' + s[i:] + '\n</body>\n</html>\n'
+
+# ---------- barra do topo (só no painel) ----------
+rep('<span class="demo-tag">Protótipo</span>', '<span class="demo-tag" id="brandtag">Protótipo</span><span class="savest" id="savest" hidden></span>')
+rep('<button id="tab-loja" aria-pressed="true">Vitrine da cliente</button>', '<button id="tab-loja" aria-pressed="true">Ver como cliente</button>')
+rep('<button id="tab-painel" aria-pressed="false">Painel da lojista</button>\n  </div>', '<button id="tab-painel" aria-pressed="false">Painel</button>\n  </div>\n  <a class="tlink" id="logout" href="/sair" hidden>Sair</a>')
+
+# ---------- dados: vêm do servidor ----------
+rep("""const KEY = 'vitrinezap5';
+let S;
+try { S = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { S = null; }
+if (!S || S.v !== 4) S = JSON.parse(JSON.stringify(DEFAULT));""",
+"""const BOOT = window.__BOOT__ || { mode: 'demo' };
+const MODE = BOOT.mode; // 'store' = vitrine pública, 'panel' = painel da lojista, 'demo' = protótipo offline
+document.body.classList.add('m-' + MODE);
+const KEY = 'vitrinezap5';
+let S = null, FRESH = false;
+if (MODE === 'demo') { try { S = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { S = null; } }
+else S = BOOT.state;
+const EMPTY_STORE = MODE === 'store' && !S;
+if (!S || S.v !== 4) {
+  S = JSON.parse(JSON.stringify(DEFAULT)); FRESH = MODE === 'panel';
+  if (FRESH) { // loja nova: nome dela, sem produtos nem depoimentos de exemplo
+    Object.assign(S.store, { name: BOOT.store.name, bannerKicker: 'Bem-vinda', bannerTitle: BOOT.store.name, bio: 'Escreva aqui uma frase sobre a sua loja', phone: '', coupon: '', footer: '', layout: 'list' });
+    S.cats = ['Novidades']; S.products = []; S.testimonials = [];
+    S.links.forEach(l => { l.value = ''; l.on = l.type === 'zap'; });
+  }
+}""")
+rep("""if (!S.testimonials) S.testimonials = JSON.parse(JSON.stringify(DEFAULT_TESTI));""",
+    """if (!S.testimonials) S.testimonials = FRESH ? [] : JSON.parse(JSON.stringify(DEFAULT_TESTI));""")
+
+# salvar: no painel vai para o servidor (com espera curta para juntar várias mudanças)
+rep("""function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { toast('Não deu para salvar neste navegador. A imagem do banner pode estar grande demais.'); } }""",
+"""function save() {
+  if (MODE === 'panel') return scheduleSync();
+  if (MODE === 'demo') try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { toast('Não deu para salvar neste navegador. A imagem do banner pode estar grande demais.'); }
+}
+const sync = { t: 0, busy: false, dirty: false };
+function setSaveState(st) { const el = document.getElementById('savest'); if (!el) return; el.hidden = false; el.dataset.st = st;
+  el.textContent = st === 'ok' ? 'Salvo' : st === 'err' ? 'Não salvou' : 'Salvando...'; }
+function scheduleSync() { sync.dirty = true; setSaveState('pending'); clearTimeout(sync.t); sync.t = setTimeout(runSync, 700); }
+// Troca as imagens enviadas como data: pelos endereços que o servidor guardou
+function swapUrls(a, b) { if (!a || !b || typeof a !== 'object') return;
+  for (const k of Object.keys(a)) { const x = a[k], y = b[k];
+    if (typeof x === 'string' && x.startsWith('data:') && typeof y === 'string' && y.startsWith('/u/')) a[k] = y; else if (x && typeof x === 'object') swapUrls(x, y); } }
+async function runSync() {
+  if (sync.busy) return scheduleSync();
+  sync.busy = true; sync.dirty = false;
+  try {
+    const r = await fetch('/api/store', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ state: S }) });
+    if (r.status === 401) { location.href = '/entrar'; return; }
+    const j = await r.json(); if (!r.ok) throw new Error(j.error);
+    swapUrls(S, j.state); setSaveState(sync.dirty ? 'pending' : 'ok');
+  } catch (e) { setSaveState('err'); toast('Não deu para salvar. Confira a internet e tente de novo.'); }
+  sync.busy = false; if (sync.dirty) scheduleSync();
+}
+window.addEventListener('beforeunload', e => { if (MODE === 'panel' && (sync.dirty || sync.busy)) { e.preventDefault(); e.returnValue = ''; } });
+// Métricas da vitrine (visitas, produtos vistos, cliques no Eu quero, pedidos)
+function track(t, p) {
+  if (MODE !== 'store') return;
+  try { navigator.sendBeacon('/api/e', JSON.stringify({ s: BOOT.store.slug, t, p: p ? String(p) : '' })); } catch (e) {}
+  try { if (window.fbq) { if (t === 'click') fbq('track', 'AddToCart'); if (t === 'order') fbq('track', 'Lead'); if (t === 'pview') fbq('track', 'ViewContent'); } } catch (e) {}
+  try { if (window.gtag) gtag('event', { view: 'page_view_store', pview: 'view_item', click: 'add_to_cart', order: 'generate_lead' }[t] || t); } catch (e) {}
+}""")
+
+# fotos e vídeos: no painel sobem para o servidor
+rep("""  const id = 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  MEDIA[id] = URL.createObjectURL(blob); idb.put(id, blob);
+  return { id, type };""",
+"""  if (MODE === 'panel') {
+    try {
+      const r = await fetch('/api/media', { method: 'POST', headers: { 'Content-Type': blob.type || file.type || (type === 'video' ? 'video/mp4' : 'image/jpeg') }, body: blob });
+      const j = await r.json(); if (!r.ok) { toast(j.error || 'Não deu para enviar o arquivo.'); return null; }
+      MEDIA[j.id] = j.url; return { id: j.id, type: j.type };
+    } catch (e) { toast('Não deu para enviar o arquivo. Confira a internet.'); return null; }
+  }
+  const id = 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+  MEDIA[id] = URL.createObjectURL(blob); idb.put(id, blob);
+  return { id, type };""")
+rep("""let cart = [];""", """function hydrateMedia() { if (MODE === 'demo') return; S.products.forEach(p => (p.media || []).forEach(m => { if (m.id !== 'demo' && !MEDIA[m.id]) MEDIA[m.id] = '/u/' + m.id; })); }
+hydrateMedia();
+let cart = [];""")
+
+# ---------- vitrine pública ----------
+rep("""  if (s.online === false) { $('#view-loja').innerHTML = `<div class="offbar">Só você vê esta faixa: sua vitrine está fora do ar. <button class="more" id="goon">Ligar no painel</button></div>""",
+    """  if (EMPTY_STORE) { $('#view-loja').innerHTML = `<div class="offpage"><h1 class="store-name">${esc(BOOT.store.name)}</h1><p>Esta vitrine está sendo preparada. Volte em breve!</p></div>`; return; }
+  if (s.online === false) { $('#view-loja').innerHTML = `${MODE === 'store' ? '' : '<div class="offbar">Só você vê esta faixa: sua vitrine está fora do ar. <button class="more" id="goon">Ligar no painel</button></div>'}""")
+rep("""    $('#goon').onclick = () => show('painel'); return; }""", """    if ($('#goon')) $('#goon').onclick = () => show('painel'); return; }""")
+rep("""    ${s.footer ? `<p class="foot">${esc(s.footer)}</p>` : ''}`;""",
+    """    ${s.footer ? `<p class="foot">${esc(s.footer)}</p>` : ''}
+    ${MODE !== 'demo' && !(BOOT.store.pro || (MODE === 'panel' && BOOT.store.plan !== 'free')) ? `<p class="madewith"><a href="${esc(BOOT.home)}" target="_blank" rel="noopener">Feito com ${esc(BOOT.brand)}</a></p>` : ''}`;""")
+rep("""function openProduct(id) {
+  const p = prod(id);""", """function openProduct(id) {
+  const p = prod(id); track('pview', id);""")
+rep("""  $('#buyn').onclick = () => { if (add()) openCart(); };""", """  $('#buyn').onclick = () => { if (add()) { track('click', id); openCart(); } };""")
+
+# Pix no pedido: QR Code e copia e cola com o valor do pedido
+rep("""    <div class="opt-label">Mensagem que será enviada</div>
+    <div class="msg" id="msg"></div>""", """    <div class="pixbox" id="pixbox" hidden></div>
+    <div class="opt-label">Mensagem que será enviada</div>
+    <div class="msg" id="msg"></div>""")
+rep("""  const upd = () => { const m = buildMsg(); $('#msg').textContent = m; $('#send').href = `https://wa.me/${S.store.phone.replace(/\\D/g,'')}?text=${encodeURIComponent(m)}`; };""",
+"""  const upd = () => { const m = buildMsg(); $('#msg').textContent = m; $('#send').href = `https://wa.me/${S.store.phone.replace(/\\D/g,'')}?text=${encodeURIComponent(m)}`; showPix(); };
+  $('#send').addEventListener('click', () => track('order'));""")
+rep("""/* ---------- Painel ---------- */""", """let pixFor = null;
+async function showPix() {
+  const box = $('#pixbox'); if (!box) return;
+  const t = totals().total; const want = /pix/i.test(co.pag || '') && S.store.pixKey && MODE !== 'demo' && t > 0;
+  if (!want) { box.hidden = true; pixFor = null; return; }
+  if (pixFor === t) return; pixFor = t; box.hidden = false; box.innerHTML = '<p class="note">Gerando o Pix...</p>';
+  try {
+    const r = await fetch(`/api/pix?s=${encodeURIComponent(BOOT.store.slug)}&v=${t.toFixed(2)}`); const j = await r.json(); if (!r.ok) throw new Error(j.error);
+    if (pixFor !== t) return;
+    box.innerHTML = `<div class="opt-label">Pague com Pix: ${brl(t)}</div><div class="pixqr">${j.svg}</div>
+      <div class="pixcode"><code>${esc(j.code)}</code><button class="btn btn-soft" id="pixcopy">Copiar código Pix</button></div>
+      <p class="note" style="margin:6px 0 0">Depois de pagar, envie o pedido e o comprovante no WhatsApp.</p>`;
+    $('#pixcopy').onclick = () => copyText(j.code).then(ok => toast(ok ? 'Código Pix copiado' : 'Segure o código para copiar'));
+  } catch (e) { box.innerHTML = '<p class="note">Não deu para gerar o Pix agora. Combine o pagamento pelo WhatsApp.</p>'; }
+}
+
+/* ---------- Painel ---------- */""")
+
+# ---------- painel: link real, ligar/desligar ----------
+rep("""const storeUrl = () => `${STORE_DOMAIN}/${slugOf()}`;""",
+    """const fullUrl = () => MODE === 'demo' ? `https://${STORE_DOMAIN}/${slugOf()}` : BOOT.store.publicUrl;
+const storeUrl = () => fullUrl().replace(/^https?:\\/\\//, '');""")
+rep("""      <div class="slugbox" id="slugbox" hidden><label for="sslug">Final do link (só letras minúsculas, números e hífen)</label>
+        <div class="slugrow"><span>${esc(STORE_DOMAIN)}/</span><input class="in" id="sslug" value="${esc(slugOf())}" autocomplete="off"></div></div>""",
+"""      <div class="slugbox" id="slugbox" hidden><label for="sslug">Nome no link (só letras minúsculas, números e hífen)</label>
+        <div class="slugrow"><input class="in" id="sslug" value="${esc(MODE === 'demo' ? slugOf() : BOOT.store.slug)}" autocomplete="off"><button class="tg" id="saveslug">Salvar</button></div>
+        <p class="err" id="slugerr" hidden></p></div>""")
+rep("""  $('#copylink').onclick = async () => { const ok = await copyText('https://' + storeUrl());""", """  $('#copylink').onclick = async () => { const ok = await copyText(fullUrl());""")
+rep("""  $('#sharelink').onclick = async () => { const url = 'https://' + storeUrl();""", """  $('#sharelink').onclick = async () => { const url = fullUrl();""")
+rep("""  $('#sslug').oninput = e => { const v = slugify(e.target.value); s.slug = v; $('#surl').textContent = storeUrl(); save(); };
+  $('#sslug').onblur = e => { e.target.value = slugOf(); };""",
+"""  $('#saveslug').onclick = async () => { const v = slugify($('#sslug').value); $('#slugerr').hidden = true;
+    if (MODE === 'demo') { s.slug = v; save(); renderPainel(); return; }
+    const r = await fetch('/api/slug', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ slug: v }) }); const j = await r.json();
+    if (!r.ok) { $('#slugerr').textContent = j.error; $('#slugerr').hidden = false; return; }
+    BOOT.store = { ...BOOT.store, ...j.store }; renderPainel(); toast('Link atualizado. O endereço antigo deixou de funcionar.'); };""")
+
+# ---------- painel: plano, relatórios, Pix, marketing, domínio, conta ----------
+rep("""    <div class="stats">""", """    ${MODE === 'panel' ? planCard() : ''}
+    <div class="stats">""")
+rep("""    <h3 class="pgroup">Vendas e contato<small>WhatsApp, links e depoimentos</small></h3>""",
+"""    ${MODE === 'panel' ? `<h3 class="pgroup">Relatórios<small>Visitas, cliques e pedidos da sua vitrine</small></h3>
+    ${sec('relatorio', 'Desempenho da vitrine', 'Últimos 30 dias', '<div id="statsbox"><p class="note">Carregando...</p></div>')}` : ''}
+    <h3 class="pgroup">Vendas e contato<small>WhatsApp, Pix, links e depoimentos</small></h3>
+    ${sec('pix', 'Pix no pedido', s.pixKey ? 'Chave cadastrada: QR Code no pedido' : 'Mostre o QR Code com o valor do pedido', `
+      <p class="note" style="margin:0 0 4px">Quando a cliente escolhe Pix, aparece o QR Code e o código copia e cola já com o valor do pedido. O dinheiro cai direto na sua conta.</p>
+      ${f('spixkey', 'Chave Pix (CPF, CNPJ, e-mail, celular com +55 ou chave aleatória)', s.pixKey || '')}
+      <div class="two">${f('spixname', 'Nome do recebedor', s.pixName || '')}${f('spixcity', 'Cidade', s.pixCity || '')}</div>
+      <p class="note">A forma de pagamento precisa ter a palavra Pix (veja em Carrinho e pedido no WhatsApp).</p>`)}""")
+rep("""    <h3 class="pgroup">Ajuda<small>Tamanhos ideais e exemplos prontos</small></h3>""",
+"""    ${MODE === 'panel' ? `<h3 class="pgroup">Recursos Pro<small>Divulgação e endereço próprio</small></h3>
+    ${sec('marketing', 'Pixel do Meta e Google Analytics', proOk() ? (s.metaPixel || s.gaId ? 'Ativo' : 'Meça os resultados dos seus anúncios') : 'Disponível no plano Pro', `
+      ${proOk() ? '' : '<p class="pronote">Assine o Pro para medir visitas e vendas dos seus anúncios no Instagram, Facebook e Google.</p>'}
+      ${f('spixel', 'ID do Pixel do Meta (só números)', s.metaPixel || '', proOk() ? 'inputmode="numeric" placeholder="123456789012345"' : 'disabled')}
+      ${f('sga', 'ID do Google Analytics (começa com G-)', s.gaId || '', proOk() ? 'placeholder="G-XXXXXXXXXX"' : 'disabled')}
+      <p class="note">A vitrine envia visita, produto visto, clique no Eu quero e pedido enviado.</p>`)}
+    ${sec('dominio', 'Domínio próprio', proOk() ? (BOOT.store.customDomain ? esc(BOOT.store.customDomain) : 'Use o endereço da sua marca') : 'Disponível no plano Pro', `
+      ${proOk() ? '' : '<p class="pronote">Com o Pro, sua vitrine pode abrir em www.sualoja.com.br.</p>'}
+      <div class="field"><label for="sdomain">Seu domínio</label><div class="slugrow"><input class="in" id="sdomain" value="${esc(BOOT.store.customDomain || '')}" placeholder="minhaloja.com.br" ${proOk() ? '' : 'disabled'}><button class="tg" id="savedomain" ${proOk() ? '' : 'disabled'}>Salvar</button></div></div>
+      <p class="err" id="domerr" hidden></p>
+      <ol class="steps"><li>Compre o domínio (Registro.br, Hostinger, GoDaddy...).</li><li>No painel de onde comprou, crie um registro <b>CNAME</b> com nome <b>www</b> apontando para <b>${esc(new URL(BOOT.home).hostname)}</b>.</li><li>Salve o domínio aqui. A mudança pode levar algumas horas para valer.</li></ol>`)}` : ''}
+    <h3 class="pgroup">Ajuda<small>Tamanhos ideais e exemplos prontos</small></h3>""")
+rep("""    <button class="pbtn ghost" id="reset">Voltar ao exemplo original</button>`;""",
+"""    ${MODE === 'panel' ? `<h3 class="pgroup">Sua conta</h3>
+    ${sec('conta', esc(BOOT.user.name), esc(BOOT.user.email), `
+      <div class="two"><div class="field"><label for="pwcur">Senha atual</label><input class="in" id="pwcur" type="password" autocomplete="current-password"></div>
+        <div class="field"><label for="pwnew">Nova senha</label><input class="in" id="pwnew" type="password" autocomplete="new-password" placeholder="8 caracteres ou mais"></div></div>
+      <button class="pbtn" id="pwsave">Trocar senha</button><p class="err" id="pwerr" hidden></p>
+      ${BOOT.user.admin ? '<a class="pbtn ghost" href="/admin" style="display:block;text-align:center;text-decoration:none;margin-top:8px">Abrir o painel da plataforma</a>' : ''}
+      <a class="pbtn ghost" href="/sair" style="display:block;text-align:center;text-decoration:none;margin-top:8px">Sair da conta</a>`)}
+    <p class="legal"><a href="/termos" target="_blank">Termos de uso</a> · <a href="/privacidade" target="_blank">Privacidade</a></p>`
+    : '<button class="pbtn ghost" id="reset">Voltar ao exemplo original</button>'}`;""")
+rep("""  $('#reset').onclick = () =>""", """  if ($('#reset')) $('#reset').onclick = () =>""")
+rep("""  document.querySelectorAll('details[data-sec]').forEach(el => el.ontoggle""", """  if (MODE === 'panel') bindPanelExtras(s);
+  document.querySelectorAll('details[data-sec]').forEach(el => el.ontoggle""")
+rep("""function show(view) {""", """const proOk = () => MODE === 'demo' || BOOT.store.plan !== 'free';
+const fmtDate = t => new Date(t).toLocaleDateString('pt-BR');
+function planCard() {
+  const st = BOOT.store; const active = S.products.filter(p => p.active).length;
+  const over = st.plan === 'free' && active > st.freeLimit;
+  const label = st.plan === 'pro' ? 'Plano Pro' : st.plan === 'trial' ? 'Teste grátis do Pro' : 'Plano Grátis';
+  const sub = st.plan === 'pro' ? `${st.subscribed ? 'Renova' : 'Vale'} até ${fmtDate(st.proUntil)}` : st.plan === 'trial' ? `Termina em ${fmtDate(st.trialUntil)}. Depois, volta para o plano Grátis.` : `Até ${st.freeLimit} produtos na vitrine`;
+  return `<section class="plan plan-${st.plan}"><div class="plan-top"><div><b>${label}</b><small>${sub}</small></div>
+    ${st.plan === 'pro' && st.subscribed ? '<button class="tg" id="plancancel">Cancelar</button>' : `<button class="hcopy" id="planbuy">${st.plan === 'pro' ? 'Renovar' : 'Assinar Pro'} · ${brl(st.proPrice)}/mês</button>`}</div>
+    ${st.plan !== 'pro' ? `<ul class="plan-list"><li>Produtos ilimitados</li><li>Sem a marca ${esc(st.brand)} no rodapé</li><li>Pixel do Meta e Google Analytics</li><li>Domínio próprio</li></ul>` : ''}
+    ${over ? `<p class="plan-warn">Você tem ${active} produtos ativos, mas só os ${st.freeLimit} primeiros aparecem na vitrine no plano Grátis.</p>` : ''}
+    ${st.payments === 'teste' ? '<p class="note" style="margin:6px 0 0">Modo de teste: o pagamento é simulado.</p>' : ''}</section>`;
+}
+async function api(method, url, body) {
+  const r = await fetch(url, { method, headers: body ? { 'Content-Type': 'application/json' } : {}, body: body ? JSON.stringify(body) : undefined });
+  if (r.status === 401) { location.href = '/entrar'; throw new Error('sessão'); }
+  const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error(j.error || 'Algo deu errado.'); return j;
+}
+function bindPanelExtras(s) {
+  const bindS = (id, key) => { const el = $('#' + id); if (el) el.oninput = () => { s[key] = el.value.trim(); save(); }; };
+  bindS('spixkey', 'pixKey'); bindS('spixname', 'pixName'); bindS('spixcity', 'pixCity'); bindS('spixel', 'metaPixel'); bindS('sga', 'gaId');
+  if ($('#planbuy')) $('#planbuy').onclick = async () => { $('#planbuy').disabled = true;
+    try { const j = await api('POST', '/api/billing/checkout'); if (j.url) { location.href = j.url; return; } if (j.store) { BOOT.store = { ...BOOT.store, ...j.store }; renderPainel(); renderLoja(); toast('Plano Pro ativado'); } }
+    catch (e) { toast(e.message); $('#planbuy').disabled = false; } };
+  if ($('#plancancel')) $('#plancancel').onclick = async () => { if (!confirm('Cancelar a assinatura? O Pro continua até o fim do período já pago.')) return;
+    try { const j = await api('POST', '/api/billing/cancel'); BOOT.store = { ...BOOT.store, ...j.store }; renderPainel(); toast('Assinatura cancelada'); } catch (e) { toast(e.message); } };
+  if ($('#savedomain')) $('#savedomain').onclick = async () => { $('#domerr').hidden = true;
+    try { const j = await api('PUT', '/api/domain', { domain: $('#sdomain').value }); BOOT.store = { ...BOOT.store, ...j.store }; renderPainel(); toast('Domínio salvo'); }
+    catch (e) { $('#domerr').textContent = e.message; $('#domerr').hidden = false; } };
+  $('#pwsave').onclick = async () => { $('#pwerr').hidden = true;
+    try { await api('POST', '/api/password', { current: $('#pwcur').value, next: $('#pwnew').value }); $('#pwcur').value = $('#pwnew').value = ''; toast('Senha trocada'); }
+    catch (e) { $('#pwerr').textContent = e.message; $('#pwerr').hidden = false; } };
+  const rel = document.querySelector('details[data-sec="relatorio"]');
+  const load = () => loadStats(); rel.addEventListener('toggle', () => { if (rel.open) load(); }); if (rel.open) load();
+}
+async function loadStats() {
+  const box = $('#statsbox'); if (!box) return;
+  try {
+    const j = await api('GET', '/api/stats?days=30'); const max = Math.max(1, ...j.series.map(d => d.n));
+    const nameOf = id => (S.products.find(p => String(p.id) === String(id)) || {}).name || 'Produto removido';
+    box.innerHTML = `<div class="kpis">${[['view', 'Visitas'], ['pview', 'Produtos vistos'], ['click', 'Cliques no Eu quero'], ['order', 'Pedidos enviados']].map(([k, l]) => `<div class="kpi"><b>${j.totals[k].toLocaleString('pt-BR')}</b><span>${l}</span></div>`).join('')}</div>
+      <div class="bars" role="img" aria-label="Visitas por dia nos últimos 30 dias">${j.series.map(d => `<i style="height:${Math.round(d.n / max * 100)}%" title="${d.day.split('-').reverse().join('/')}: ${d.n} visitas"></i>`).join('')}</div>
+      <div class="bars-x"><span>${j.series[0].day.split('-').reverse().slice(0, 2).join('/')}</span><span>hoje</span></div>
+      ${j.top.length ? `<div class="opt-label" style="margin-top:14px">Produtos mais procurados</div><ol class="toplist">${j.top.map(t => `<li><span>${esc(nameOf(t.id))}</span><small>${t.pview} vistas · ${t.click} cliques</small></li>`).join('')}</ol>` : ''}
+      ${j.totals.view ? `<p class="note">Conversão: ${((j.totals.order / j.totals.view) * 100).toFixed(1).replace('.', ',')}% das visitas viraram pedido no WhatsApp.</p>` : '<p class="note">Ainda sem visitas. Compartilhe o link da vitrine no Instagram e no WhatsApp.</p>'}`;
+  } catch (e) { box.innerHTML = `<p class="note">${esc(e.message)}</p>`; }
+}
+
+function show(view) {""")
+
+# ---------- inicialização ----------
+rep("""applyColors(); show('loja');
+idb.loadAll().then(() => { if (!$('#view-loja').hidden) renderLoja(); else renderPainel(); });""",
+"""if (MODE === 'panel') { $('#brandtag').textContent = BOOT.brand; $('#logout').hidden = false; }
+applyColors(); show(MODE === 'panel' ? 'painel' : 'loja');
+if (MODE === 'demo') idb.loadAll().then(() => { if (!$('#view-loja').hidden) renderLoja(); else renderPainel(); });
+if (MODE === 'store') track('view');
+if (MODE === 'panel' && FRESH) save();
+if (MODE === 'panel' && /assinatura=ok/.test(location.search)) { toast('Pagamento recebido. Assim que o Mercado Pago confirmar, o Pro é ativado.'); history.replaceState(null, '', '/painel'); }""")
+
+# exemplo carregado: liga as mídias
+rep("""S.products = e.products.map(normP); applyColors();""", """S.products = e.products.map(normP); hydrateMedia(); applyColors();""")
+
+# ---------- estilos novos ----------
+rep("""/* Cards sem moldura */""", """/* Versão com servidor */
+.m-store .topbar, .m-store.painel .topbar { display: none; }
+.m-store::before { display: none; }
+.tlink { font-size: 13px; font-weight: 600; color: var(--p-muted); text-decoration: none; padding: 6px 4px 6px 8px; }
+.m-panel .demo-tag { white-space: nowrap; font-weight: 700; letter-spacing: .06em; }
+.savest { white-space: nowrap; font-size: 11.5px; color: var(--p-muted); margin-right: 6px; }
+.savest[data-st="ok"]::before { content: "✓ "; color: #1FA855; }
+.savest[data-st="err"] { color: #C0392B; font-weight: 700; }
+.madewith { text-align: center; margin: 18px 0 0; font-size: 12px; } .madewith a { color: var(--c-muted); text-decoration: none; }
+.plan { margin-top: 14px; background: var(--p-surface); border: 1px solid var(--p-line); border-radius: 18px; padding: 14px 16px; }
+.plan-pro { border-color: #1FA855; }
+.plan-top { display: flex; align-items: center; gap: 12px; justify-content: space-between; }
+.plan-top b { display: block; font-size: 15px; } .plan-top small { color: var(--p-muted); font-size: 12px; }
+.plan-list { margin: 10px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; font-size: 12px; color: var(--p-muted); }
+.plan-list li::before { content: "✓ "; color: var(--p-acc); font-weight: 700; }
+.plan-warn { margin: 10px 0 0; font-size: 12.5px; background: #FFF4E5; color: #8A4B00; border-radius: 10px; padding: 8px 10px; }
+.pronote { margin: 0 0 6px; font-size: 12.5px; background: var(--p-soft); border-radius: 10px; padding: 8px 10px; }
+.steps { margin: 12px 0 0; padding-left: 18px; font-size: 12.5px; color: var(--p-muted); display: grid; gap: 4px; }
+.kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.kpi { background: var(--p-soft); border-radius: 12px; padding: 10px 12px; } .kpi b { display: block; font-size: 20px; font-variant-numeric: tabular-nums; } .kpi span { font-size: 11.5px; color: var(--p-muted); }
+.bars { display: flex; align-items: flex-end; gap: 2px; height: 70px; margin-top: 14px; }
+.bars i { flex: 1; min-height: 2px; background: var(--p-acc); border-radius: 3px 3px 0 0; opacity: .85; }
+.bars-x { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--p-muted); margin-top: 4px; }
+.toplist { margin: 6px 0 0; padding-left: 18px; display: grid; gap: 6px; font-size: 13px; } .toplist small { display: block; color: var(--p-muted); font-size: 11.5px; }
+.legal { text-align: center; font-size: 12px; margin: 22px 0 0; } .legal a { color: var(--p-muted); }
+.pixbox { margin-top: 12px; border: 1px solid var(--c-cardBorder); border-radius: 14px; padding: 12px; }
+.pixqr { display: grid; place-items: center; margin: 8px 0; } .pixqr svg { width: 200px; height: 200px; }
+.pixcode { display: grid; gap: 8px; } .pixcode code { font-size: 10.5px; word-break: break-all; background: var(--c-bg); padding: 8px; border-radius: 8px; max-height: 64px; overflow: auto; }
+/* Cards sem moldura */""")
+
+open(os.path.join(ROOT, 'public', 'app.html'), 'w', encoding='utf-8').write(s)
+print('public/app.html gerado')

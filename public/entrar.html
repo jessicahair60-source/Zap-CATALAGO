@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Entrar · Vitrine Zap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="/static/site.css">
+<style>
+  main { min-height: 100vh; display: grid; place-items: center; padding: 28px 20px; }
+  .box { width: 100%; max-width: 420px; }
+  .box .logo { margin-bottom: 18px; }
+  .tabs { display: grid; grid-template-columns: 1fr 1fr; background: var(--soft); border-radius: 12px; padding: 4px; margin-bottom: 6px; }
+  .tabs button { border: 0; background: none; padding: 10px; border-radius: 9px; font: 700 14px var(--f-body); color: var(--muted); cursor: pointer; }
+  .tabs button[aria-selected="true"] { background: var(--surface); color: var(--fg); box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  h1 { font-size: 26px; margin: 12px 0 2px; }
+  .chk { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; margin-top: 16px; }
+  .chk input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--acc); flex: none; }
+  form .btn { width: 100%; margin-top: 18px; padding: 15px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="box">
+    <a class="logo" href="/"><i>V</i>Vitrine Zap</a>
+    <div class="card">
+      <div class="tabs" role="tablist">
+        <button role="tab" id="t-in" aria-selected="true">Entrar</button>
+        <button role="tab" id="t-up" aria-selected="false">Criar conta</button>
+      </div>
+
+      <form id="f-in">
+        <h1>Que bom te ver</h1>
+        <p class="note" style="margin:0">Entre para cuidar da sua vitrine.</p>
+        <div class="field"><label for="ie">E-mail</label><input class="in" id="ie" type="email" autocomplete="email" required></div>
+        <div class="field"><label for="ip">Senha</label><input class="in" id="ip" type="password" autocomplete="current-password" required></div>
+        <p class="err" id="ierr" hidden></p>
+        <button class="btn" type="submit">Entrar</button>
+        <p class="note" style="text-align:center">Esqueceu a senha? Fale com o suporte para receber uma senha nova.</p>
+      </form>
+
+      <form id="f-up" hidden>
+        <h1>Crie sua vitrine</h1>
+        <p class="note" style="margin:0">Leva 1 minuto. Você ganha 7 dias do plano Pro para testar.</p>
+        <div class="field"><label for="un">Seu nome</label><input class="in" id="un" autocomplete="name" required></div>
+        <div class="field"><label for="us">Nome da loja</label><input class="in" id="us" required placeholder="Ex.: Jessica Hair"></div>
+        <div class="field"><label for="ue">E-mail</label><input class="in" id="ue" type="email" autocomplete="email" required></div>
+        <div class="field"><label for="up">Senha</label><input class="in" id="up" type="password" autocomplete="new-password" minlength="8" required placeholder="8 caracteres ou mais"></div>
+        <label class="chk"><input type="checkbox" id="ut"> <span>Li e aceito os <a href="/termos" target="_blank">termos de uso</a> e a <a href="/privacidade" target="_blank">política de privacidade</a>.</span></label>
+        <p class="err" id="uerr" hidden></p>
+        <button class="btn" type="submit">Criar minha vitrine</button>
+      </form>
+    </div>
+  </div>
+</main>
+<script>
+const $ = s => document.querySelector(s);
+function tab(up) {
+  $('#t-in').setAttribute('aria-selected', !up); $('#t-up').setAttribute('aria-selected', up);
+  $('#f-in').hidden = up; $('#f-up').hidden = !up;
+  history.replaceState(null, '', up ? '/cadastro' : '/entrar');
+}
+$('#t-in').onclick = () => tab(false); $('#t-up').onclick = () => tab(true);
+if (location.pathname === '/cadastro') tab(true);
+
+async function send(url, body, errEl, btn) {
+  errEl.hidden = true; btn.disabled = true;
+  try {
+    const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.error || 'Algo deu errado. Tente de novo.');
+    location.href = j.redirect || '/painel';
+  } catch (e) { errEl.textContent = e.message; errEl.hidden = false; btn.disabled = false; }
+}
+$('#f-in').onsubmit = e => { e.preventDefault(); send('/api/login', { email: $('#ie').value, password: $('#ip').value }, $('#ierr'), e.submitter || $('#f-in .btn')); };
+$('#f-up').onsubmit = e => { e.preventDefault();
+  send('/api/signup', { name: $('#un').value, storeName: $('#us').value, email: $('#ue').value, password: $('#up').value, terms: $('#ut').checked }, $('#uerr'), e.submitter || $('#f-up .btn')); };
+</script>
+</body>
+</html>

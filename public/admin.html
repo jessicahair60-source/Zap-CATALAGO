@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Administração · Vitrine Zap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="/static/site.css">
+<style>
+  body { background: #F7F4F6; }
+  .top { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; gap: 10px; }
+  .top small { display: block; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+  h1 { font-size: 26px; }
+  .kpis { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 8px; }
+  .kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; }
+  .kpi b { display: block; font: 800 26px var(--f-display); font-variant-numeric: tabular-nums; }
+  .kpi span { font-size: 12.5px; color: var(--muted); }
+  .kpi.hl { background: #2A1A22; color: #fff; border-color: #2A1A22; } .kpi.hl span { color: #E7CFD9; }
+  h2 { font-size: 18px; margin: 30px 0 10px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .tools { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .tools .in { max-width: 320px; padding: 10px 12px; }
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { border: 1px solid var(--line); background: var(--surface); border-radius: 99px; padding: 7px 12px; font: 600 13px var(--f-body); cursor: pointer; color: var(--fg); }
+  .chip[aria-pressed="true"] { background: var(--fg); color: #fff; border-color: var(--fg); }
+  .list { display: grid; gap: 8px; }
+  .row { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; display: grid; gap: 10px; }
+  .row-top { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+  .row b { font-size: 15.5px; } .row .meta { font-size: 12.5px; color: var(--muted); margin-top: 2px; word-break: break-word; }
+  .tag { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 99px; white-space: nowrap; letter-spacing: .04em; text-transform: uppercase; }
+  .t-pro { background: #E3F6EA; color: #137A3D; } .t-trial { background: #EEE8FB; color: #5B3FA8; } .t-free { background: var(--soft); color: var(--muted); } .t-blocked { background: #FDE7E4; color: var(--danger); }
+  .acts { display: flex; gap: 6px; flex-wrap: wrap; }
+  .acts button, .acts a { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 7px 11px; font: 600 12.5px var(--f-body); cursor: pointer; color: var(--fg); text-decoration: none; }
+  .acts .danger { color: var(--danger); }
+  table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; font-size: 13.5px; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); } th { font-size: 12px; color: var(--muted); font-weight: 700; } tr:last-child td { border-bottom: 0; }
+  td.num { font-variant-numeric: tabular-nums; text-align: right; } th.num { text-align: right; }
+  .empty { padding: 24px; text-align: center; color: var(--muted); background: var(--surface); border-radius: 16px; border: 1px dashed var(--line); }
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: #2A1A22; color: #fff; padding: 10px 16px; border-radius: 10px; font-size: 14px; z-index: 9; max-width: 90vw; }
+  @media (min-width: 760px) { .kpis { grid-template-columns: repeat(4, 1fr); } }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="top"><div><small>Administração da plataforma</small><h1 id="brand">Vitrine Zap</h1></div>
+    <div class="acts"><a href="/painel">Minha vitrine</a><a href="/sair">Sair</a></div></div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <h2>Lojas</h2>
+  <div class="tools">
+    <input class="in" id="q" type="search" placeholder="Buscar por loja, dona ou e-mail" aria-label="Buscar lojas">
+    <div class="chips" id="chips"></div>
+  </div>
+  <div class="list" id="list"><div class="empty">Carregando...</div></div>
+
+  <h2>Pagamentos recentes</h2>
+  <div id="pays"></div>
+</div>
+<div class="toast" id="toast" hidden></div>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const brl = v => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+const date = t => t ? new Date(t).toLocaleDateString('pt-BR') : '';
+const PLAN = { pro: 'Pro', trial: 'Teste', free: 'Grátis' };
+let data = null, filter = 'all';
+function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 3000); }
+
+async function load() {
+  const r = await fetch('/api/admin/overview');
+  if (r.status === 403 || r.status === 401) { location.href = '/entrar'; return; }
+  data = await r.json(); render();
+}
+function render() {
+  const m = data.metrics; $('#brand').textContent = data.brand;
+  $('#kpis').innerHTML = [
+    ['hl', brl(m.mrr), 'Receita mensal recorrente'], ['', m.total, 'Lojas cadastradas'], ['', m.paying, 'Lojas pagando o Pro'], ['', m.newWeek, 'Novas nos últimos 7 dias'],
+    ['', m.trial, 'Em teste grátis'], ['', m.free, 'No plano Grátis'], ['', brl(m.revenue30), 'Recebido em 30 dias'], ['', m.views30.toLocaleString('pt-BR'), 'Visitas nas vitrines (30 dias)']
+  ].map(([c, v, l]) => `<div class="kpi ${c}"><b>${v}</b><span>${l}</span></div>`).join('');
+  const chips = [['all', `Todas (${m.total})`], ['pro', `Pro (${m.paying})`], ['trial', `Teste (${m.trial})`], ['free', `Grátis (${m.free})`], ['blocked', `Bloqueadas (${m.blocked})`]];
+  $('#chips').innerHTML = chips.map(([k, l]) => `<button class="chip" data-f="${k}" aria-pressed="${filter === k}">${l}</button>`).join('');
+  document.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { filter = b.dataset.f; render(); });
+  const q = $('#q').value.trim().toLowerCase();
+  const list = data.stores.filter(s => (filter === 'all' || (filter === 'blocked' ? s.blocked : s.plan === filter && !s.blocked)) && (!q || `${s.name} ${s.owner} ${s.email} ${s.slug}`.toLowerCase().includes(q)));
+  $('#list').innerHTML = list.length ? list.map(s => `<div class="row">
+    <div class="row-top"><div><b>${esc(s.name)}</b>
+      <div class="meta">${esc(s.owner)} · ${esc(s.email)}</div>
+      <div class="meta"><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.url.replace(/^https?:\/\//, ''))}</a> · ${s.products} produtos · ${s.online ? 'no ar' : 'fora do ar'} · desde ${date(s.createdAt)}</div>
+      <div class="meta">${s.plan === 'pro' ? `Pro até ${date(s.proUntil)}${s.subscribed ? ' · assinatura ativa' : ''}` : s.plan === 'trial' ? `Teste até ${date(s.trialUntil)}` : 'Plano Grátis'}${s.blocked ? ` · bloqueada${s.blockedReason ? ': ' + esc(s.blockedReason) : ''}` : ''}</div></div>
+      <span class="tag ${s.blocked ? 't-blocked' : 't-' + s.plan}">${s.blocked ? 'Bloqueada' : PLAN[s.plan]}</span></div>
+    <div class="acts">
+      <a href="${esc(s.url)}" target="_blank" rel="noopener">Ver vitrine</a>
+      <button data-a="givePro" data-id="${s.id}">Dar Pro por 30 dias</button>
+      ${s.plan !== 'free' ? `<button data-a="setFree" data-id="${s.id}">Passar para Grátis</button>` : ''}
+      <button data-a="resetPassword" data-id="${s.id}">Senha nova</button>
+      ${s.blocked ? `<button data-a="unblock" data-id="${s.id}">Desbloquear</button>` : `<button class="danger" data-a="block" data-id="${s.id}">Bloquear</button>`}
+    </div></div>`).join('') : '<div class="empty">Nenhuma loja aqui.</div>';
+  document.querySelectorAll('[data-a]').forEach(b => b.onclick = () => act(+b.dataset.id, b.dataset.a));
+  $('#pays').innerHTML = data.payments.length ? `<table><thead><tr><th>Data</th><th>Loja</th><th>Situação</th><th class="num">Valor</th></tr></thead><tbody>
+    ${data.payments.map(p => `<tr><td>${date(p.created_at)}</td><td>${esc(p.name)}</td><td>${p.status === 'approved' ? 'Aprovado' : esc(p.status)}</td><td class="num">${brl(p.amount)}</td></tr>`).join('')}</tbody></table>`
+    : '<div class="empty">Nenhum pagamento ainda.</div>';
+}
+async function act(id, action) {
+  const s = data.stores.find(x => x.id === id); const body = { action };
+  if (action === 'block') { const reason = prompt(`Bloquear ${s.name}? A vitrine sai do ar para as clientes. Motivo (opcional):`); if (reason === null) return; body.reason = reason; }
+  if (action === 'setFree' && !confirm(`Passar ${s.name} para o plano Grátis agora?`)) return;
+  if (action === 'givePro') body.days = 30;
+  if (action === 'resetPassword' && !confirm(`Gerar uma senha nova para ${s.owner}? A senha atual deixa de funcionar.`)) return;
+  const r = await fetch(`/api/admin/stores/${id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) return toast(j.error || 'Não deu certo.');
+  if (j.tempPassword) prompt(`Senha nova de ${s.owner}. Envie para ela e peça para trocar no painel:`, j.tempPassword);
+  else toast('Feito');
+  load();
+}
+$('#q').oninput = () => data && render();
+load();
+</script>
+</body>
+</html>

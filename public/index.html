@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vitrine Zap · Sua vitrine com pedido no WhatsApp</title>
+<meta name="description" content="Crie em minutos uma vitrine bonita para o link da bio, com catálogo, vídeos e pedidos direto no seu WhatsApp.">
+<meta property="og:title" content="Vitrine Zap · Sua vitrine com pedido no WhatsApp">
+<meta property="og:description" content="Link da bio com catálogo, vídeos e pedido pronto no WhatsApp. Teste 7 dias grátis.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="/static/site.css">
+<style>
+  .hero { display: grid; gap: 40px; align-items: center; padding: 34px 0 20px; }
+  .hero h1 { font-size: clamp(36px, 7vw, 60px); letter-spacing: -.02em; }
+  .hero h1 em { font-style: normal; color: var(--acc); }
+  .hero p.lead { font-size: 18px; color: var(--muted); max-width: 520px; margin: 18px 0 26px; }
+  .cta { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .cta small { color: var(--muted); font-size: 13px; width: 100%; }
+  .phone { justify-self: center; width: 280px; aspect-ratio: 9/18.5; border-radius: 40px; background: #2A1A22; padding: 10px; box-shadow: 0 30px 60px -30px rgba(80,20,50,.5); }
+  .screen { width: 100%; height: 100%; border-radius: 31px; overflow: hidden; background: var(--bg); display: grid; grid-template-rows: 30% auto 1fr; }
+  .sb { background: linear-gradient(135deg, #E8B4C6, #B9476F); display: grid; align-content: end; padding: 14px; color: #fff; }
+  .sb small { font-size: 9px; letter-spacing: .14em; text-transform: uppercase; opacity: .85; } .sb b { font-family: var(--f-display); font-size: 22px; }
+  .sl { padding: 10px 12px 4px; display: grid; gap: 6px; }
+  .sl i { display: block; height: 22px; border-radius: 99px; background: #fff; border: 1px solid var(--line); }
+  .sp { padding: 6px 12px; display: grid; gap: 10px; }
+  .sp div { display: grid; grid-template-columns: 54px 1fr; gap: 10px; align-items: center; }
+  .sp span { aspect-ratio: 9/14; border-radius: 10px; }
+  .sp p { margin: 0; display: grid; gap: 5px; } .sp p i { display: block; height: 7px; border-radius: 4px; background: #E9D7DE; } .sp p i:first-child { width: 80%; background: #CFAFBC; }
+  .sp p em { display: block; width: 62px; height: 18px; border-radius: 6px; background: var(--acc); }
+  section.blk { padding: 56px 0 0; }
+  .eyebrow { font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--acc); font-weight: 700; margin: 0 0 10px; }
+  .blk h2 { font-size: clamp(28px, 4.5vw, 40px); max-width: 640px; }
+  .feats { display: grid; gap: 14px; margin-top: 26px; }
+  .feat { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 20px; }
+  .feat b { display: block; font-size: 16px; margin: 10px 0 4px; } .feat p { margin: 0; color: var(--muted); font-size: 14.5px; }
+  .ico { width: 40px; height: 40px; border-radius: 12px; background: var(--soft); color: var(--acc); display: grid; place-items: center; }
+  .ico svg { width: 21px; height: 21px; }
+  .steps { counter-reset: s; display: grid; gap: 14px; margin-top: 26px; }
+  .step { display: grid; grid-template-columns: 44px 1fr; gap: 14px; align-items: start; }
+  .step::before { counter-increment: s; content: counter(s); width: 44px; height: 44px; border-radius: 50%; background: var(--acc); color: #fff; display: grid; place-items: center; font: 800 18px var(--f-display); }
+  .step b { display: block; margin-top: 2px; } .step p { margin: 2px 0 0; color: var(--muted); font-size: 14.5px; }
+  .plans { display: grid; gap: 16px; margin-top: 26px; }
+  .plan { background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: 24px; display: grid; gap: 12px; align-content: start; }
+  .plan.pro { border: 2px solid var(--acc); position: relative; }
+  .plan.pro::after { content: "Mais escolhido"; position: absolute; top: -12px; right: 20px; background: var(--acc); color: #fff; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 99px; }
+  .plan h3 { font-size: 20px; } .price { font: 800 34px var(--f-display); } .price small { font: 500 14px var(--f-body); color: var(--muted); }
+  .plan ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; font-size: 14.5px; }
+  .plan li::before { content: "✓"; color: var(--acc); font-weight: 800; margin-right: 8px; }
+  .faq { margin-top: 22px; display: grid; gap: 10px; }
+  .faq details { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 18px; }
+  .faq summary { cursor: pointer; font-weight: 700; list-style: none; } .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: "+"; float: right; color: var(--acc); font-size: 20px; line-height: 1; }
+  .faq details[open] summary::after { content: "−"; }
+  .faq p { margin: 10px 0 0; color: var(--muted); font-size: 14.5px; }
+  .final { margin-top: 64px; background: #2A1A22; color: #fff; border-radius: 28px; padding: 38px 24px; text-align: center; }
+  .final h2 { font-size: clamp(26px, 4vw, 36px); margin: 0 auto 10px; } .final p { color: #E7CFD9; margin: 0 0 22px; }
+  @media (min-width: 760px) {
+    .hero { grid-template-columns: 1.15fr .85fr; padding-top: 50px; }
+    .feats { grid-template-columns: repeat(3, 1fr); }
+    .steps { grid-template-columns: repeat(3, 1fr); }
+    .plans { grid-template-columns: 1fr 1fr; max-width: 760px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <nav class="nav">
+    <a class="logo" href="/"><i>V</i>Vitrine Zap</a>
+    <div class="nav-links"><a class="btn ghost" href="/entrar">Entrar</a><a class="btn" href="/cadastro">Criar grátis</a></div>
+  </nav>
+
+  <header class="hero">
+    <div>
+      <h1>Sua vitrine no link da bio, com pedido <em>direto no WhatsApp</em></h1>
+      <p class="lead">Mostre seus produtos com fotos e vídeos, deixe a cliente escolher e receba o pedido pronto no seu WhatsApp. Sem site complicado, sem taxa por venda.</p>
+      <div class="cta"><a class="btn big" href="/cadastro">Criar minha vitrine</a><a class="btn big soft" href="#planos">Ver planos</a>
+        <small>7 dias do plano Pro grátis. Não pedimos cartão para testar.</small></div>
+    </div>
+    <div class="phone" aria-hidden="true"><div class="screen">
+      <div class="sb"><small>Nova coleção</small><b>Sua loja</b></div>
+      <div class="sl"><i></i><i></i></div>
+      <div class="sp">
+        <div><span style="background:linear-gradient(160deg,#F3C9D6,#C9718F)"></span><p><i></i><i></i><em></em></p></div>
+        <div><span style="background:linear-gradient(160deg,#F6DCC4,#C98A5E)"></span><p><i></i><i></i><em></em></p></div>
+        <div><span style="background:linear-gradient(160deg,#DCD3F0,#8A74C2)"></span><p><i></i><i></i><em></em></p></div>
+      </div>
+    </div></div>
+  </header>
+
+  <section class="blk">
+    <p class="eyebrow">Feito para quem vende no Instagram</p>
+    <h2>Tudo o que sua cliente precisa para comprar, num link só</h2>
+    <div class="feats">
+      <div class="feat"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l1.6-4.8A8.5 8.5 0 1 1 8 19.6z"/></svg></span><b>Pedido pronto no WhatsApp</b><p>Produto, tamanho, quantidade, entrega e pagamento chegam numa mensagem só.</p></div>
+      <div class="feat"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="13" height="14" rx="2"/><path d="m16 10 5-3v10l-5-3"/></svg></span><b>Fotos e vídeos dos produtos</b><p>Até 5 fotos por produto e vídeo no estilo stories, como a cliente já está acostumada.</p></div>
+      <div class="feat"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg></span><b>Pix com valor certo</b><p>QR Code e copia e cola gerados com o total do pedido. O dinheiro cai direto na sua conta.</p></div>
+      <div class="feat"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s7 7.5 7 12a7 7 0 0 1-14 0c0-4.5 7-12 7-12z"/></svg></span><b>Com a cara da sua marca</b><p>Banner, logo, temas prontos, fontes e uma cor para cada parte da vitrine.</p></div>
+      <div class="feat"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6"/></svg></span><b>Relatórios simples</b><p>Visitas, produtos mais vistos, cliques no Eu quero e pedidos enviados.</p></div>
+      <div class="feat"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span><b>Para qualquer negócio</b><p>Roupas, perucas, doces, beleza, serviços com agendamento e infoprodutos.</p></div>
+    </div>
+  </section>
+
+  <section class="blk">
+    <p class="eyebrow">Como funciona</p>
+    <h2>Sua vitrine no ar em três passos</h2>
+    <div class="steps">
+      <div class="step"><div><b>Crie sua conta</b><p>Só nome, nome da loja, e-mail e senha.</p></div></div>
+      <div class="step"><div><b>Cadastre os produtos</b><p>Envie as fotos pelo celular, escreva o preço e pronto.</p></div></div>
+      <div class="step"><div><b>Coloque o link na bio</b><p>Copie o link da vitrine e cole no Instagram e no TikTok.</p></div></div>
+    </div>
+  </section>
+
+  <section class="blk" id="planos">
+    <p class="eyebrow">Planos</p>
+    <h2>Comece grátis. Assine quando quiser crescer.</h2>
+    <div class="plans">
+      <div class="plan"><h3>Grátis</h3><div class="price">R$ 0 <small>para sempre</small></div>
+        <ul><li>Até 10 produtos na vitrine</li><li>Pedido no WhatsApp e Pix</li><li>Fotos e vídeos</li><li>Relatórios de visitas</li></ul>
+        <a class="btn soft" href="/cadastro">Começar grátis</a></div>
+      <div class="plan pro"><h3>Pro</h3><div class="price">R$ 29,90 <small>por mês</small></div>
+        <ul><li>Produtos ilimitados</li><li>Sem a nossa marca no rodapé</li><li>Pixel do Meta e Google Analytics</li><li>Domínio próprio (www.sualoja.com.br)</li><li>Tudo do plano Grátis</li></ul>
+        <a class="btn" href="/cadastro">Testar 7 dias grátis</a></div>
+    </div>
+  </section>
+
+  <section class="blk">
+    <p class="eyebrow">Dúvidas</p>
+    <h2>Perguntas frequentes</h2>
+    <div class="faq">
+      <details><summary>Vocês cobram taxa por venda?</summary><p>Não. Você paga só a mensalidade do plano Pro, se quiser. O pagamento da cliente vai direto para você.</p></details>
+      <details><summary>Preciso de CNPJ?</summary><p>Não. Funciona para quem vende como pessoa física ou como empresa.</p></details>
+      <details><summary>Como cancelo o Pro?</summary><p>No próprio painel, em um toque. Você continua com o Pro até o fim do mês pago e depois volta para o plano Grátis, sem perder seus produtos.</p></details>
+      <details><summary>Posso usar no computador?</summary><p>Sim. A vitrine e o painel se ajustam ao celular e ao computador.</p></details>
+    </div>
+  </section>
+
+  <section class="final">
+    <h2>Sua próxima venda começa no link da bio</h2>
+    <p>Crie sua vitrine agora e teste o Pro por 7 dias.</p>
+    <a class="btn big" href="/cadastro">Criar minha vitrine</a>
+  </section>
+
+  <footer class="site"><span>© Vitrine Zap</span><span><a href="/termos">Termos de uso</a> · <a href="/privacidade">Privacidade</a> · <a href="/entrar">Entrar</a></span></footer>
+</div>
+</body>
+</html>
