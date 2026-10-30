@@ -592,6 +592,19 @@ body.painel .stats { margin: 14px 0 6px; }
 .fine > summary { cursor: pointer; font-size: 13px; font-weight: 600; color: var(--p-muted); }
 .moreopts { margin: 18px 0 4px; }
 
+/* Abas do painel (barra embaixo, como app) */
+#view-painel .offtab { display: none !important; }
+.ptabs { position: fixed; z-index: 60; left: 0; right: 0; bottom: 0; display: none; background: var(--p-surface); border-top: 1px solid var(--p-line);
+  padding: 6px 6px calc(6px + env(safe-area-inset-bottom)); box-shadow: 0 -6px 20px rgba(36,24,30,.06); }
+body.painel .ptabs { display: flex; }
+body.painel #view-painel { padding-bottom: 86px; }
+.ptabs button { flex: 1; border: 0; background: none; display: grid; justify-items: center; gap: 3px; padding: 6px 2px; border-radius: 12px; font-size: 11px; font-weight: 600; color: var(--p-muted); font-family: inherit; }
+.ptabs svg { width: 22px; height: 22px; }
+.ptabs button[aria-current="page"] { color: var(--p-acc); background: var(--p-soft); }
+@media (max-width: 1099px) { body.painel .pv-tab { bottom: 84px; } }
+@media (min-width: 1100px) { .ptabs { left: 50%; right: auto; bottom: 16px; transform: translateX(-50%); width: 520px; border: 1px solid var(--p-line); border-radius: 20px; padding: 6px; }
+  body.painel.pv-on .ptabs { left: calc(50% - 190px); } }
+
 /* Prévia ao vivo no painel */
 .is-pv .topbar, .is-pv body::before { display: none; }
 .pv-tab { position: fixed; z-index: 70; right: 16px; bottom: 16px; display: none; align-items: center; gap: 8px; border: 0; border-radius: 999px; padding: 11px 16px;
@@ -1543,7 +1556,40 @@ function applySimple() {
   b.onclick = () => { pui.adv = !pui.adv; try { localStorage.setItem('vz-adv', pui.adv ? '1' : '0'); } catch (e) {} renderPainel(); };
   at.before(b);
 }
-{ const rp0 = renderPainel; renderPainel = function () { rp0.apply(this, arguments); applySimple(); }; }
+/* Abas: cada grupo do painel fica numa aba da barra de baixo */
+const PTABS = [
+  ['inicio', 'Início', '<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>'],
+  ['produtos', 'Produtos', '<path d="M6 7h12l-1 13H7z"/><path d="M9 7a3 3 0 0 1 6 0"/>'],
+  ['aparencia', 'Aparência', '<circle cx="12" cy="12" r="9"/><circle cx="8.5" cy="10" r="1.3"/><circle cx="12" cy="7.5" r="1.3"/><circle cx="15.5" cy="10" r="1.3"/><path d="M12 21a2.5 2.5 0 0 1 0-5h2a3 3 0 0 0 3-3"/>'],
+  ['vendas', 'Vendas', '<path d="M4 5h16v11H8l-4 4z"/>'],
+  ['conta', 'Conta', '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4.5-6 8-6s7 2 8 6"/>']];
+const TAB_OF_GROUP = { 'Produtos': 'produtos', 'Aparência': 'aparencia', 'Relatórios': 'inicio', 'Vendas e contato': 'vendas', 'Divulgação': 'vendas', 'Ajuda': 'conta', 'Sua conta': 'conta' };
+pui.tab = 'inicio';
+function setTab(t, top) {
+  pui.tab = t;
+  $('#view-painel').querySelectorAll(':scope > *').forEach(el => el.classList.toggle('offtab', el.dataset.tab !== t && !(el.dataset.tab === 'all' && t !== 'inicio')));
+  document.querySelectorAll('.ptabs button').forEach(b => b.setAttribute('aria-current', b.dataset.tab === t ? 'page' : 'false'));
+  if (top) window.scrollTo(0, 0);
+}
+function applyTabs() {
+  const box = $('#view-painel'); let cur = 'inicio';
+  box.querySelectorAll(':scope > *').forEach(el => {
+    if (el.matches('h3.pgroup')) cur = TAB_OF_GROUP[el.firstChild.textContent.trim()] || cur;
+    else if (el.matches('.legal')) cur = 'conta';
+    el.dataset.tab = el.matches('.moreopts') ? 'all' : cur;
+  });
+  if (!$('.ptabs')) {
+    const nav = document.createElement('nav'); nav.className = 'ptabs'; nav.setAttribute('aria-label', 'Partes do painel');
+    nav.innerHTML = PTABS.map(([k, l, d]) => `<button data-tab="${k}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>${l}</button>`).join('');
+    nav.querySelectorAll('button').forEach(b => b.onclick = () => setTab(b.dataset.tab, true));
+    document.body.appendChild(nav);
+  }
+  // atalhos do início (Novo produto, Cores...) levam para a aba certa
+  box.querySelectorAll('[data-go]').forEach(b => { const go = b.onclick; b.onclick = () => {
+    const sec = box.querySelector(`details[data-sec="${b.dataset.go}"]`); if (sec) setTab(sec.dataset.tab); go(); }; });
+  setTab(pui.tab);
+}
+{ const rp0 = renderPainel; renderPainel = function () { rp0.apply(this, arguments); applySimple(); if (!PV) applyTabs(); }; }
 
 /* Prévia ao vivo: a mesma página roda num mini celular e recebe os dados a cada mudança */
 const pv = { frame: null, t: 0 };
