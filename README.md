@@ -23,6 +23,8 @@ Sem `MP_ACCESS_TOKEN` e fora de produção, o botão "Assinar" simula o pagament
 
 ## Colocar no ar
 
+Pelo Dokploy: siga o passo a passo em [DOKPLOY.md](DOKPLOY.md).
+
 Precisa de um servidor com Node.js 20 ou mais novo e um disco que não seja apagado a cada atualização (para o banco e as fotos, na pasta `DATA_DIR`).
 
 1. Suba o código, rode `npm ci --omit=dev` e `npm start` (ou use o `Dockerfile`).
