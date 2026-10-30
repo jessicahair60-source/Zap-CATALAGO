@@ -17,6 +17,7 @@ const CFG = {
   baseDomain: (process.env.BASE_DOMAIN || '').toLowerCase(),
   proPrice: parseFloat(process.env.PLAN_PRICE || '47.00'),
   trialDays: parseInt(process.env.TRIAL_DAYS || '7', 10),
+  adminHost: (process.env.ADMIN_HOST || '').toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, ''),
   admins: (process.env.ADMIN_EMAILS || '').toLowerCase().split(',').map(s => s.trim()).filter(Boolean),
   fakePayments: !mp.enabled() && process.env.NODE_ENV !== 'production'
 };
@@ -200,6 +201,12 @@ function simplePage(title, text, extra = '') {
 <body><main><h1>${escHtml(title)}</h1><p>${escHtml(text)}</p>${extra}</main></body></html>`;
 }
 
+// Endereço só da administração (ex.: adm.zapcatalago.com): a página inicial é o painel da dona
+app.use((req, res, next) => {
+  if (CFG.adminHost && (req.hostname || '').toLowerCase() === CFG.adminHost && req.path === '/') req.url = '/admin';
+  next();
+});
+
 // Domínio próprio da lojista ou subdomínio (loja.seudominio.com.br) abrem direto a vitrine
 app.use((req, res, next) => {
   if (req.path.startsWith('/api/') || req.path.startsWith('/u/') || req.path.startsWith('/static/')) return next();
@@ -226,7 +233,7 @@ app.get('/privacidade', page('privacidade.html'));
 app.get(['/entrar', '/cadastro'], (req, res) => currentUser(req) ? res.redirect('/painel') : res.sendFile(path.join(PUB, 'entrar.html')));
 app.get('/sair', (req, res) => {
   const t = cookies(req).vz; if (t) db.prepare('DELETE FROM sessions WHERE token = ?').run(t);
-  res.set('Set-Cookie', 'vz=; Path=/; Max-Age=0').redirect('/entrar');
+  res.set('Set-Cookie', 'vz=; Path=/; Max-Age=0').redirect(req.query.para === 'admin' ? '/admin' : '/entrar');
 });
 app.get('/painel', (req, res) => {
   const u = currentUser(req);
@@ -241,8 +248,8 @@ app.get('/painel', (req, res) => {
 });
 app.get('/admin', (req, res) => {
   const u = currentUser(req);
-  if (!u) return res.redirect('/entrar');
-  if (!isAdmin(u)) return res.status(403).send(simplePage('Sem acesso', 'Esta área é só da administração da plataforma.', '<p><a href="/painel">Ir para o meu painel</a></p>'));
+  if (!u) return res.set('Cache-Control', 'no-store').sendFile(path.join(PUB, 'admin-entrar.html'));
+  if (!isAdmin(u)) return res.status(403).send(simplePage('Sem acesso', 'Esta área é só da administração da plataforma.', '<p><a href="/sair?para=admin">Entrar com outra conta</a> · <a href="/painel">Ir para o meu painel</a></p>'));
   res.set('Cache-Control', 'no-store').sendFile(path.join(PUB, 'admin.html'));
 });
 
@@ -275,9 +282,26 @@ app.post('/api/login', jsonBody, (req, res) => {
   const email = String(req.body.email || '').trim().toLowerCase();
   const u = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
   if (!u || !checkPass(String(req.body.password || ''), u.pass)) return res.status(401).json({ error: 'E-mail ou senha incorretos.' });
+  if (req.body.admin && !isAdmin(u)) return res.status(403).json({ error: 'Esta conta não tem acesso à administração.' });
   startSession(res, u.id);
+  if (req.body.admin) return res.json({ ok: true, redirect: '/admin' });
   const hasStore = db.prepare('SELECT 1 FROM stores WHERE user_id = ?').get(u.id);
   res.json({ ok: true, redirect: hasStore ? '/painel' : '/admin' });
+});
+
+// Primeiro acesso da dona: cria a senha sem loja, só para e-mails de ADMIN_EMAILS
+app.post('/api/admin/setup', jsonBody, (req, res) => {
+  if (tooMany(req.ip)) return res.status(429).json({ error: 'Muitas tentativas. Espere 15 minutos e tente de novo.' });
+  const name = String(req.body.name || '').trim().slice(0, 80);
+  const email = String(req.body.email || '').trim().toLowerCase();
+  const pass = String(req.body.password || '');
+  if (!name) return res.status(400).json({ error: 'Preencha seu nome.' });
+  if (!CFG.admins.includes(email)) return res.status(403).json({ error: 'Este e-mail não está autorizado como administração.' });
+  if (pass.length < 10) return res.status(400).json({ error: 'A senha precisa ter pelo menos 10 caracteres.' });
+  if (db.prepare('SELECT 1 FROM users WHERE email = ?').get(email)) return res.status(409).json({ error: 'Este e-mail já tem senha. Use "Já tenho senha" para entrar.' });
+  const u = db.prepare('INSERT INTO users (name, email, pass, created_at) VALUES (?, ?, ?, ?)').run(name, email, hashPass(pass), now());
+  startSession(res, u.lastInsertRowid);
+  res.json({ ok: true, redirect: '/admin' });
 });
 
 app.post('/api/password', jsonBody, auth, (req, res) => {

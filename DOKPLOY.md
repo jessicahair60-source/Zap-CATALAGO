@@ -46,6 +46,7 @@ DATA_DIR=/app/data
 PUBLIC_URL=https://SEU-DOMINIO.com.br
 BRAND_NAME=Vitrine Zap
 ADMIN_EMAILS=jessicahair60@gmail.com
+ADMIN_HOST=
 PLAN_PRICE=47.00
 TRIAL_DAYS=7
 MP_ACCESS_TOKEN=
@@ -87,9 +88,17 @@ Este passo é obrigatório. Sem ele, cada atualização apaga as lojas e as foto
 
 Para atualizar sozinho a cada mudança no GitHub, ligue **Autodeploy** na aba General.
 
-## 8. Criar a sua conta de dona
+## 8. Entrar na administração
 
-Abra `https://seu-dominio.com.br/cadastro` e crie a conta com o e-mail que está em `ADMIN_EMAILS`. Depois, o painel da plataforma fica em `https://seu-dominio.com.br/admin`.
+Abra `https://seu-dominio.com.br/admin`. Na primeira vez, toque em **Primeiro acesso? Criar minha senha** e use o e-mail que está em `ADMIN_EMAILS`. Essa conta é só da administração e não cria loja.
+
+### Endereço só da administração (opcional)
+
+Para abrir a administração em `adm.seu-dominio.com.br`:
+
+1. No DNS do domínio, crie o registro **A** com nome **adm** apontando para o IP da VPS.
+2. No Dokploy, aba **Domains**, adicione o host `adm.seu-dominio.com.br`, Path `/`, porta `3000`, HTTPS com Let's Encrypt.
+3. Na aba **Environment**, preencha `ADMIN_HOST=adm.seu-dominio.com.br`, salve e clique em **Deploy**.
 
 ## 9. Mercado Pago (para receber as assinaturas)
 

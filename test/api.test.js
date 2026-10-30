@@ -6,7 +6,8 @@ const fs = require('fs');
 const path = require('path');
 
 process.env.DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), 'vz-test-'));
-process.env.ADMIN_EMAILS = 'dona@teste.com';
+process.env.ADMIN_EMAILS = 'dona@teste.com,socia@teste.com';
+process.env.ADMIN_HOST = 'adm.teste.com';
 process.env.PUBLIC_URL = 'http://localhost';
 delete process.env.MP_ACCESS_TOKEN;
 const app = require('../server');
@@ -127,10 +128,31 @@ test('painel da dona da plataforma', async () => {
   await dona('POST', `/api/admin/stores/${ana.id}`, { action: 'unblock' });
   r = await pub('GET', '/ana-modas'); assert.strictEqual(r.status, 200);
 
+  // entrada separada da administração
+  const anon = client();
+  r = await anon('GET', '/admin'); assert.strictEqual(r.status, 200); assert.match(r.text, /Administração da plataforma/);
+  r = await anon('POST', '/api/admin/setup', { name: 'X', email: 'ana@teste.com', password: 'senha-muito-forte' }); assert.strictEqual(r.status, 403);
+  r = await anon('POST', '/api/admin/setup', { name: 'Dona', email: 'dona@teste.com', password: 'senha-muito-forte' }); assert.strictEqual(r.status, 409);
+  r = await anon('POST', '/api/login', { email: 'ana@teste.com', password: 'senha-forte', admin: true }); assert.strictEqual(r.status, 403);
+  r = await anon('GET', '/api/admin/overview'); assert.notStrictEqual(r.status, 200);
+  r = await anon('POST', '/api/login', { email: 'dona@teste.com', password: 'senha-forte', admin: true }); assert.strictEqual(r.json.redirect, '/admin');
+  r = await anon('GET', '/admin'); assert.match(r.text, /id="brand"/);
+
   // senha nova gerada pela dona
   r = await dona('POST', `/api/admin/stores/${ana.id}`, { action: 'resetPassword' }); assert.ok(r.json.tempPassword);
   const a = client();
   r = await a('POST', '/api/login', { email: 'ana@teste.com', password: r.json.tempPassword }); assert.strictEqual(r.status, 200);
+});
+
+test('primeiro acesso da administração, sem loja, e endereço só da administração', async () => {
+  const c = client();
+  let r = await c('POST', '/api/admin/setup', { name: 'Sócia', email: 'socia@teste.com', password: 'curta' }); assert.strictEqual(r.status, 400);
+  r = await c('POST', '/api/admin/setup', { name: 'Sócia', email: 'socia@teste.com', password: 'senha-muito-forte' }); assert.strictEqual(r.status, 200);
+  r = await c('GET', '/api/admin/overview'); assert.strictEqual(r.status, 200);
+  r = await c('GET', '/painel'); assert.strictEqual(r.headers.get('location'), '/admin');
+  r = await c('GET', '/', null, { 'X-Forwarded-Host': 'adm.teste.com' }); assert.match(r.text, /id="brand"/);
+  r = await c('GET', '/sair?para=admin'); assert.strictEqual(r.headers.get('location'), '/admin');
+  r = await client()('GET', '/', null, { 'X-Forwarded-Host': 'adm.teste.com' }); assert.match(r.text, /Primeiro acesso/);
 });
 
 test('páginas públicas da plataforma', async () => {
