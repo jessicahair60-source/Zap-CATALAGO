@@ -16,7 +16,6 @@ const CFG = {
   publicUrl: (process.env.PUBLIC_URL || 'http://localhost:3000').replace(/\/$/, ''),
   baseDomain: (process.env.BASE_DOMAIN || '').toLowerCase(),
   proPrice: parseFloat(process.env.PLAN_PRICE || '47.00'),
-  trialDays: parseInt(process.env.TRIAL_DAYS || '7', 10),
   adminHost: (process.env.ADMIN_HOST || '').toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, ''),
   admins: (process.env.ADMIN_EMAILS || '').toLowerCase().split(',').map(s => s.trim()).filter(Boolean),
   fakePayments: !mp.enabled() && process.env.NODE_ENV !== 'production'
@@ -48,10 +47,11 @@ function uniqueSlug(base) {
   return candidate;
 }
 
-// Situação da assinatura: paga, em teste grátis, ou vencida (vitrine sai do ar até pagar)
+// Situação da assinatura: paga, liberada (sem cobrança ligada ainda) ou vencida (vitrine sai do ar até pagar).
+// Não tem teste grátis: com a cobrança ligada, a loja nova só entra no ar depois de pagar.
 function planOf(store) {
   if (store.pro_until && store.pro_until > now()) return 'pro';
-  if (store.trial_until && store.trial_until > now()) return 'trial';
+  if (!mp.enabled() && !CFG.fakePayments) return 'open';
   return 'expired';
 }
 const isPro = store => planOf(store) !== 'expired';
@@ -270,7 +270,7 @@ app.post('/api/signup', jsonBody, (req, res) => {
   const tx = db.transaction(() => {
     const u = db.prepare('INSERT INTO users (name, email, pass, created_at) VALUES (?, ?, ?, ?)').run(name, email, hashPass(pass), t);
     db.prepare('INSERT INTO stores (user_id, slug, name, trial_until, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)')
-      .run(u.lastInsertRowid, uniqueSlug(slugify(storeName)), storeName, CFG.trialDays > 0 ? t + CFG.trialDays * DAY : null, t, t);
+      .run(u.lastInsertRowid, uniqueSlug(slugify(storeName)), storeName, null, t, t);
     return u.lastInsertRowid;
   });
   startSession(res, tx());
@@ -531,7 +531,7 @@ app.get('/api/admin/overview', adminOnly, (req, res) => {
   const views30 = db.prepare("SELECT COALESCE(SUM(n), 0) AS t FROM events WHERE type = 'view' AND day >= ?").get(new Date(now() - 29 * DAY).toISOString().slice(0, 10)).t;
   res.json({
     brand: CFG.brand, proPrice: CFG.proPrice,
-    metrics: { total: list.length, paying, trial: list.filter(s => s.plan === 'trial').length, expired: list.filter(s => s.plan === 'expired').length,
+    metrics: { total: list.length, paying, open: list.filter(s => s.plan === 'open').length, expired: list.filter(s => s.plan === 'expired').length,
       blocked: list.filter(s => s.blocked).length, newWeek: stores.filter(s => s.created_at > week).length, mrr: paying * CFG.proPrice, revenue30, views30 },
     stores: list,
     payments: db.prepare('SELECT p.*, s.name FROM payments p JOIN stores s ON s.id = p.store_id ORDER BY p.created_at DESC LIMIT 30').all()

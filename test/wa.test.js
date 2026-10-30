@@ -57,6 +57,7 @@ test('lê o modelo de texto', () => {
 test('robô: ligar o número e cadastrar produtos', async () => {
   const c = client();
   await c('POST', '/api/signup', { name: 'Ana', storeName: 'Ana Perucas', email: 'ana@wa.com', password: 'senha-forte', terms: true });
+  await c('POST', '/api/billing/checkout');
   const st = { v: 4, store: { name: 'Ana Perucas' }, colors: {}, links: [], cats: ['Novidades'], catImgs: {}, testimonials: [], products: [{ id: 1, name: 'Antigo', price: 10, active: true, media: [] }] };
   let r = await c('PUT', '/api/store', { state: st }); const base0 = r.json.savedAt; assert.ok(base0);
 

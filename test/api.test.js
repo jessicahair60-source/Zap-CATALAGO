@@ -47,7 +47,10 @@ test('fluxo completo da lojista', async () => {
   r = await c('POST', '/api/signup', { name: 'Ana', storeName: 'Ateliê da Ana', email: 'ana@teste.com', password: 'senha-forte', terms: true });
   assert.strictEqual(r.status, 200);
   r = await c('GET', '/api/me');
-  assert.strictEqual(r.json.store.slug, 'atelie-da-ana'); assert.strictEqual(r.json.store.plan, 'trial');
+  assert.strictEqual(r.json.store.slug, 'atelie-da-ana'); assert.strictEqual(r.json.store.plan, 'expired');
+  // sem teste grátis: com a cobrança ligada, a vitrine só entra no ar depois de pagar
+  r = await client()('GET', '/atelie-da-ana'); assert.strictEqual(r.status, 402);
+  r = await c('POST', '/api/billing/checkout'); assert.strictEqual(r.status, 200); assert.strictEqual(r.json.simulated, true); assert.strictEqual(r.json.store.plan, 'pro'); assert.strictEqual(r.json.store.proPrice, 47);
 
   // vitrine sem dados mostra "em preparação"
   r = await c('GET', '/atelie-da-ana'); assert.strictEqual(r.status, 200); assert.match(r.text, /"state":null/);
@@ -92,8 +95,6 @@ test('fluxo completo da lojista', async () => {
   r = await c('GET', '/api/stats?days=7');
   assert.deepStrictEqual(r.json.totals, { view: 2, pview: 1, click: 1, order: 1 }); assert.strictEqual(r.json.top[0].id, '2'); assert.strictEqual(r.json.series.length, 7);
 
-  // assinatura em modo de teste
-  r = await c('POST', '/api/billing/checkout'); assert.strictEqual(r.status, 200); assert.strictEqual(r.json.simulated, true); assert.strictEqual(r.json.store.plan, 'pro'); assert.strictEqual(r.json.store.proPrice, 47);
 
   // domínio próprio (Pro) e acesso pelo domínio
   r = await c('PUT', '/api/domain', { domain: 'https://www.anamodas.com.br/' }); assert.strictEqual(r.status, 200); assert.strictEqual(r.json.store.customDomain, 'anamodas.com.br');

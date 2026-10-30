@@ -1674,6 +1674,7 @@ const proOk = () => MODE === 'demo' || BOOT.store.plan !== 'expired';
 const fmtDate = t => new Date(t).toLocaleDateString('pt-BR');
 function planCard() {
   const st = BOOT.store;
+  if (st.plan === 'open') return ''; // cobrança ainda não ligada: nada de assinatura no painel
   const label = st.plan === 'pro' ? 'Assinatura ativa' : st.plan === 'trial' ? 'Teste grátis' : 'Assinatura vencida';
   const sub = st.plan === 'pro' ? `${st.subscribed ? 'Renova' : 'Vale'} até ${fmtDate(st.proUntil)}` : st.plan === 'trial' ? `Termina em ${fmtDate(st.trialUntil)}. Assine para a vitrine continuar no ar.` : 'Sua vitrine está fora do ar para as clientes.';
   return `<section class="plan plan-${st.plan}"><div class="plan-top"><div><b>${label}</b><small>${sub}</small></div>

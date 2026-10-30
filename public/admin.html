@@ -29,7 +29,7 @@
   .row-top { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
   .row b { font-size: 15.5px; } .row .meta { font-size: 12.5px; color: var(--muted); margin-top: 2px; word-break: break-word; }
   .tag { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 99px; white-space: nowrap; letter-spacing: .04em; text-transform: uppercase; }
-  .t-pro { background: #E3F6EA; color: #137A3D; } .t-trial { background: #EEE8FB; color: #5B3FA8; } .t-expired { background: #FFF4E5; color: var(--warn); } .t-blocked { background: #FDE7E4; color: var(--danger); }
+  .t-pro { background: #E3F6EA; color: #137A3D; } .t-open, .t-trial { background: #EEE8FB; color: #5B3FA8; } .t-expired { background: #FFF4E5; color: var(--warn); } .t-blocked { background: #FDE7E4; color: var(--danger); }
   .acts { display: flex; gap: 6px; flex-wrap: wrap; }
   .acts button, .acts a { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 7px 11px; font: 600 12.5px var(--f-body); cursor: pointer; color: var(--fg); text-decoration: none; }
   .acts .danger { color: var(--danger); }
@@ -64,7 +64,7 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const brl = v => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 const date = t => t ? new Date(t).toLocaleDateString('pt-BR') : '';
-const PLAN = { pro: 'Paga', trial: 'Teste', expired: 'Vencida' };
+const PLAN = { pro: 'Paga', open: 'Liberada', trial: 'Teste', expired: 'Vencida' };
 let data = null, filter = 'all';
 function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 3000); }
 
@@ -77,9 +77,9 @@ function render() {
   const m = data.metrics; $('#brand').textContent = data.brand;
   $('#kpis').innerHTML = [
     ['hl', brl(m.mrr), 'Receita mensal recorrente'], ['', m.total, 'Lojas cadastradas'], ['', m.paying, 'Lojas pagando'], ['', m.newWeek, 'Novas nos últimos 7 dias'],
-    ['', m.trial, 'Em teste grátis'], ['', m.expired, 'Vencidas (fora do ar)'], ['', brl(m.revenue30), 'Recebido em 30 dias'], ['', m.views30.toLocaleString('pt-BR'), 'Visitas nas vitrines (30 dias)']
+    ['', m.open, 'Liberadas (sem cobrança)'], ['', m.expired, 'Vencidas (fora do ar)'], ['', brl(m.revenue30), 'Recebido em 30 dias'], ['', m.views30.toLocaleString('pt-BR'), 'Visitas nas vitrines (30 dias)']
   ].map(([c, v, l]) => `<div class="kpi ${c}"><b>${v}</b><span>${l}</span></div>`).join('');
-  const chips = [['all', `Todas (${m.total})`], ['pro', `Pagas (${m.paying})`], ['trial', `Teste (${m.trial})`], ['expired', `Vencidas (${m.expired})`], ['blocked', `Bloqueadas (${m.blocked})`]];
+  const chips = [['all', `Todas (${m.total})`], ['pro', `Pagas (${m.paying})`], ['open', `Liberadas (${m.open})`], ['expired', `Vencidas (${m.expired})`], ['blocked', `Bloqueadas (${m.blocked})`]];
   $('#chips').innerHTML = chips.map(([k, l]) => `<button class="chip" data-f="${k}" aria-pressed="${filter === k}">${l}</button>`).join('');
   document.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { filter = b.dataset.f; render(); });
   const q = $('#q').value.trim().toLowerCase();
@@ -88,7 +88,7 @@ function render() {
     <div class="row-top"><div><b>${esc(s.name)}</b>
       <div class="meta">${esc(s.owner)} · ${esc(s.email)}</div>
       <div class="meta"><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.url.replace(/^https?:\/\//, ''))}</a> · ${s.products} produtos · ${s.online ? 'no ar' : 'fora do ar'} · desde ${date(s.createdAt)}</div>
-      <div class="meta">${s.plan === 'pro' ? `Paga até ${date(s.proUntil)}${s.subscribed ? ' · assinatura ativa' : ''}` : s.plan === 'trial' ? `Teste até ${date(s.trialUntil)}` : 'Vencida · vitrine fora do ar'}${s.blocked ? ` · bloqueada${s.blockedReason ? ': ' + esc(s.blockedReason) : ''}` : ''}</div></div>
+      <div class="meta">${s.plan === 'pro' ? `Paga até ${date(s.proUntil)}${s.subscribed ? ' · assinatura ativa' : ''}` : s.plan === 'open' ? 'Liberada · cobrança ainda não ligada' : 'Vencida · vitrine fora do ar'}${s.blocked ? ` · bloqueada${s.blockedReason ? ': ' + esc(s.blockedReason) : ''}` : ''}</div></div>
       <span class="tag ${s.blocked ? 't-blocked' : 't-' + s.plan}">${s.blocked ? 'Bloqueada' : PLAN[s.plan]}</span></div>
     <div class="acts">
       <a href="${esc(s.url)}" target="_blank" rel="noopener">Ver vitrine</a>
