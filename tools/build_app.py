@@ -183,7 +183,7 @@ rep("""    <button class="pbtn ghost" id="reset">Voltar ao exemplo original</but
 """    ${MODE === 'panel' ? `<h3 class="pgroup">Sua conta</h3>
     ${sec('conta', esc(BOOT.user.name), esc(BOOT.user.email), `
       <div class="two"><div class="field"><label for="pwcur">Senha atual</label><input class="in" id="pwcur" type="password" autocomplete="current-password"></div>
-        <div class="field"><label for="pwnew">Nova senha</label><input class="in" id="pwnew" type="password" autocomplete="new-password" placeholder="8 caracteres ou mais"></div></div>
+        <div class="field"><label for="pwnew">Nova senha</label><input class="in" id="pwnew" type="password" autocomplete="new-password" placeholder="4 caracteres ou mais"></div></div>
       <button class="pbtn" id="pwsave">Trocar senha</button><p class="err" id="pwerr" hidden></p>
       ${BOOT.user.admin ? '<a class="pbtn ghost" href="/admin" style="display:block;text-align:center;text-decoration:none;margin-top:8px">Abrir o painel da plataforma</a>' : ''}
       <a class="pbtn ghost" href="/sair" style="display:block;text-align:center;text-decoration:none;margin-top:8px">Sair da conta</a>`)}

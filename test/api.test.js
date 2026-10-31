@@ -40,7 +40,7 @@ test('Pix: CRC16 e código copia e cola', () => {
 
 test('fluxo completo da lojista', async () => {
   const c = client();
-  let r = await c('POST', '/api/signup', { name: 'Ana', storeName: 'Ateliê da Ana', email: 'ana@teste.com', password: 'curta', terms: true });
+  let r = await c('POST', '/api/signup', { name: 'Ana', storeName: 'Ateliê da Ana', email: 'ana@teste.com', password: 'abc', terms: true });
   assert.strictEqual(r.status, 400);
   r = await c('POST', '/api/signup', { name: 'Ana', storeName: 'Ateliê da Ana', email: 'ana@teste.com', password: 'senha-forte', terms: false });
   assert.strictEqual(r.status, 400);
@@ -146,7 +146,7 @@ test('painel da dona da plataforma', async () => {
   // link de senha nova gerado pela administração
   r = await dona('POST', `/api/admin/stores/${ana.id}`, { action: 'resetLink' }); const tk = new URL(r.json.link).searchParams.get('t'); assert.ok(tk);
   const lojista = client();
-  r = await lojista('POST', '/api/password/reset', { token: tk, password: 'curta' }); assert.strictEqual(r.status, 400);
+  r = await lojista('POST', '/api/password/reset', { token: tk, password: 'abc' }); assert.strictEqual(r.status, 400);
   r = await lojista('POST', '/api/password/reset', { token: tk, password: 'nova-senha-123' }); assert.strictEqual(r.status, 200); assert.strictEqual(r.json.redirect, '/painel');
   r = await lojista('GET', '/api/me'); assert.strictEqual(r.json.store.slug, 'ana-modas');
   r = await client()('POST', '/api/password/reset', { token: tk, password: 'outra-senha-123' }); assert.strictEqual(r.status, 400); // uso único

@@ -283,7 +283,7 @@ app.post('/api/signup', jsonBody, (req, res) => {
   const pass = String(req.body.password || '');
   if (!name || !storeName) return res.status(400).json({ error: 'Preencha seu nome e o nome da loja.' });
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: 'E-mail inválido.' });
-  if (pass.length < 8) return res.status(400).json({ error: 'A senha precisa ter pelo menos 8 caracteres.' });
+  if (pass.length < 4) return res.status(400).json({ error: 'A senha precisa ter pelo menos 4 caracteres.' });
   if (!req.body.terms) return res.status(400).json({ error: 'Para criar a conta, aceite os termos de uso e a política de privacidade.' });
   if (db.prepare('SELECT 1 FROM users WHERE email = ?').get(email)) return res.status(409).json({ error: 'Já existe uma conta com este e-mail. Tente entrar.' });
   const t = now();
@@ -339,7 +339,9 @@ app.post('/api/password/reset', jsonBody, (req, res) => {
   const pass = String(req.body.password || '');
   const row = db.prepare('SELECT * FROM pw_resets WHERE token_hash = ? AND expires_at > ?').get(tokenHash(req.body.token), now());
   if (!row) return res.status(400).json({ error: 'Este link venceu ou já foi usado. Peça um link novo.' });
-  if (pass.length < 8) return res.status(400).json({ error: 'A senha precisa ter pelo menos 8 caracteres.' });
+  if (pass.length < 4) return res.status(400).json({ error: 'A senha precisa ter pelo menos 4 caracteres.' });
+  const owner = db.prepare('SELECT * FROM users WHERE id = ?').get(row.user_id);
+  if (isAdmin(owner) && pass.length < 10) return res.status(400).json({ error: 'Senha da administração precisa ter pelo menos 10 caracteres.' });
   db.transaction(() => {
     db.prepare('UPDATE users SET pass = ? WHERE id = ?').run(hashPass(pass), row.user_id);
     db.prepare('DELETE FROM sessions WHERE user_id = ?').run(row.user_id);
@@ -368,7 +370,7 @@ app.post('/api/admin/setup', jsonBody, (req, res) => {
 app.post('/api/password', jsonBody, auth, (req, res) => {
   if (!checkPass(String(req.body.current || ''), req.user.pass)) return res.status(400).json({ error: 'A senha atual está incorreta.' });
   const p = String(req.body.next || '');
-  if (p.length < 8) return res.status(400).json({ error: 'A nova senha precisa ter pelo menos 8 caracteres.' });
+  if (p.length < 4) return res.status(400).json({ error: 'A nova senha precisa ter pelo menos 4 caracteres.' });
   db.prepare('UPDATE users SET pass = ? WHERE id = ?').run(hashPass(p), req.user.id);
   res.json({ ok: true });
 });
