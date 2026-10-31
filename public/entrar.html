@@ -50,6 +50,8 @@
   .okbox .ic { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: #E6F7EC; color: var(--ok); }
   .okbox .ic svg { width: 28px; height: 28px; }
   .wa { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 10px; border-radius: 14px; padding: 14px; background: #1FA855; color: #fff; font-weight: 700; text-decoration: none; }
+  .or { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 12.5px; margin: 14px 0 0; }
+  .or::before, .or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
   .back { display: block; text-align: center; margin-top: 16px; }
   .foot { text-align: center; margin-top: 18px; font-size: 12.5px; color: var(--muted); }
   .foot a { color: var(--muted); }
@@ -119,7 +121,12 @@
 
         <form id="f-fg" hidden novalidate>
           <h1>Esqueceu a senha?</h1>
-          <p class="sub">Coloque o e-mail da sua conta. A gente manda um link para você criar uma senha nova.</p>
+          <p class="sub" id="fg-sub">Coloque o e-mail da sua conta. A gente manda um link para você criar uma senha nova.</p>
+          <div id="fg-wa" hidden>
+            <a class="wa" id="fg-wa-go" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 20l1.3-4A8 8 0 1 1 8 18.7z"/></svg>Receber o link no WhatsApp</a>
+            <p class="sub" style="font-size:13px;margin-top:8px">Mande a mensagem do WhatsApp que você ligou na loja. O robô responde na hora com o link.</p>
+            <p class="or" id="fg-or">ou pelo e-mail</p>
+          </div>
           <div class="f"><label for="fe">E-mail</label><div class="inp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></svg><input id="fe" type="email" autocomplete="email" inputmode="email" required placeholder="voce@email.com"></div></div>
           <p class="err" id="ferr" hidden></p>
           <button class="go" type="submit"><span class="spin"></span>Enviar link</button>
@@ -167,6 +174,13 @@ $('#t-in').onclick = () => view('in', true); $('#t-up').onclick = () => view('up
 $('#go-forgot').onclick = e => { e.preventDefault(); $('#fe').value = $('#ie').value; view('fg', true); };
 document.querySelectorAll('[data-back]').forEach(a => a.onclick = e => { e.preventDefault(); view('in', true); });
 const token = new URLSearchParams(location.search).get('t');
+// formas de recuperar a senha que estão ligadas
+let OPT = {};
+fetch('/api/password/options').then(r => r.json()).then(o => { OPT = o;
+  if (o.whatsapp) { $('#fg-wa').hidden = false; $('#fg-wa-go').href = `https://wa.me/${o.whatsapp}?text=${encodeURIComponent('Esqueci minha senha')}`;
+    $('#fg-sub').textContent = 'Escolha como quer receber o link para criar uma senha nova.'; }
+  if (!o.email) { $('#fg-or').hidden = true; if (o.whatsapp) document.querySelectorAll('#f-fg .f, #f-fg .go').forEach(el => el.hidden = true); }
+}).catch(() => {});
 view(location.pathname === '/cadastro' ? 'up' : location.pathname === '/esqueci' ? 'fg' : location.pathname === '/nova-senha' && token ? 'rs' : 'in');
 
 async function post(url, body, errEl, btn) {
@@ -194,9 +208,9 @@ $('#f-fg').onsubmit = async e => { e.preventDefault(); const err = $('#ferr');
   const j = await post('/api/password/forgot', { email: $('#fe').value }, err, $('#f-fg .go')); if (!j) return;
   $('#f-fg .go').disabled = false;
   const ch = j.channels || {};
-  if (ch.email || ch.whatsapp) {
-    $('#sent-t').textContent = 'Confira seu ' + (ch.email ? 'e-mail' : 'WhatsApp');
-    $('#sent-p').textContent = `Se ${$('#fe').value.trim()} tiver conta, você vai receber ${ch.email && ch.whatsapp ? 'no e-mail e no WhatsApp ligado à loja ' : ch.email ? '' : 'no WhatsApp ligado à loja '}um link para criar a senha nova. Ele vale por 1 hora.${ch.email ? ' Olhe também a caixa de spam.' : ''}`;
+  if (ch.email) {
+    $('#sent-t').textContent = 'Confira seu e-mail';
+    $('#sent-p').textContent = `Se ${$('#fe').value.trim()} tiver conta, você vai receber um link para criar a senha nova. Ele vale por 1 hora. Olhe também a caixa de spam.`;
   } else {
     $('#sent-t').textContent = 'Fale com o suporte';
     $('#sent-p').textContent = 'O suporte manda para você um link seguro para criar a senha nova.';

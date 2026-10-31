@@ -106,6 +106,13 @@ test('robô: ligar o número e cadastrar produtos', async () => {
   await new Promise(res => setTimeout(res, 60));
   r = await c('GET', '/api/wa/new?since=0'); assert.strictEqual(r.json.products.filter(x => x.name === 'Dup').length, 1);
 
+  // esqueci minha senha pelo WhatsApp: o robô responde com o link, que troca a senha
+  await hook('5511988887777', { type: 'text', text: { body: 'Esqueci minha senha' } }); assert.match(last(), /senha nova/);
+  const tk = last().match(/nova-senha\?t=([\w-]+)/)[1];
+  r = await client()('POST', '/api/password/reset', { token: tk, password: 'trocada-123' }); assert.strictEqual(r.status, 200);
+  r = await c('POST', '/api/login', { email: 'ana@wa.com', password: 'trocada-123' }); assert.strictEqual(r.status, 200); // a senha nova encerra as sessões antigas
+  r = await client()('GET', '/api/password/options'); assert.strictEqual(r.json.whatsapp, '5511900000000');
+
   // desligar o número
   r = await c('DELETE', '/api/wa/phone/5511988887777'); assert.strictEqual(r.json.phones.length, 0);
   await hook('5511988887777', { type: 'text', text: { body: 'Nome: X\nPreço: 1' } }); assert.match(last(), /ainda não está ligado/);

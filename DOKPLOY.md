@@ -148,4 +148,4 @@ SMTP_PASS=a senha desse e-mail
 SMTP_FROM=Zap Catálogo <contato@zapcatalago.com>
 ```
 
-Se o robô do WhatsApp estiver ligado, o link também vai para o WhatsApp que a lojista ligou na loja.
+Com o robô do WhatsApp ligado (WHATSAPP.md), a tela "Esqueci minha senha" mostra o botão **Receber o link no WhatsApp**: a lojista manda "Esqueci minha senha" para o robô, do número que ela ligou na loja, e recebe o link na hora. Não precisa de e-mail.

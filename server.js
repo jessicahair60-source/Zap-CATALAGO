@@ -320,20 +320,20 @@ function resetLink(userId, hours) {
 app.post('/api/password/forgot', jsonBody, async (req, res) => {
   if (tooMany(req.ip, 'senha')) return res.status(429).json({ error: 'Muitas tentativas. Espere 15 minutos e tente de novo.' });
   const email = String(req.body.email || '').trim().toLowerCase();
-  const channels = { email: mail.enabled(), whatsapp: wa.enabled() };
+  const channels = { email: mail.enabled() };
   // a resposta é a mesma com ou sem conta, para ninguém descobrir quais e-mails estão cadastrados
   res.json({ ok: true, channels, support: CFG.support });
   const u = email && db.prepare('SELECT * FROM users WHERE email = ?').get(email);
-  if (!u || (!channels.email && !channels.whatsapp)) return;
+  if (!u || !channels.email) return;
   const link = resetLink(u.id, 1);
   const first = u.name.split(' ')[0];
   if (channels.email) mail.send({ to: u.email, subject: `Sua senha nova · ${CFG.brand}`,
     text: `Oi, ${first}!\n\nPara criar uma senha nova, abra o link abaixo. Ele vale por 1 hora.\n\n${link}\n\nSe não foi você que pediu, pode ignorar este e-mail.`,
     html: `<p>Oi, ${escHtml(first)}!</p><p>Para criar uma senha nova, toque no botão. O link vale por 1 hora.</p><p><a href="${link}" style="display:inline-block;background:#B9476F;color:#fff;padding:12px 20px;border-radius:10px;text-decoration:none;font-weight:700">Criar senha nova</a></p><p style="color:#7A6670;font-size:13px">Se não foi você que pediu, pode ignorar este e-mail.</p>` })
     .catch(e => console.error('e-mail de senha:', e.message));
-  if (channels.whatsapp) db.prepare('SELECT l.phone FROM wa_links l JOIN stores s ON s.id = l.store_id WHERE s.user_id = ?').all(u.id)
-    .forEach(({ phone }) => wa.sendText(phone, `🔑 ${CFG.brand}: para criar uma senha nova, abra o link (vale 1 hora):\n${link}\n\nSe não foi você que pediu, ignore esta mensagem.`).catch(e => console.error('whatsapp de senha:', e.message)));
 });
+// Como a lojista pode recuperar a senha: pelo robô do WhatsApp (ela manda "Esqueci minha senha"), por e-mail ou com o suporte
+app.get('/api/password/options', (req, res) => res.json({ whatsapp: wa.enabled() ? wa.number() : '', email: mail.enabled(), support: CFG.support }));
 app.post('/api/password/reset', jsonBody, (req, res) => {
   if (tooMany(req.ip, 'senha')) return res.status(429).json({ error: 'Muitas tentativas. Espere 15 minutos e tente de novo.' });
   const pass = String(req.body.password || '');
@@ -536,6 +536,7 @@ const bot = createBot({
   send: (to, text) => wa.enabled() ? wa.sendText(to, text) : console.log(`[robô -> ${to}] ${text}`),
   download: id => wa.download(id),
   saveFile,
+  resetLink: userId => resetLink(userId, 1),
   storeOk: store => store.blocked ? 'Sua loja está bloqueada. Fale com o suporte.' : !isPro(store) ? `Sua assinatura está vencida. Assine no painel (${CFG.publicUrl}/painel) para voltar a cadastrar pelo WhatsApp.` : ''
 });
 app.get('/api/webhooks/wa', (req, res) => {
