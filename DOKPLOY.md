@@ -127,3 +127,25 @@ Em **Volume Backups** (ou **Backups**) do Dokploy, agende a cópia diária do vo
 - **Deploy falhou:** abra o deployment e veja o log. Me mande o trecho em vermelho.
 - **Site não abre:** confira se o DNS já aponta para o IP da VPS e se a porta do domínio é 3000.
 - **Botão Assinar dá erro:** falta o `MP_ACCESS_TOKEN`.
+
+## 11. Esqueci minha senha
+
+Na aba **Environment**, acrescente:
+
+```
+SUPPORT_WHATSAPP=5511999999999
+```
+
+Com isso, quem esquecer a senha vê um botão para falar com você no WhatsApp. No seu painel de administração, o botão **Link de senha nova** de cada loja gera um link seguro (vale 24 horas) para você mandar para a lojista.
+
+Para o link chegar sozinho por e-mail, crie um e-mail (por exemplo `contato@zapcatalago.com` na Hostinger) e preencha:
+
+```
+SMTP_HOST=smtp.hostinger.com
+SMTP_PORT=465
+SMTP_USER=contato@zapcatalago.com
+SMTP_PASS=a senha desse e-mail
+SMTP_FROM=Zap Catálogo <contato@zapcatalago.com>
+```
+
+Se o robô do WhatsApp estiver ligado, o link também vai para o WhatsApp que a lojista ligou na loja.

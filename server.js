@@ -9,6 +9,7 @@ const { db, DATA_DIR } = require('./lib/db');
 const { pixPayload } = require('./lib/pix');
 const mp = require('./lib/mercadopago');
 const wa = require('./lib/whatsapp');
+const mail = require('./lib/mail');
 const { createBot, TEMPLATE: WA_TEMPLATE } = require('./lib/wabot');
 
 const CFG = {
@@ -18,7 +19,8 @@ const CFG = {
   proPrice: parseFloat(process.env.PLAN_PRICE || '47.00'),
   adminHost: (process.env.ADMIN_HOST || '').toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, ''),
   admins: (process.env.ADMIN_EMAILS || '').toLowerCase().split(',').map(s => s.trim()).filter(Boolean),
-  fakePayments: !mp.enabled() && process.env.NODE_ENV !== 'production'
+  fakePayments: !mp.enabled() && process.env.NODE_ENV !== 'production',
+  support: String(process.env.SUPPORT_WHATSAPP || '').replace(/\D/g, '')
 };
 const UPLOADS = path.join(DATA_DIR, 'uploads');
 const DAY = 86400000;
@@ -107,10 +109,11 @@ function adminOnly(req, res, next) {
 
 // Limite simples de tentativas de login por IP (10 a cada 15 minutos)
 const tries = new Map();
-function tooMany(ip) {
-  const t = tries.get(ip) || { n: 0, at: now() };
+function tooMany(ip, kind = 'login') {
+  const key = kind + ':' + ip;
+  const t = tries.get(key) || { n: 0, at: now() };
   if (now() - t.at > 15 * 60000) { t.n = 0; t.at = now(); }
-  t.n++; tries.set(ip, t);
+  t.n++; tries.set(key, t);
   return t.n > 10;
 }
 
@@ -230,11 +233,28 @@ const page = name => (req, res) => res.sendFile(path.join(PUB, name));
 app.get('/', page('index.html'));
 app.get('/termos', page('termos.html'));
 app.get('/privacidade', page('privacidade.html'));
+app.get(['/esqueci', '/nova-senha'], page('entrar.html'));
 app.get(['/entrar', '/cadastro'], (req, res) => currentUser(req) ? res.redirect('/painel') : res.sendFile(path.join(PUB, 'entrar.html')));
 app.get('/sair', (req, res) => {
   const t = cookies(req).vz; if (t) db.prepare('DELETE FROM sessions WHERE token = ?').run(t);
   res.set('Set-Cookie', 'vz=; Path=/; Max-Age=0').redirect(req.query.para === 'admin' ? '/admin' : '/entrar');
 });
+// O painel funciona como aplicativo: dá para instalar na tela inicial do celular
+const APP_HEAD = '<link rel="manifest" href="/manifest.webmanifest"><meta name="theme-color" content="#FBF3F5"><link rel="apple-touch-icon" href="/static/icon-180.png">'
+  + '<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Zap Catálogo"><link rel="icon" href="/static/logo.svg" type="image/svg+xml">';
+app.get('/manifest.webmanifest', (req, res) => res.type('application/manifest+json').set('Cache-Control', 'public, max-age=3600').send(JSON.stringify({
+  name: CFG.brand, short_name: CFG.brand, description: 'Painel da sua vitrine com pedido no WhatsApp', lang: 'pt-BR',
+  id: '/painel', start_url: '/painel', scope: '/', display: 'standalone', background_color: '#FBF3F5', theme_color: '#FBF3F5',
+  icons: [{ src: '/static/icon-192.png', sizes: '192x192', type: 'image/png' }, { src: '/static/icon-512.png', sizes: '512x512', type: 'image/png' },
+    { src: '/static/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }]
+})));
+// Service worker mínimo: deixa instalar o app; sem conexão, mostra um aviso em vez da tela do navegador
+app.get('/sw.js', (req, res) => res.type('application/javascript').set('Cache-Control', 'no-cache').send(`self.addEventListener('install', () => self.skipWaiting());
+self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
+self.addEventListener('fetch', e => {
+  if (e.request.mode !== 'navigate') return;
+  e.respondWith(fetch(e.request).catch(() => new Response('<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><body style="font-family:system-ui;display:grid;place-items:center;min-height:90vh;text-align:center;color:#2A1A22;background:#FBF3F5"><div><h2>Sem internet</h2><p>Confira a conexão e abra o app de novo.</p></div></body>', { headers: { 'Content-Type': 'text/html; charset=utf-8' } })));
+});`));
 app.get('/painel', (req, res) => {
   const u = currentUser(req);
   if (!u) return res.redirect('/entrar');
@@ -242,7 +262,7 @@ app.get('/painel', (req, res) => {
   if (!store) return res.redirect('/admin');
   let state = null; try { state = JSON.parse(store.state || 'null'); } catch (e) {}
   const boot = { mode: 'panel', state, store: storeInfo(store), user: { name: u.name, email: u.email, admin: isAdmin(u) }, brand: CFG.brand, home: CFG.publicUrl };
-  const html = APP_HTML().replace('<!--HEAD-->', `<title>Painel · ${escHtml(store.name)}</title><meta name="robots" content="noindex">`).replace('<!--BOOT-->', `<script>window.__BOOT__=${jsonForScript(boot)}</script>`);
+  const html = APP_HTML().replace('<!--HEAD-->', `<title>Painel · ${escHtml(store.name)}</title><meta name="robots" content="noindex">${APP_HEAD}`).replace('<!--BOOT-->', `<script>window.__BOOT__=${jsonForScript(boot)}</script>`);
   res.set('Cache-Control', 'no-store');
   sendApp(res, html);
 });
@@ -286,6 +306,47 @@ app.post('/api/login', jsonBody, (req, res) => {
   startSession(res, u.id);
   if (req.body.admin) return res.json({ ok: true, redirect: '/admin' });
   const hasStore = db.prepare('SELECT 1 FROM stores WHERE user_id = ?').get(u.id);
+  res.json({ ok: true, redirect: hasStore ? '/painel' : '/admin' });
+});
+
+// Esqueci minha senha: link de uso único, vale 1 hora (24 horas quando a administração gera)
+const tokenHash = t => crypto.createHash('sha256').update(String(t)).digest('hex');
+function resetLink(userId, hours) {
+  const token = crypto.randomBytes(24).toString('base64url');
+  db.prepare('DELETE FROM pw_resets WHERE user_id = ? OR expires_at < ?').run(userId, now());
+  db.prepare('INSERT INTO pw_resets (token_hash, user_id, expires_at) VALUES (?, ?, ?)').run(tokenHash(token), userId, now() + hours * 3600000);
+  return `${CFG.publicUrl}/nova-senha?t=${token}`;
+}
+app.post('/api/password/forgot', jsonBody, async (req, res) => {
+  if (tooMany(req.ip, 'senha')) return res.status(429).json({ error: 'Muitas tentativas. Espere 15 minutos e tente de novo.' });
+  const email = String(req.body.email || '').trim().toLowerCase();
+  const channels = { email: mail.enabled(), whatsapp: wa.enabled() };
+  // a resposta é a mesma com ou sem conta, para ninguém descobrir quais e-mails estão cadastrados
+  res.json({ ok: true, channels, support: CFG.support });
+  const u = email && db.prepare('SELECT * FROM users WHERE email = ?').get(email);
+  if (!u || (!channels.email && !channels.whatsapp)) return;
+  const link = resetLink(u.id, 1);
+  const first = u.name.split(' ')[0];
+  if (channels.email) mail.send({ to: u.email, subject: `Sua senha nova · ${CFG.brand}`,
+    text: `Oi, ${first}!\n\nPara criar uma senha nova, abra o link abaixo. Ele vale por 1 hora.\n\n${link}\n\nSe não foi você que pediu, pode ignorar este e-mail.`,
+    html: `<p>Oi, ${escHtml(first)}!</p><p>Para criar uma senha nova, toque no botão. O link vale por 1 hora.</p><p><a href="${link}" style="display:inline-block;background:#B9476F;color:#fff;padding:12px 20px;border-radius:10px;text-decoration:none;font-weight:700">Criar senha nova</a></p><p style="color:#7A6670;font-size:13px">Se não foi você que pediu, pode ignorar este e-mail.</p>` })
+    .catch(e => console.error('e-mail de senha:', e.message));
+  if (channels.whatsapp) db.prepare('SELECT l.phone FROM wa_links l JOIN stores s ON s.id = l.store_id WHERE s.user_id = ?').all(u.id)
+    .forEach(({ phone }) => wa.sendText(phone, `🔑 ${CFG.brand}: para criar uma senha nova, abra o link (vale 1 hora):\n${link}\n\nSe não foi você que pediu, ignore esta mensagem.`).catch(e => console.error('whatsapp de senha:', e.message)));
+});
+app.post('/api/password/reset', jsonBody, (req, res) => {
+  if (tooMany(req.ip, 'senha')) return res.status(429).json({ error: 'Muitas tentativas. Espere 15 minutos e tente de novo.' });
+  const pass = String(req.body.password || '');
+  const row = db.prepare('SELECT * FROM pw_resets WHERE token_hash = ? AND expires_at > ?').get(tokenHash(req.body.token), now());
+  if (!row) return res.status(400).json({ error: 'Este link venceu ou já foi usado. Peça um link novo.' });
+  if (pass.length < 8) return res.status(400).json({ error: 'A senha precisa ter pelo menos 8 caracteres.' });
+  db.transaction(() => {
+    db.prepare('UPDATE users SET pass = ? WHERE id = ?').run(hashPass(pass), row.user_id);
+    db.prepare('DELETE FROM sessions WHERE user_id = ?').run(row.user_id);
+    db.prepare('DELETE FROM pw_resets WHERE user_id = ?').run(row.user_id);
+  })();
+  startSession(res, row.user_id);
+  const hasStore = db.prepare('SELECT 1 FROM stores WHERE user_id = ?').get(row.user_id);
   res.json({ ok: true, redirect: hasStore ? '/painel' : '/admin' });
 });
 
@@ -548,6 +609,7 @@ app.post('/api/admin/stores/:id', adminOnly, jsonBody, (req, res) => {
     const days = Math.min(3650, Math.max(1, parseInt(req.body.days, 10) || 30));
     db.prepare('UPDATE stores SET pro_until = ?, updated_at = ? WHERE id = ?').run(Math.max(now(), s.pro_until || 0) + days * DAY, now(), s.id);
   } else if (a === 'expire') db.prepare('UPDATE stores SET pro_until = NULL, trial_until = NULL, updated_at = ? WHERE id = ?').run(now(), s.id);
+  else if (a === 'resetLink') return res.json({ ok: true, link: resetLink(s.user_id, 24) });
   else if (a === 'resetPassword') {
     const temp = crypto.randomBytes(5).toString('hex');
     db.prepare('UPDATE users SET pass = ? WHERE id = ?').run(hashPass(temp), s.user_id);

@@ -2,80 +2,211 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2A1A22">
 <title>Entrar · Zap Catálogo</title>
+<link rel="icon" href="/static/logo.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/static/icon-180.png">
+<link rel="manifest" href="/manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="/static/site.css">
 <style>
-  main { min-height: 100vh; display: grid; place-items: center; padding: 28px 20px; }
-  .box { width: 100%; max-width: 420px; }
-  .box .logo { margin-bottom: 18px; }
-  .tabs { display: grid; grid-template-columns: 1fr 1fr; background: var(--soft); border-radius: 12px; padding: 4px; margin-bottom: 6px; }
-  .tabs button { border: 0; background: none; padding: 10px; border-radius: 9px; font: 700 14px var(--f-body); color: var(--muted); cursor: pointer; }
-  .tabs button[aria-selected="true"] { background: var(--surface); color: var(--fg); box-shadow: 0 1px 4px rgba(0,0,0,.08); }
-  h1 { font-size: 26px; margin: 12px 0 2px; }
+  body { background: var(--bg); }
+  .wrap2 { min-height: 100vh; min-height: 100dvh; display: grid; grid-template-columns: minmax(0, 1fr); }
+  /* lado da marca: só no computador */
+  .brandside { display: none; }
+  .formside { display: grid; align-content: center; justify-items: center; padding: max(28px, env(safe-area-inset-top)) max(20px, env(safe-area-inset-right)) max(28px, env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left)); }
+  .box { width: 100%; max-width: 400px; }
+  .mark { display: grid; justify-items: center; gap: 10px; margin-bottom: 22px; text-align: center; text-decoration: none; color: var(--fg); }
+  .mark img { width: 64px; height: 64px; filter: drop-shadow(0 10px 24px rgba(185,71,111,.35)); }
+  .mark b { font: 800 22px var(--f-display); letter-spacing: -.01em; }
+  .card2 { background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: 22px; box-shadow: 0 20px 50px rgba(42,26,34,.08); }
+  .seg { display: grid; grid-template-columns: 1fr 1fr; background: var(--soft); border-radius: 14px; padding: 4px; margin-bottom: 18px; }
+  .seg button { border: 0; background: none; padding: 11px; border-radius: 11px; font: 700 14px var(--f-body); color: var(--muted); cursor: pointer; }
+  .seg button[aria-selected="true"] { background: var(--surface); color: var(--fg); box-shadow: 0 2px 8px rgba(42,26,34,.08); }
+  h1 { font: 800 24px/1.15 var(--f-display); margin: 0 0 4px; letter-spacing: -.01em; }
+  .sub { margin: 0 0 6px; color: var(--muted); font-size: 14.5px; }
+  .f { margin-top: 14px; display: grid; gap: 6px; }
+  .f label { font-size: 13px; font-weight: 700; }
+  .inp { position: relative; }
+  .inp svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--muted); pointer-events: none; }
+  .inp input { width: 100%; border: 1.5px solid var(--line); background: var(--bg); border-radius: 14px; padding: 14px 14px 14px 42px; font: 500 16px var(--f-body); color: var(--fg); }
+  .inp input:focus { outline: none; border-color: var(--acc); background: var(--surface); box-shadow: 0 0 0 4px rgba(185,71,111,.12); }
+  .eye { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); border: 0; background: none; width: 40px; height: 40px; border-radius: 10px; cursor: pointer; color: var(--muted); display: grid; place-items: center; }
+  .eye svg { position: static; transform: none; }
+  .row2 { display: flex; justify-content: flex-end; margin-top: 8px; }
+  .link { border: 0; background: none; padding: 4px 0; font: 700 13.5px var(--f-body); color: var(--acc); cursor: pointer; text-decoration: none; }
+  .go { width: 100%; margin-top: 18px; border: 0; border-radius: 14px; padding: 16px; font: 700 16px var(--f-body); color: #fff; cursor: pointer;
+    background: linear-gradient(135deg, #D24C7C, #8C2F67); box-shadow: 0 10px 24px rgba(185,71,111,.3); display: flex; align-items: center; justify-content: center; gap: 10px; }
+  .go:disabled { opacity: .7; cursor: wait; }
+  .go .spin { width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,.4); border-top-color: #fff; border-radius: 50%; animation: sp .8s linear infinite; display: none; }
+  .go:disabled .spin { display: block; }
+  @keyframes sp { to { transform: rotate(360deg); } }
   .chk { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; margin-top: 16px; }
   .chk input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--acc); flex: none; }
-  form .btn { width: 100%; margin-top: 18px; padding: 15px; }
+  .err { margin: 12px 0 0; background: #FDECEA; color: var(--danger); border-radius: 12px; padding: 10px 12px; font-size: 13.5px; font-weight: 600; }
+  .okbox { text-align: center; display: grid; justify-items: center; gap: 8px; }
+  .okbox .ic { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; background: #E6F7EC; color: var(--ok); }
+  .okbox .ic svg { width: 28px; height: 28px; }
+  .wa { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 10px; border-radius: 14px; padding: 14px; background: #1FA855; color: #fff; font-weight: 700; text-decoration: none; }
+  .back { display: block; text-align: center; margin-top: 16px; }
+  .foot { text-align: center; margin-top: 18px; font-size: 12.5px; color: var(--muted); }
+  .foot a { color: var(--muted); }
+  @media (min-width: 960px) {
+    .wrap2 { grid-template-columns: 1.05fr 1fr; }
+    .brandside { display: grid; align-content: space-between; padding: 44px 52px; color: #fff; position: relative; overflow: hidden;
+      background: radial-gradient(120% 90% at 0% 0%, #8C2F67 0%, #3A1830 55%, #22121C 100%); }
+    .brandside::after { content: ""; position: absolute; width: 520px; height: 520px; right: -180px; bottom: -200px; border-radius: 50%; background: radial-gradient(circle, rgba(229,82,127,.45), transparent 65%); }
+    .bs-top { display: flex; align-items: center; gap: 12px; font: 800 20px var(--f-display); }
+    .bs-top img { width: 40px; height: 40px; }
+    .bs-mid h2 { font: 800 44px/1.05 var(--f-display); margin: 0 0 14px; letter-spacing: -.02em; max-width: 14ch; }
+    .bs-mid h2 em { font-style: normal; color: #FFB3CC; }
+    .bs-mid ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; font-size: 15.5px; color: #F1DCE6; }
+    .bs-mid li { display: flex; gap: 10px; align-items: center; }
+    .bs-mid li i { width: 26px; height: 26px; border-radius: 8px; background: rgba(255,255,255,.12); display: grid; place-items: center; font-style: normal; font-size: 13px; }
+    .bs-foot { font-size: 13px; color: #CDAFC0; position: relative; z-index: 1; }
+    .formside .mark { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) { .go .spin { animation: none; } }
 </style>
 </head>
 <body>
-<main>
-  <div class="box">
-    <a class="logo" href="/"><i>Z</i>Zap Catálogo</a>
-    <div class="card">
-      <div class="tabs" role="tablist">
-        <button role="tab" id="t-in" aria-selected="true">Entrar</button>
-        <button role="tab" id="t-up" aria-selected="false">Criar conta</button>
-      </div>
-
-      <form id="f-in">
-        <h1>Que bom te ver</h1>
-        <p class="note" style="margin:0">Entre para cuidar da sua vitrine.</p>
-        <div class="field"><label for="ie">E-mail</label><input class="in" id="ie" type="email" autocomplete="email" required></div>
-        <div class="field"><label for="ip">Senha</label><input class="in" id="ip" type="password" autocomplete="current-password" required></div>
-        <p class="err" id="ierr" hidden></p>
-        <button class="btn" type="submit">Entrar</button>
-        <p class="note" style="text-align:center">Esqueceu a senha? Fale com o suporte para receber uma senha nova.</p>
-      </form>
-
-      <form id="f-up" hidden>
-        <h1>Crie sua vitrine</h1>
-        <p class="note" style="margin:0">Leva 1 minuto.</p>
-        <div class="field"><label for="un">Seu nome</label><input class="in" id="un" autocomplete="name" required></div>
-        <div class="field"><label for="us">Nome da loja</label><input class="in" id="us" required placeholder="Ex.: Jessica Hair"></div>
-        <div class="field"><label for="ue">E-mail</label><input class="in" id="ue" type="email" autocomplete="email" required></div>
-        <div class="field"><label for="up">Senha</label><input class="in" id="up" type="password" autocomplete="new-password" minlength="8" required placeholder="8 caracteres ou mais"></div>
-        <label class="chk"><input type="checkbox" id="ut"> <span>Li e aceito os <a href="/termos" target="_blank">termos de uso</a> e a <a href="/privacidade" target="_blank">política de privacidade</a>.</span></label>
-        <p class="err" id="uerr" hidden></p>
-        <button class="btn" type="submit">Criar minha vitrine</button>
-      </form>
+<div class="wrap2">
+  <aside class="brandside" aria-hidden="true">
+    <div class="bs-top"><img src="/static/logo.svg" alt="">Zap Catálogo</div>
+    <div class="bs-mid">
+      <h2>Sua vitrine no link da bio, com pedido <em>direto no WhatsApp</em></h2>
+      <ul>
+        <li><i>✓</i>Produtos com fotos e vídeos</li>
+        <li><i>✓</i>A cliente monta o pedido sozinha</li>
+        <li><i>✓</i>Pix com QR Code no valor certinho</li>
+      </ul>
     </div>
-  </div>
-</main>
+    <div class="bs-foot">Feito para quem vende pelo Instagram e WhatsApp.</div>
+  </aside>
+
+  <main class="formside">
+    <div class="box">
+      <a class="mark" href="/"><img src="/static/logo.svg" alt=""><b>Zap Catálogo</b></a>
+      <div class="card2">
+        <div class="seg" role="tablist" id="seg">
+          <button role="tab" id="t-in" aria-selected="true">Entrar</button>
+          <button role="tab" id="t-up" aria-selected="false">Criar conta</button>
+        </div>
+
+        <form id="f-in" novalidate>
+          <h1>Que bom te ver</h1>
+          <p class="sub">Entre para cuidar da sua vitrine.</p>
+          <div class="f"><label for="ie">E-mail</label><div class="inp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></svg><input id="ie" type="email" autocomplete="email" inputmode="email" required placeholder="voce@email.com"></div></div>
+          <div class="f"><label for="ip">Senha</label><div class="inp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10" width="16" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><input id="ip" type="password" autocomplete="current-password" required placeholder="Sua senha"><button type="button" class="eye" data-eye="ip" aria-label="Mostrar senha"></button></div></div>
+          <div class="row2"><a class="link" href="/esqueci" id="go-forgot">Esqueci minha senha</a></div>
+          <p class="err" id="ierr" hidden></p>
+          <button class="go" type="submit"><span class="spin"></span>Entrar</button>
+        </form>
+
+        <form id="f-up" hidden novalidate>
+          <h1>Crie sua vitrine</h1>
+          <p class="sub">Leva 1 minuto.</p>
+          <div class="f"><label for="un">Seu nome</label><div class="inp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4.5-6 8-6s7 2 8 6"/></svg><input id="un" autocomplete="name" required placeholder="Como você se chama"></div></div>
+          <div class="f"><label for="us">Nome da loja</label><div class="inp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9l1.5-5h13L20 9M4 9h16v11H4zM9 20v-6h6v6"/></svg><input id="us" required placeholder="Ex.: Jessica Hair"></div></div>
+          <div class="f"><label for="ue">E-mail</label><div class="inp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></svg><input id="ue" type="email" autocomplete="email" inputmode="email" required placeholder="voce@email.com"></div></div>
+          <div class="f"><label for="up">Senha</label><div class="inp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10" width="16" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><input id="up" type="password" autocomplete="new-password" minlength="8" required placeholder="8 caracteres ou mais"><button type="button" class="eye" data-eye="up" aria-label="Mostrar senha"></button></div></div>
+          <label class="chk"><input type="checkbox" id="ut"> <span>Li e aceito os <a href="/termos" target="_blank">termos de uso</a> e a <a href="/privacidade" target="_blank">política de privacidade</a>.</span></label>
+          <p class="err" id="uerr" hidden></p>
+          <button class="go" type="submit"><span class="spin"></span>Criar minha vitrine</button>
+        </form>
+
+        <form id="f-fg" hidden novalidate>
+          <h1>Esqueceu a senha?</h1>
+          <p class="sub">Coloque o e-mail da sua conta. A gente manda um link para você criar uma senha nova.</p>
+          <div class="f"><label for="fe">E-mail</label><div class="inp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></svg><input id="fe" type="email" autocomplete="email" inputmode="email" required placeholder="voce@email.com"></div></div>
+          <p class="err" id="ferr" hidden></p>
+          <button class="go" type="submit"><span class="spin"></span>Enviar link</button>
+          <a class="link back" href="/entrar" data-back>Voltar para entrar</a>
+        </form>
+
+        <div id="v-sent" class="okbox" hidden>
+          <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M5 12l5 5L19 7"/></svg></span>
+          <h1 id="sent-t">Pronto!</h1>
+          <p class="sub" id="sent-p"></p>
+          <a class="wa" id="sent-wa" hidden target="_blank" rel="noopener">Falar com o suporte no WhatsApp</a>
+          <a class="link back" href="/entrar" data-back>Voltar para entrar</a>
+        </div>
+
+        <form id="f-rs" hidden novalidate>
+          <h1>Crie sua senha nova</h1>
+          <p class="sub">Depois disso você já entra direto no painel.</p>
+          <div class="f"><label for="rp">Senha nova</label><div class="inp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10" width="16" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><input id="rp" type="password" autocomplete="new-password" minlength="8" required placeholder="8 caracteres ou mais"><button type="button" class="eye" data-eye="rp" aria-label="Mostrar senha"></button></div></div>
+          <p class="err" id="rerr" hidden></p>
+          <button class="go" type="submit"><span class="spin"></span>Salvar e entrar</button>
+        </form>
+      </div>
+      <p class="foot"><a href="/">Conhecer o Zap Catálogo</a> · <a href="/termos">Termos</a> · <a href="/privacidade">Privacidade</a></p>
+    </div>
+  </main>
+</div>
 <script>
 const $ = s => document.querySelector(s);
-function tab(up) {
-  $('#t-in').setAttribute('aria-selected', !up); $('#t-up').setAttribute('aria-selected', up);
-  $('#f-in').hidden = up; $('#f-up').hidden = !up;
-  history.replaceState(null, '', up ? '/cadastro' : '/entrar');
-}
-$('#t-in').onclick = () => tab(false); $('#t-up').onclick = () => tab(true);
-if (location.pathname === '/cadastro') tab(true);
+const EYE = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+const EYE_OFF = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3l18 18M10.6 5.1A10.4 10.4 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4M6.6 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a9.6 9.6 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
+document.querySelectorAll('[data-eye]').forEach(b => { b.innerHTML = EYE; b.onclick = () => {
+  const i = document.getElementById(b.dataset.eye); const show = i.type === 'password';
+  i.type = show ? 'text' : 'password'; b.innerHTML = show ? EYE_OFF : EYE; b.setAttribute('aria-label', show ? 'Esconder senha' : 'Mostrar senha'); }; });
 
-async function send(url, body, errEl, btn) {
+const VIEWS = { in: '#f-in', up: '#f-up', fg: '#f-fg', sent: '#v-sent', rs: '#f-rs' };
+const PATHS = { in: '/entrar', up: '/cadastro', fg: '/esqueci' };
+function view(v, push) {
+  Object.entries(VIEWS).forEach(([k, sel]) => { $(sel).hidden = k !== v; });
+  $('#seg').hidden = !(v === 'in' || v === 'up');
+  $('#t-in').setAttribute('aria-selected', v === 'in'); $('#t-up').setAttribute('aria-selected', v === 'up');
+  if (push && PATHS[v]) history.replaceState(null, '', PATHS[v]);
+  const first = $(VIEWS[v]).querySelector('input'); if (first && matchMedia('(min-width: 960px)').matches) first.focus();
+}
+$('#t-in').onclick = () => view('in', true); $('#t-up').onclick = () => view('up', true);
+$('#go-forgot').onclick = e => { e.preventDefault(); $('#fe').value = $('#ie').value; view('fg', true); };
+document.querySelectorAll('[data-back]').forEach(a => a.onclick = e => { e.preventDefault(); view('in', true); });
+const token = new URLSearchParams(location.search).get('t');
+view(location.pathname === '/cadastro' ? 'up' : location.pathname === '/esqueci' ? 'fg' : location.pathname === '/nova-senha' && token ? 'rs' : 'in');
+
+async function post(url, body, errEl, btn) {
   errEl.hidden = true; btn.disabled = true;
   try {
     const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
     const j = await r.json().catch(() => ({}));
     if (!r.ok) throw new Error(j.error || 'Algo deu errado. Tente de novo.');
-    location.href = j.redirect || '/painel';
-  } catch (e) { errEl.textContent = e.message; errEl.hidden = false; btn.disabled = false; }
+    return j;
+  } catch (e) { errEl.textContent = e.message === 'Failed to fetch' ? 'Sem conexão. Confira a internet e tente de novo.' : e.message; errEl.hidden = false; btn.disabled = false; return null; }
 }
-$('#f-in').onsubmit = e => { e.preventDefault(); send('/api/login', { email: $('#ie').value, password: $('#ip').value }, $('#ierr'), e.submitter || $('#f-in .btn')); };
-$('#f-up').onsubmit = e => { e.preventDefault();
-  send('/api/signup', { name: $('#un').value, storeName: $('#us').value, email: $('#ue').value, password: $('#up').value, terms: $('#ut').checked }, $('#uerr'), e.submitter || $('#f-up .btn')); };
+const need = (errEl, msg) => { errEl.textContent = msg; errEl.hidden = false; return false; };
+const okEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+
+$('#f-in').onsubmit = async e => { e.preventDefault(); const err = $('#ierr');
+  if (!okEmail($('#ie').value)) return need(err, 'Confira o e-mail.'); if (!$('#ip').value) return need(err, 'Digite sua senha.');
+  const j = await post('/api/login', { email: $('#ie').value, password: $('#ip').value }, err, $('#f-in .go')); if (j) location.href = j.redirect || '/painel'; };
+$('#f-up').onsubmit = async e => { e.preventDefault(); const err = $('#uerr');
+  if (!$('#un').value.trim() || !$('#us').value.trim()) return need(err, 'Preencha seu nome e o nome da loja.');
+  if (!okEmail($('#ue').value)) return need(err, 'Confira o e-mail.'); if ($('#up').value.length < 8) return need(err, 'A senha precisa ter pelo menos 8 caracteres.');
+  if (!$('#ut').checked) return need(err, 'Para continuar, aceite os termos de uso.');
+  const j = await post('/api/signup', { name: $('#un').value, storeName: $('#us').value, email: $('#ue').value, password: $('#up').value, terms: true }, err, $('#f-up .go')); if (j) location.href = j.redirect || '/painel'; };
+$('#f-fg').onsubmit = async e => { e.preventDefault(); const err = $('#ferr');
+  if (!okEmail($('#fe').value)) return need(err, 'Confira o e-mail.');
+  const j = await post('/api/password/forgot', { email: $('#fe').value }, err, $('#f-fg .go')); if (!j) return;
+  $('#f-fg .go').disabled = false;
+  const ch = j.channels || {};
+  if (ch.email || ch.whatsapp) {
+    $('#sent-t').textContent = 'Confira seu ' + (ch.email ? 'e-mail' : 'WhatsApp');
+    $('#sent-p').textContent = `Se ${$('#fe').value.trim()} tiver conta, você vai receber ${ch.email && ch.whatsapp ? 'no e-mail e no WhatsApp ligado à loja ' : ch.email ? '' : 'no WhatsApp ligado à loja '}um link para criar a senha nova. Ele vale por 1 hora.${ch.email ? ' Olhe também a caixa de spam.' : ''}`;
+  } else {
+    $('#sent-t').textContent = 'Fale com o suporte';
+    $('#sent-p').textContent = 'O suporte manda para você um link seguro para criar a senha nova.';
+  }
+  const wa = $('#sent-wa'); wa.hidden = !j.support;
+  if (j.support) wa.href = `https://wa.me/${j.support}?text=${encodeURIComponent(`Oi! Esqueci a senha do Zap Catálogo. Meu e-mail é ${$('#fe').value.trim()}`)}`;
+  view('sent'); };
+$('#f-rs').onsubmit = async e => { e.preventDefault(); const err = $('#rerr');
+  if ($('#rp').value.length < 8) return need(err, 'A senha precisa ter pelo menos 8 caracteres.');
+  const j = await post('/api/password/reset', { token, password: $('#rp').value }, err, $('#f-rs .go')); if (j) location.href = j.redirect || '/painel'; };
 </script>
 </body>
 </html>

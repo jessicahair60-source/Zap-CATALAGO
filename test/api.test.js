@@ -143,6 +143,18 @@ test('painel da dona da plataforma', async () => {
   r = await dona('POST', `/api/admin/stores/${ana.id}`, { action: 'resetPassword' }); assert.ok(r.json.tempPassword);
   const a = client();
   r = await a('POST', '/api/login', { email: 'ana@teste.com', password: r.json.tempPassword }); assert.strictEqual(r.status, 200);
+  // link de senha nova gerado pela administração
+  r = await dona('POST', `/api/admin/stores/${ana.id}`, { action: 'resetLink' }); const tk = new URL(r.json.link).searchParams.get('t'); assert.ok(tk);
+  const lojista = client();
+  r = await lojista('POST', '/api/password/reset', { token: tk, password: 'curta' }); assert.strictEqual(r.status, 400);
+  r = await lojista('POST', '/api/password/reset', { token: tk, password: 'nova-senha-123' }); assert.strictEqual(r.status, 200); assert.strictEqual(r.json.redirect, '/painel');
+  r = await lojista('GET', '/api/me'); assert.strictEqual(r.json.store.slug, 'ana-modas');
+  r = await client()('POST', '/api/password/reset', { token: tk, password: 'outra-senha-123' }); assert.strictEqual(r.status, 400); // uso único
+  r = await client()('POST', '/api/login', { email: 'ana@teste.com', password: 'nova-senha-123' }); assert.strictEqual(r.status, 200);
+  // esqueci minha senha: mesma resposta com ou sem conta
+  r = await client()('POST', '/api/password/forgot', { email: 'ninguem@teste.com' }); assert.strictEqual(r.status, 200); assert.strictEqual(r.json.ok, true);
+  r = await client()('GET', '/esqueci'); assert.match(r.text, /Esqueceu a senha/);
+  r = await client()('GET', '/manifest.webmanifest'); assert.strictEqual(JSON.parse(r.text).start_url, '/painel');
 });
 
 test('primeiro acesso da administração, sem loja, e endereço só da administração', async () => {

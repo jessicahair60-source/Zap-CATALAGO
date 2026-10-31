@@ -94,7 +94,7 @@ function render() {
       <a href="${esc(s.url)}" target="_blank" rel="noopener">Ver vitrine</a>
       <button data-a="givePro" data-id="${s.id}">Liberar 30 dias</button>
       ${s.plan !== 'expired' ? `<button data-a="expire" data-id="${s.id}">Encerrar acesso</button>` : ''}
-      <button data-a="resetPassword" data-id="${s.id}">Senha nova</button>
+      <button data-a="resetLink" data-id="${s.id}">Link de senha nova</button>
       ${s.blocked ? `<button data-a="unblock" data-id="${s.id}">Desbloquear</button>` : `<button class="danger" data-a="block" data-id="${s.id}">Bloquear</button>`}
     </div></div>`).join('') : '<div class="empty">Nenhuma loja aqui.</div>';
   document.querySelectorAll('[data-a]').forEach(b => b.onclick = () => act(+b.dataset.id, b.dataset.a));
@@ -107,11 +107,11 @@ async function act(id, action) {
   if (action === 'block') { const reason = prompt(`Bloquear ${s.name}? A vitrine sai do ar para as clientes. Motivo (opcional):`); if (reason === null) return; body.reason = reason; }
   if (action === 'expire' && !confirm(`Encerrar o acesso de ${s.name} agora? A vitrine sai do ar até ela assinar.`)) return;
   if (action === 'givePro') body.days = 30;
-  if (action === 'resetPassword' && !confirm(`Gerar uma senha nova para ${s.owner}? A senha atual deixa de funcionar.`)) return;
   const r = await fetch(`/api/admin/stores/${id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   const j = await r.json().catch(() => ({}));
   if (!r.ok) return toast(j.error || 'Não deu certo.');
-  if (j.tempPassword) prompt(`Senha nova de ${s.owner}. Envie para ela e peça para trocar no painel:`, j.tempPassword);
+  if (j.link) prompt(`Link para ${s.owner} criar uma senha nova (vale 24 horas). Copie e mande para ela no WhatsApp:`, j.link);
+  else if (j.tempPassword) prompt(`Senha nova de ${s.owner}. Envie para ela e peça para trocar no painel:`, j.tempPassword);
   else toast('Feito');
   load();
 }

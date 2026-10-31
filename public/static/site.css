@@ -13,7 +13,7 @@ h1, h2, h3 { font-family: var(--f-display); line-height: 1.1; margin: 0; text-wr
 .container { width: 100%; max-width: 1080px; margin: 0 auto; padding: 0 20px; }
 .nav { display: flex; align-items: center; justify-content: space-between; padding: 18px 0; gap: 12px; }
 .logo { font-family: var(--f-display); font-weight: 800; font-size: 20px; color: var(--fg); text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
-.logo i { width: 26px; height: 26px; border-radius: 8px; background: var(--acc); display: inline-grid; place-items: center; color: #fff; font-style: normal; font-size: 14px; }
+.logo i { width: 30px; height: 30px; flex: none; background: url(/static/logo.svg) center / contain no-repeat; font-size: 0; color: transparent; }
 .nav-links { display: flex; align-items: center; gap: 6px; }
 .logo, .nav .btn { white-space: nowrap; }
 @media (max-width: 420px) { .nav .btn { padding: 10px 12px; font-size: 14px; } .logo { font-size: 18px; } }
