@@ -42,6 +42,7 @@ test('fluxo completo da lojista', async () => {
   const c = client();
   let r = await c('POST', '/api/signup', { name: 'Ana', storeName: 'Ateliê da Ana', email: 'ana@teste.com', password: 'abc', terms: true });
   assert.strictEqual(r.status, 400);
+  r = await client()('POST', '/api/signup', { name: 'Bia', storeName: 'Bia 4', email: 'bia4@teste.com', password: '1234', terms: true }); assert.strictEqual(r.status, 200); // 4 dígitos vale para lojista
   r = await c('POST', '/api/signup', { name: 'Ana', storeName: 'Ateliê da Ana', email: 'ana@teste.com', password: 'senha-forte', terms: false });
   assert.strictEqual(r.status, 400);
   r = await c('POST', '/api/signup', { name: 'Ana', storeName: 'Ateliê da Ana', email: 'ana@teste.com', password: 'senha-forte', terms: true });
