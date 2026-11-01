@@ -48,6 +48,8 @@ BRAND_NAME=Vitrine Zap
 ADMIN_EMAILS=jessicahair60@gmail.com
 ADMIN_HOST=
 PLAN_PRICE=47.00
+KIWIFY_TOKEN=
+KIWIFY_CHECKOUT_URL=
 MP_ACCESS_TOKEN=
 MP_WEBHOOK_SECRET=
 BASE_DOMAIN=
@@ -99,7 +101,11 @@ Para abrir a administração em `adm.seu-dominio.com.br`:
 2. No Dokploy, aba **Domains**, adicione o host `adm.seu-dominio.com.br`, Path `/`, porta `3000`, HTTPS com Let's Encrypt.
 3. Na aba **Environment**, preencha `ADMIN_HOST=adm.seu-dominio.com.br`, salve e clique em **Deploy**.
 
-## 9. Mercado Pago (para receber as assinaturas)
+## 9. Receber as assinaturas
+
+Pela **Kiwify**: siga o [KIWIFY.md](KIWIFY.md). Se usar a Kiwify, deixe `MP_ACCESS_TOKEN` vazio.
+
+Pelo **Mercado Pago**:
 
 1. No Mercado Pago, vá em **Seu negócio > Configurações > Credenciais** e copie o **Access Token de produção**.
 2. Em **Suas integrações > Webhooks**, cadastre a URL `https://seu-dominio.com.br/api/webhooks/mp` e marque os eventos de **Planos e assinaturas**.

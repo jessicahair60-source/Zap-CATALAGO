@@ -8,6 +8,7 @@ const QRCode = require('qrcode');
 const { db, DATA_DIR } = require('./lib/db');
 const { pixPayload } = require('./lib/pix');
 const mp = require('./lib/mercadopago');
+const kiwify = require('./lib/kiwify');
 const wa = require('./lib/whatsapp');
 const mail = require('./lib/mail');
 const { createBot, TEMPLATE: WA_TEMPLATE } = require('./lib/wabot');
@@ -19,7 +20,7 @@ const CFG = {
   proPrice: parseFloat(process.env.PLAN_PRICE || '47.00'),
   adminHost: (process.env.ADMIN_HOST || '').toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, ''),
   admins: (process.env.ADMIN_EMAILS || '').toLowerCase().split(',').map(s => s.trim()).filter(Boolean),
-  fakePayments: !mp.enabled() && process.env.NODE_ENV !== 'production',
+  fakePayments: !mp.enabled() && !kiwify.enabled() && process.env.NODE_ENV !== 'production',
   support: String(process.env.SUPPORT_WHATSAPP || '').replace(/\D/g, '')
 };
 const UPLOADS = path.join(DATA_DIR, 'uploads');
@@ -53,7 +54,7 @@ function uniqueSlug(base) {
 // Não tem teste grátis: com a cobrança ligada, a loja nova só entra no ar depois de pagar.
 function planOf(store) {
   if (store.pro_until && store.pro_until > now()) return 'pro';
-  if (!mp.enabled() && !CFG.fakePayments) return 'open';
+  if (!mp.enabled() && !kiwify.enabled() && !CFG.fakePayments) return 'open';
   return 'expired';
 }
 const isPro = store => planOf(store) !== 'expired';
@@ -63,7 +64,7 @@ function storeInfo(store) {
     id: store.id, slug: store.slug, name: store.name, plan: planOf(store), proUntil: store.pro_until, trialUntil: store.trial_until,
     subscribed: !!store.mp_preapproval, customDomain: store.custom_domain, blocked: !!store.blocked, blockedReason: store.blocked_reason,
     lastPayment: (db.prepare('SELECT status FROM payments WHERE store_id = ? ORDER BY created_at DESC, id DESC LIMIT 1').get(store.id) || {}).status || '',
-    publicUrl: publicUrlOf(store), proPrice: CFG.proPrice, brand: CFG.brand, payments: mp.enabled() ? 'mercadopago' : CFG.fakePayments ? 'teste' : 'off', savedAt: store.updated_at
+    publicUrl: publicUrlOf(store), proPrice: CFG.proPrice, brand: CFG.brand, payments: kiwify.enabled() ? 'kiwify' : mp.enabled() ? 'mercadopago' : CFG.fakePayments ? 'teste' : 'off', savedAt: store.updated_at
   };
 }
 function publicUrlOf(store) {
@@ -292,7 +293,9 @@ app.post('/api/signup', jsonBody, (req, res) => {
       .run(u.lastInsertRowid, uniqueSlug(slugify(storeName)), storeName, null, t, t);
     return u.lastInsertRowid;
   });
-  startSession(res, tx());
+  const userId = tx();
+  applyKiwifyPending(email);
+  startSession(res, userId);
   res.json({ ok: true, redirect: '/painel' });
 });
 
@@ -474,6 +477,10 @@ app.get('/api/pix', async (req, res) => {
 app.post('/api/billing/checkout', auth, async (req, res) => {
   const s = req.store;
   try {
+    if (kiwify.enabled()) {
+      if (!kiwify.checkoutUrl()) return res.status(503).json({ error: 'O link de pagamento ainda não foi configurado na plataforma.' });
+      return res.json({ url: kiwify.checkout({ email: req.user.email, name: req.user.name }) });
+    }
     if (mp.enabled()) {
       const sub = await mp.createSubscription({ storeId: s.id, email: req.user.email, price: CFG.proPrice, reason: `${CFG.brand} - ${s.name}`, backUrl: `${CFG.publicUrl}/painel?assinatura=ok` });
       db.prepare('UPDATE stores SET mp_preapproval = ?, updated_at = ? WHERE id = ?').run(sub.id, now(), s.id);
@@ -491,10 +498,57 @@ app.post('/api/billing/checkout', auth, async (req, res) => {
 
 app.post('/api/billing/cancel', auth, async (req, res) => {
   const s = req.store;
+  if (String(s.mp_preapproval || '').startsWith('kiwify:'))
+    return res.status(400).json({ error: 'Sua assinatura é pela Kiwify. Para cancelar, abra o e-mail da compra e use o link da área do cliente da Kiwify.' });
   try { if (mp.enabled() && s.mp_preapproval && s.mp_preapproval !== 'teste') await mp.cancelSubscription(s.mp_preapproval); }
   catch (e) { console.error(e); return res.status(502).json({ error: 'Não deu para cancelar agora. Tente de novo em alguns minutos.' }); }
   db.prepare('UPDATE stores SET mp_preapproval = NULL, updated_at = ? WHERE id = ?').run(now(), s.id);
   res.json({ ok: true, store: storeInfo(db.prepare('SELECT * FROM stores WHERE id = ?').get(s.id)) });
+});
+
+// Avisos da Kiwify: compra aprovada e renovação liberam a loja do mesmo e-mail; reembolso e chargeback tiram do ar
+function applyKiwifyPending(email) {
+  const p = db.prepare('SELECT * FROM kiwify_pending WHERE email = ?').get(email);
+  const store = p && db.prepare('SELECT s.* FROM stores s JOIN users u ON u.id = s.user_id WHERE u.email = ?').get(email);
+  if (!store) return;
+  db.prepare('UPDATE stores SET pro_until = MAX(COALESCE(pro_until, 0), ?), mp_preapproval = ?, updated_at = ? WHERE id = ?').run(p.until, p.sub_id ? 'kiwify:' + p.sub_id : null, now(), store.id);
+  db.prepare('INSERT INTO payments (store_id, mp_id, amount, status, created_at) VALUES (?, ?, ?, ?, ?)').run(store.id, 'kiwify:' + (p.order_id || ''), CFG.proPrice, 'approved', now());
+  db.prepare('DELETE FROM kiwify_pending WHERE email = ?').run(email);
+}
+app.post('/api/webhooks/kiwify', express.raw({ type: '*/*', limit: '1mb' }), (req, res) => {
+  const raw = Buffer.isBuffer(req.body) ? req.body : Buffer.from('');
+  if (!kiwify.enabled() || !kiwify.validSignature(raw, req.query.signature)) return res.sendStatus(401);
+  let body; try { body = JSON.parse(raw.toString('utf8')); } catch (e) { return res.sendStatus(400); }
+  const k = kiwify.parse(body);
+  res.sendStatus(200);
+  if (!k.email) return;
+  const store = db.prepare('SELECT s.* FROM stores s JOIN users u ON u.id = s.user_id WHERE u.email = ?').get(k.email);
+  const payId = 'kiwify:' + k.orderId;
+  const seen = k.orderId && db.prepare('SELECT 1 FROM payments WHERE mp_id = ? AND status = ?');
+  const paid = (k.event === 'order_approved' || k.event === 'subscription_renewed') && k.status === 'paid';
+  if (paid) {
+    // Vale até a próxima cobrança, com 2 dias de folga; sem a data, 32 dias
+    const until = k.nextPayment > now() ? k.nextPayment + 2 * DAY : Math.max(now(), (store && store.pro_until) || 0) + 32 * DAY;
+    if (!store) {
+      db.prepare(`INSERT INTO kiwify_pending (email, until, sub_id, order_id, created_at) VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT(email) DO UPDATE SET until = MAX(until, excluded.until), sub_id = excluded.sub_id, order_id = excluded.order_id`).run(k.email, until, k.subId || null, k.orderId, now());
+      return console.log(`kiwify: compra de ${k.email} sem conta ainda; libera quando a conta for criada`);
+    }
+    if (seen && seen.get(payId, 'approved')) return; // aviso repetido
+    db.prepare('UPDATE stores SET pro_until = MAX(COALESCE(pro_until, 0), ?), mp_preapproval = ?, updated_at = ? WHERE id = ?').run(until, k.subId ? 'kiwify:' + k.subId : store.mp_preapproval, now(), store.id);
+    db.prepare('INSERT INTO payments (store_id, mp_id, amount, status, created_at) VALUES (?, ?, ?, ?, ?)').run(store.id, payId, CFG.proPrice, 'approved', now());
+    return;
+  }
+  if (!store) return;
+  if (k.event === 'subscription_late' || k.event === 'order_rejected') {
+    db.prepare('INSERT INTO payments (store_id, mp_id, amount, status, created_at) VALUES (?, ?, ?, ?, ?)').run(store.id, payId, CFG.proPrice, 'rejected', now());
+  } else if (k.event === 'subscription_canceled') {
+    // Continua no ar até o fim do período pago
+    db.prepare('UPDATE stores SET mp_preapproval = NULL, updated_at = ? WHERE id = ?').run(now(), store.id);
+  } else if (k.event === 'order_refunded' || k.event === 'chargeback') {
+    db.prepare('UPDATE stores SET pro_until = ?, mp_preapproval = NULL, updated_at = ? WHERE id = ?').run(now(), now(), store.id);
+    db.prepare('INSERT INTO payments (store_id, mp_id, amount, status, created_at) VALUES (?, ?, ?, ?, ?)').run(store.id, payId, CFG.proPrice, k.event === 'chargeback' ? 'chargeback' : 'refunded', now());
+  }
 });
 
 // Avisos do Mercado Pago: sempre consultamos a API para confirmar, então um aviso falso não libera nada

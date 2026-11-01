@@ -1,0 +1,49 @@
+# Vender a assinatura pela Kiwify
+
+A lojista toca em **Assinar** no painel, paga no checkout da Kiwify e a loja dela é liberada sozinha. O sistema liga a compra à loja pelo **e-mail**: o checkout já abre com o e-mail da conta preenchido.
+
+## Antes de ligar: libere as lojas que já existem
+
+Com a Kiwify ligada, loja sem assinatura paga sai do ar (como era com o Mercado Pago). Antes de colocar o token, entre em `/admin` e toque em **Liberar 30 dias** na sua loja e nas lojas que você quer manter no ar.
+
+## 1. Criar o produto
+
+1. Na Kiwify, abra **Produtos > Criar produto**.
+2. Tipo de cobrança: **Assinatura**, mensal, R$ 47.
+3. Salve e copie o **link do checkout** (começa com `https://pay.kiwify.com.br/`). Ele vai em `KIWIFY_CHECKOUT_URL`.
+
+## 2. Criar o webhook
+
+1. Abra **Apps > Webhooks > Criar webhook**.
+2. **URL:** `https://zapcatalago.com/api/webhooks/kiwify`
+3. **Produto:** o da assinatura.
+4. **Eventos:** marque Compra aprovada, Compra recusada, Compra reembolsada, Chargeback, Assinatura renovada, Assinatura atrasada e Assinatura cancelada.
+5. Copie o **token** do webhook. Ele vai em `KIWIFY_TOKEN`. Não mande por chat.
+
+## 3. Preencher no Dokploy
+
+Na aba **Environment** do aplicativo:
+
+```
+KIWIFY_TOKEN=o token do webhook
+KIWIFY_CHECKOUT_URL=https://pay.kiwify.com.br/seu-link
+```
+
+Clique em **Save** e depois em **Deploy**.
+
+## 4. Testar
+
+Na tela do webhook da Kiwify, use **Testar webhook**: a Kiwify manda um aviso de exemplo. Depois faça uma compra de verdade com uma conta de teste e confira em `/admin` que a loja ficou **Paga**.
+
+## O que cada aviso faz
+
+| Aviso da Kiwify | Na loja |
+|---|---|
+| Compra aprovada, Assinatura renovada | Libera até a próxima cobrança, mais 2 dias de folga |
+| Assinatura atrasada, Compra recusada | Mostra no painel "O último pagamento não foi aprovado" |
+| Assinatura cancelada | Continua no ar até o fim do período pago |
+| Reembolso, Chargeback | Sai do ar na hora |
+
+- **Comprou com outro e-mail:** a loja não é liberada sozinha. Libere em `/admin` com **Liberar 30 dias**.
+- **Comprou antes de criar a conta:** a compra fica guardada e a loja é liberada quando ela criar a conta com o mesmo e-mail.
+- **Cancelar:** a lojista cancela pela área do cliente da Kiwify (link no e-mail da compra). O botão Cancelar do painel explica isso.

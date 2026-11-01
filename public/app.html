@@ -1751,8 +1751,9 @@ function planCard() {
   return `<section class="plan plan-${st.plan}"><div class="plan-top"><div><b>${label}</b><small>${sub}</small></div>
     ${st.plan === 'pro' && st.subscribed ? '<button class="tg" id="plancancel">Cancelar</button>' : `<button class="hcopy" id="planbuy">${st.plan === 'pro' ? 'Renovar' : 'Assinar'} · ${brl(st.proPrice)}/mês</button>`}</div>
     ${st.plan === 'pro' && !st.subscribed && st.proUntil - Date.now() < 5 * 864e5 ? `<p class="plan-warn">Sua assinatura vence em ${Math.max(0, Math.ceil((st.proUntil - Date.now()) / 864e5))} dia(s). Renove para a vitrine não sair do ar.</p>` : ''}
-    ${st.lastPayment && st.lastPayment !== 'approved' ? '<p class="plan-warn">O último pagamento não foi aprovado. Confira o cartão no Mercado Pago para a assinatura continuar.</p>' : ''}
+    ${st.lastPayment && st.lastPayment !== 'approved' ? `<p class="plan-warn">O último pagamento não foi aprovado. Confira o cartão ${st.payments === 'kiwify' ? 'no e-mail da compra da Kiwify' : 'no Mercado Pago'} para a assinatura continuar.</p>` : ''}
     ${st.plan === 'expired' ? '<p class="plan-warn">Assine para colocar a vitrine de volta no ar. Seus produtos e configurações continuam salvos.</p>' : ''}
+    ${st.payments === 'kiwify' && st.plan !== 'pro' ? '<p class="note" style="margin:6px 0 0">O pagamento é pela Kiwify. Use na compra o mesmo e-mail da sua conta: assim a loja é liberada sozinha.</p>' : ''}
     ${st.payments === 'teste' ? '<p class="note" style="margin:6px 0 0">Modo de teste: o pagamento é simulado.</p>' : ''}</section>`;
 }
 async function api(method, url, body) {
