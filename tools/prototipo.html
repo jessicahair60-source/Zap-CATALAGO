@@ -61,7 +61,16 @@ html, body { overflow-x: clip; }
   box-shadow: 0 1px 2px rgba(60,20,40,.06); transition: transform .15s, box-shadow .15s; }
 .link:hover { transform: translateY(-1px); box-shadow: var(--shadow); }
 .link .ico { position: absolute; left: 6px; top: 50%; transform: translateY(-50%); }
-.link .dots { position: absolute; right: 18px; opacity: .5; font-size: 18px; line-height: 1; }
+.link .dots { position: absolute; right: 16px; top: 50%; width: 18px; height: 18px; margin-top: -9px; opacity: .45; transition: transform .25s ease, opacity .25s; }
+.link .dots svg { width: 100%; height: 100%; display: block; }
+.link:hover .dots, .link:focus-visible .dots { transform: translateX(3px); opacity: .8; }
+.links-h { text-align: center; margin: 18px 0 2px; }
+.links-h b { display: block; font: 700 13px var(--f-title); letter-spacing: .14em; text-transform: uppercase; color: var(--c-title); }
+.links-h small { display: block; margin-top: 3px; font-size: 12.5px; color: var(--c-muted); }
+.sarr { display: inline-block; width: 1.05em; height: 1.05em; vertical-align: -.15em; margin-left: 8px; color: var(--c-buyBg); animation: sarr 1.8s ease-in-out infinite; }
+.sarr svg { width: 100%; height: 100%; display: block; }
+@keyframes sarr { 0%, 100% { transform: translateY(0); opacity: .7; } 50% { transform: translateY(4px); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .sarr { animation: none; } }
 .ico { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; flex: none; }
 .ico svg { width: 21px; height: 21px; }
 .ico-ig { background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%); color: #fff; }
@@ -439,7 +448,7 @@ html, body { overflow-x: clip; }
 .link { min-height: 40px !important; font-size: 13px; padding: 4px 46px; }
 .link .ico { width: 28px !important; height: 28px !important; left: 6px !important; }
 .link .ico svg { width: 16px !important; height: 16px !important; }
-.link .dots { right: 14px; font-size: 15px; }
+.link .dots { right: 14px; width: 16px; height: 16px; margin-top: -8px; }
 .cat-title { font-size: 14px; letter-spacing: .14em; margin-top: 20px; font-weight: 700; }
 .search { margin-top: 10px; min-height: 40px; }
 .search input { font-size: 13.5px; }
@@ -1003,6 +1012,8 @@ const LINKTYPES = {
 };
 const webUrl = v => { v = String(v || '').trim(); return /^https?:\/\//i.test(v) ? v : 'https://' + v; };
 const LINK_TEXT = { ig: 'Siga no Instagram', tt: 'Siga no TikTok', zap: 'Fale no WhatsApp', map: 'Como chegar na loja', yt: 'Inscreva-se no canal', site: 'Visite nosso site', link: 'Meu link' };
+const secMark = () => { const v = S.store.secEmoji ?? 'seta';
+  return v === 'seta' || v === '👇' ? '<span class="sarr" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v15M6 13l6 6 6-6"/></svg></span>' : v ? ` <span aria-hidden="true">${esc(v)}</span>` : ''; };
 const socialLinks = () => S.links.filter(l => LINKTYPES[l.type] && l.on && (l.value || l.type === 'zap')).map(l => ({ icon: l.type, cls: LINKTYPES[l.type].cls, text: l.text, url: LINKTYPES[l.type].url(l.value) }));
 function catImg(c) {
   if (S.catImgs[c]) return `<img src="${S.catImgs[c]}" alt="">`;
@@ -1023,8 +1034,9 @@ function renderLoja() {
     <div class="banner">${s.bannerImg || s.bannerImgM ? `<picture>${s.bannerImg && s.bannerImgM ? `<source media="(min-width: 760px)" srcset="${s.bannerImg}">` : ''}<img src="${s.bannerImgM || s.bannerImg}" alt="${esc(s.bannerTitle)}"></picture>${s.bannerInfo === true && (s.bannerKicker || s.bannerTitle) ? `<div class="bdeco"><small>${esc(s.bannerKicker)}</small><strong>${esc(s.bannerTitle)}</strong></div>` : ''}` :
       `<div class="bart" aria-hidden="true">${[1, 5, 3].map(id => prod(id) ? `<img src="${artSrc(prod(id)) || ''}" alt="">` : '').join('')}</div>${s.bannerInfo === false ? '' : `<div class="bdeco"><small>${esc(s.bannerKicker)}</small><strong>${esc(s.bannerTitle)}</strong></div>`}`}</div>
     <aside class="side"><section class="intro">${s.logo ? `<img class="logo" src="${s.logo}" alt="${esc(s.name)}">` : ''}${!s.logo || s.showName ? `<h1 class="store-name">${esc(s.name)}</h1>` : ''}<p class="bio">${esc(s.bio)}</p></section>
+    ${socialLinks().length && (s.linksTitle ?? 'Conecte-se com a gente') ? `<div class="links-h"><b>${esc(s.linksTitle ?? 'Conecte-se com a gente')}</b>${(s.linksSub ?? 'Toque na opção desejada') ? `<small>${esc(s.linksSub ?? 'Toque na opção desejada')}</small>` : ''}</div>` : ''}
     <nav class="links" aria-label="Redes e contato">
-      ${socialLinks().map(l => `<a class="link" href="${esc(l.url)}" target="_blank" rel="noopener"><span class="ico ${l.cls}">${ICONS[l.icon]}</span>${esc(l.text)}<span class="dots" aria-hidden="true">›</span></a>`).join('')}
+      ${socialLinks().map(l => `<a class="link" href="${esc(l.url)}" target="_blank" rel="noopener"><span class="ico ${l.cls}">${ICONS[l.icon]}</span>${esc(l.text)}<span class="dots" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span></a>`).join('')}
     </nav></aside>
     <section class="main">${s.catalogTitle !== '' ? `<h2 class="cat-title">${esc((s.catalogTitle ?? 'Conheça nossos produtos').replace('{loja}', s.name))}</h2>` : ''}
     <label class="search">${ICONS.search}<input id="q" type="search" placeholder="Buscar no catálogo" value="${esc(ui.q)}" aria-label="Buscar produtos"></label>
@@ -1061,7 +1073,7 @@ function renderGrid() {
   if (group) { const order = c => { const i = S.cats.indexOf(c); return i < 0 ? 999 : i; }; list = list.map((p, i) => [p, i]).sort((a, b) => order(a[0].cat) - order(b[0].cat) || a[1] - b[1]).map(x => x[0]); }
   let lastCat = null;
   g.innerHTML = list.length ? list.map((p, i) => {
-    const head = group && p.cat !== lastCat ? `<h3 class="sec-h">${esc(p.cat || 'Outros')}${(S.store.secEmoji ?? '👇') ? ` <span aria-hidden="true">${esc(S.store.secEmoji ?? '👇')}</span>` : ''}</h3>` : ''; lastCat = p.cat;
+    const head = group && p.cat !== lastCat ? `<h3 class="sec-h">${esc(p.cat || 'Outros')}${secMark()}</h3>` : ''; lastCat = p.cat;
     const sub = (p.specs || []).length ? p.specs.map(x => x[1]).filter(Boolean).slice(0, 2).join(' · ') : p.desc;
     const quick = !p.link && !soldOut(p) ? `<button class="plus" data-quick="${p.id}" aria-label="Adicionar ${esc(p.name)} ao pedido">+</button>` : '';
     const b = badgeOf(p); const out = soldOut(p); const v = firstVid(p); const st = stockTxt(p);
@@ -1371,7 +1383,7 @@ function renderPainel() {
         <button data-ratio="916" aria-pressed="${s.ratio !== '45'}">Em pé 9:16</button><button data-ratio="45" aria-pressed="${s.ratio === '45'}">4:5 (Instagram)</button></div></div>
       ${ck('ssort', 'Mostrar a contagem de itens e o filtro de ordenar (Mais vendidos, Menor preço...)', !!s.showSort)}
       ${ck('sgroup', 'Separar os produtos por categoria, com título (ex.: CACHEADOS 👇)', s.groupCats === true)}
-      ${f('semoji', 'Emoji depois do título da categoria (vazio = sem emoji)', s.secEmoji ?? '👇')}
+      ${f('semoji', 'Depois do título da categoria: "seta" = seta animada, ou um emoji (vazio = nada)', (s.secEmoji ?? 'seta') === '👇' ? 'seta' : s.secEmoji ?? 'seta')}
       <div class="two">${f('sbuy', 'Texto do botão de compra', s.buyText)}${f('sinst', 'Parcelas sem juros (1 = esconder)', s.installments, 'inputmode="numeric"')}</div>`)}
     <h3 class="pgroup">Vendas e contato<small>WhatsApp, links e depoimentos</small></h3>
     ${sec('pedido', 'Carrinho e pedido no WhatsApp', 'Pagamento, entrega, cupom e mensagem', `
@@ -1386,7 +1398,7 @@ function renderPainel() {
           <span class="lact"><button class="tg" data-lup="${i}" ${i ? '' : 'disabled'} aria-label="Subir">↑</button><button class="tg" data-ldown="${i}" ${i < S.links.length - 1 ? '' : 'disabled'} aria-label="Descer">↓</button>
           <label class="chk"><input type="checkbox" data-lon="${i}" ${l.on ? 'checked' : ''}> Mostrar</label><button class="tg danger" data-ldel="${i}" aria-label="Tirar este link">Tirar</button></span></div>
         <div class="two">${f('lt' + i, 'Texto do botão', l.text, `data-ltext="${i}"`)}${f('lv' + i, LINKTYPES[l.type].field, l.value, `data-lval="${i}"`)}</div>
-      </div>`).join('') + `<div class="field"><label for="lnew">Adicionar outro link</label><div style="display:flex;gap:8px"><select class="in" id="lnew">${Object.entries(LINKTYPES).map(([k, v]) => `<option value="${k}">${v.name}</option>`).join('')}</select><button class="tg" id="ladd" style="padding:8px 14px">Adicionar</button></div></div>`)}
+      </div>`).join('') + `<div class="two">${f('slt', 'Título acima dos links (vazio = esconder)', s.linksTitle ?? 'Conecte-se com a gente')}${f('sls', 'Frase pequena embaixo', s.linksSub ?? 'Toque na opção desejada')}</div><div class="field"><label for="lnew">Adicionar outro link</label><div style="display:flex;gap:8px"><select class="in" id="lnew">${Object.entries(LINKTYPES).map(([k, v]) => `<option value="${k}">${v.name}</option>`).join('')}</select><button class="tg" id="ladd" style="padding:8px 14px">Adicionar</button></div></div>`)}
     ${sec('depo', 'Depoimentos e avaliações', `${S.testimonials.length} depoimentos`, `
       ${f('stesti', 'Título da seção', s.testiTitle)}
       <div class="plist">${S.testimonials.map((t, i) => `<div class="drow">
@@ -1421,7 +1433,7 @@ function renderPainel() {
   bind('sname','name'); bind('sbio','bio'); bind('sphone','phone'); bind('skick','bannerKicker'); if ($('#sbinfo')) $('#sbinfo').onchange = e => { s.bannerInfo = e.target.checked; save(); }; bind('stitle','bannerTitle');
   bind('sgreet','greeting'); bind('spay','payments'); bind('sdel','delivery'); bind('spick','pickup'); bind('scoupon','coupon');
   bind('scpct','couponPct', v => Math.min(100, Math.max(0, parseInt(v) || 0))); bind('sinst','installments', v => Math.max(1, parseInt(v) || 1));
-  bind('sbuy','buyText'); bind('sgroup','groupCats'); bind('ssort','showSort', v => { document.body.classList.toggle('showsort', v); return v; }); bind('semoji','secEmoji'); bind('scattitle','catalogTitle'); bind('sfoot','footer'); bind('sshowstock','showStock'); bind('slow','lowStock', v => Math.max(0, parseInt(v) || 0)); bind('szero','zeroStock');
+  bind('sbuy','buyText'); bind('sgroup','groupCats'); bind('ssort','showSort', v => { document.body.classList.toggle('showsort', v); return v; }); bind('semoji','secEmoji'); if ($('#slt')) { bind('slt','linksTitle'); bind('sls','linksSub'); } bind('scattitle','catalogTitle'); bind('sfoot','footer'); bind('sshowstock','showStock'); bind('slow','lowStock', v => Math.max(0, parseInt(v) || 0)); bind('szero','zeroStock');
   $('#sigring').onchange = e => { s.igRing = e.target.checked; save(); applyColors(); };
   $('#sigvid').onchange = e => { s.igVideo = e.target.checked; save(); applyColors(); };
   document.querySelectorAll('[data-bn]').forEach(el => el.oninput = () => { s.badgeNames[el.dataset.bn] = el.value; save(); });

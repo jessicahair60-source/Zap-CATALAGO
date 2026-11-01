@@ -169,9 +169,7 @@ function publicState(store) {
   let state = null;
   try { state = JSON.parse(store.state || 'null'); } catch (e) { state = null; }
   if (!state || state.v !== 4) return null; // loja que ainda não abriu o painel
-  if (state.store) {
-    delete state.store.p2; delete state.store.p3; delete state.store.p4; delete state.store.p5;
-  }
+  // as marcas p2..p5 ficam: sem elas a vitrine refazia ajustes antigos e apagava cores e o layout escolhidos
   return state;
 }
 
