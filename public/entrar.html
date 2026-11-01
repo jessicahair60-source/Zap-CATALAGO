@@ -161,6 +161,8 @@ document.querySelectorAll('[data-eye]').forEach(b => { b.innerHTML = EYE; b.oncl
   i.type = show ? 'text' : 'password'; b.innerHTML = show ? EYE_OFF : EYE; b.setAttribute('aria-label', show ? 'Esconder senha' : 'Mostrar senha'); }; });
 
 const VIEWS = { in: '#f-in', up: '#f-up', fg: '#f-fg', sent: '#v-sent', rs: '#f-rs' };
+// Veio de "Quero o plano mensal/anual" da página de vendas: o painel já abre o pagamento desse plano
+const plano = () => { const p = new URLSearchParams(location.search).get('plano'); return p === 'anual' || p === 'mensal' ? '?plano=' + p : ''; };
 const PATHS = { in: '/entrar', up: '/cadastro', fg: '/esqueci' };
 function view(v, push) {
   Object.entries(VIEWS).forEach(([k, sel]) => { $(sel).hidden = k !== v; });
@@ -195,12 +197,12 @@ const okEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
 
 $('#f-in').onsubmit = async e => { e.preventDefault(); const err = $('#ierr');
   if (!okEmail($('#ie').value)) return need(err, 'Confira o e-mail.'); if (!$('#ip').value) return need(err, 'Digite sua senha.');
-  const j = await post('/api/login', { email: $('#ie').value, password: $('#ip').value }, err, $('#f-in .go')); if (j) location.href = j.redirect || '/painel'; };
+  const j = await post('/api/login', { email: $('#ie').value, password: $('#ip').value }, err, $('#f-in .go')); if (j) location.href = (j.redirect || '/painel') + plano(); };
 $('#f-up').onsubmit = async e => { e.preventDefault(); const err = $('#uerr');
   if (!$('#un').value.trim() || !$('#us').value.trim()) return need(err, 'Preencha seu nome e o nome da loja.');
   if (!okEmail($('#ue').value)) return need(err, 'Confira o e-mail.'); if ($('#up').value.length < 4) return need(err, 'A senha precisa ter pelo menos 4 caracteres.');
   if (!$('#ut').checked) return need(err, 'Para continuar, aceite os termos de uso.');
-  const j = await post('/api/signup', { name: $('#un').value, storeName: $('#us').value, email: $('#ue').value, password: $('#up').value, terms: true }, err, $('#f-up .go')); if (j) location.href = j.redirect || '/painel'; };
+  const j = await post('/api/signup', { name: $('#un').value, storeName: $('#us').value, email: $('#ue').value, password: $('#up').value, terms: true }, err, $('#f-up .go')); if (j) location.href = (j.redirect || '/painel') + plano(); };
 $('#f-fg').onsubmit = async e => { e.preventDefault(); const err = $('#ferr');
   if (!okEmail($('#fe').value)) return need(err, 'Confira o e-mail.');
   const j = await post('/api/password/forgot', { email: $('#fe').value }, err, $('#f-fg .go')); if (!j) return;

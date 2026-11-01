@@ -18,6 +18,7 @@ const CFG = {
   publicUrl: (process.env.PUBLIC_URL || 'http://localhost:3000').replace(/\/$/, ''),
   baseDomain: (process.env.BASE_DOMAIN || '').toLowerCase(),
   proPrice: parseFloat(process.env.PLAN_PRICE || '47.00'),
+  yearPrice: parseFloat(process.env.PLAN_PRICE_YEAR || '299.99'),
   adminHost: (process.env.ADMIN_HOST || '').toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, ''),
   admins: (process.env.ADMIN_EMAILS || '').toLowerCase().split(',').map(s => s.trim()).filter(Boolean),
   fakePayments: !mp.enabled() && !kiwify.enabled() && process.env.NODE_ENV !== 'production',
@@ -64,7 +65,7 @@ function storeInfo(store) {
     id: store.id, slug: store.slug, name: store.name, plan: planOf(store), proUntil: store.pro_until, trialUntil: store.trial_until,
     subscribed: !!store.mp_preapproval, customDomain: store.custom_domain, blocked: !!store.blocked, blockedReason: store.blocked_reason,
     lastPayment: (db.prepare('SELECT status FROM payments WHERE store_id = ? ORDER BY created_at DESC, id DESC LIMIT 1').get(store.id) || {}).status || '',
-    publicUrl: publicUrlOf(store), proPrice: CFG.proPrice, brand: CFG.brand, payments: kiwify.enabled() ? 'kiwify' : mp.enabled() ? 'mercadopago' : CFG.fakePayments ? 'teste' : 'off', savedAt: store.updated_at
+    publicUrl: publicUrlOf(store), proPrice: CFG.proPrice, yearPrice: kiwify.enabled() && kiwify.checkoutUrl('anual') ? CFG.yearPrice : 0, brand: CFG.brand, payments: kiwify.enabled() ? 'kiwify' : mp.enabled() ? 'mercadopago' : CFG.fakePayments ? 'teste' : 'off', savedAt: store.updated_at
   };
 }
 function publicUrlOf(store) {
@@ -474,12 +475,13 @@ app.get('/api/pix', async (req, res) => {
 });
 
 /* ---------- assinatura ---------- */
-app.post('/api/billing/checkout', auth, async (req, res) => {
+app.post('/api/billing/checkout', auth, jsonBody, async (req, res) => {
   const s = req.store;
   try {
     if (kiwify.enabled()) {
-      if (!kiwify.checkoutUrl()) return res.status(503).json({ error: 'O link de pagamento ainda não foi configurado na plataforma.' });
-      return res.json({ url: kiwify.checkout({ email: req.user.email, name: req.user.name }) });
+      const plan = req.body && req.body.plan === 'anual' ? 'anual' : 'mensal';
+      if (!kiwify.checkoutUrl(plan)) return res.status(503).json({ error: 'O link de pagamento ainda não foi configurado na plataforma.' });
+      return res.json({ url: kiwify.checkout({ email: req.user.email, name: req.user.name, plan }) });
     }
     if (mp.enabled()) {
       const sub = await mp.createSubscription({ storeId: s.id, email: req.user.email, price: CFG.proPrice, reason: `${CFG.brand} - ${s.name}`, backUrl: `${CFG.publicUrl}/painel?assinatura=ok` });
@@ -528,7 +530,7 @@ app.post('/api/webhooks/kiwify', express.raw({ type: '*/*', limit: '1mb' }), (re
   const paid = (k.event === 'order_approved' || k.event === 'subscription_renewed') && k.status === 'paid';
   if (paid) {
     // Vale até a próxima cobrança, com 2 dias de folga; sem a data, 32 dias
-    const until = k.nextPayment > now() ? k.nextPayment + 2 * DAY : Math.max(now(), (store && store.pro_until) || 0) + 32 * DAY;
+    const until = k.nextPayment > now() ? k.nextPayment + 2 * DAY : Math.max(now(), (store && store.pro_until) || 0) + (k.yearly ? 367 : 32) * DAY;
     if (!store) {
       db.prepare(`INSERT INTO kiwify_pending (email, until, sub_id, order_id, created_at) VALUES (?, ?, ?, ?, ?)
         ON CONFLICT(email) DO UPDATE SET until = MAX(until, excluded.until), sub_id = excluded.sub_id, order_id = excluded.order_id`).run(k.email, until, k.subId || null, k.orderId, now());

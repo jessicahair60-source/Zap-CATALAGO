@@ -200,7 +200,8 @@ function planCard() {
   const label = st.plan === 'pro' ? 'Assinatura ativa' : st.plan === 'trial' ? 'Teste grátis' : 'Assinatura vencida';
   const sub = st.plan === 'pro' ? `${st.subscribed ? 'Renova' : 'Vale'} até ${fmtDate(st.proUntil)}` : st.plan === 'trial' ? `Termina em ${fmtDate(st.trialUntil)}. Assine para a vitrine continuar no ar.` : 'Sua vitrine está fora do ar para as clientes.';
   return `<section class="plan plan-${st.plan}"><div class="plan-top"><div><b>${label}</b><small>${sub}</small></div>
-    ${st.plan === 'pro' && st.subscribed ? '<button class="tg" id="plancancel">Cancelar</button>' : `<button class="hcopy" id="planbuy">${st.plan === 'pro' ? 'Renovar' : 'Assinar'} · ${brl(st.proPrice)}/mês</button>`}</div>
+    ${st.plan === 'pro' && st.subscribed ? '<button class="tg" id="plancancel">Cancelar</button>' : `<button class="hcopy" id="planbuy" data-plan="mensal">${st.plan === 'pro' ? 'Renovar' : 'Assinar'} · ${brl(st.proPrice)}/mês</button>`}</div>
+    ${st.yearPrice && !(st.plan === 'pro' && st.subscribed) ? `<button class="hcopy" id="planyear" data-plan="anual" style="margin-top:8px;width:100%">Plano anual · ${brl(st.yearPrice)}/ano (sai ${brl(st.yearPrice / 12)} por mês)</button>` : ''}
     ${st.plan === 'pro' && !st.subscribed && st.proUntil - Date.now() < 5 * 864e5 ? `<p class="plan-warn">Sua assinatura vence em ${Math.max(0, Math.ceil((st.proUntil - Date.now()) / 864e5))} dia(s). Renove para a vitrine não sair do ar.</p>` : ''}
     ${st.lastPayment && st.lastPayment !== 'approved' ? `<p class="plan-warn">O último pagamento não foi aprovado. Confira o cartão ${st.payments === 'kiwify' ? 'no e-mail da compra da Kiwify' : 'no Mercado Pago'} para a assinatura continuar.</p>` : ''}
     ${st.plan === 'expired' ? '<p class="plan-warn">Assine para colocar a vitrine de volta no ar. Seus produtos e configurações continuam salvos.</p>' : ''}
@@ -215,9 +216,13 @@ async function api(method, url, body) {
 function bindPanelExtras(s) {
   const bindS = (id, key) => { const el = $('#' + id); if (el) el.oninput = () => { s[key] = el.value.trim(); save(); }; };
   bindS('spixkey', 'pixKey'); bindS('spixname', 'pixName'); bindS('spixcity', 'pixCity'); bindS('spixel', 'metaPixel'); bindS('sga', 'gaId');
-  if ($('#planbuy')) $('#planbuy').onclick = async () => { $('#planbuy').disabled = true;
-    try { const j = await api('POST', '/api/billing/checkout'); if (j.url) { location.href = j.url; return; } if (j.store) { BOOT.store = { ...BOOT.store, ...j.store }; renderPainel(); renderLoja(); toast('Assinatura ativada'); } }
-    catch (e) { toast(e.message); $('#planbuy').disabled = false; } };
+  const buy = async b => { b.disabled = true;
+    try { const j = await api('POST', '/api/billing/checkout', { plan: b.dataset.plan }); if (j.url) { location.href = j.url; return; } if (j.store) { BOOT.store = { ...BOOT.store, ...j.store }; renderPainel(); renderLoja(); toast('Assinatura ativada'); } }
+    catch (e) { toast(e.message); b.disabled = false; } };
+  ['#planbuy', '#planyear'].forEach(id => { if ($(id)) $(id).onclick = () => buy($(id)); });
+  // Veio da página de vendas com um plano escolhido: abre o pagamento dele uma vez
+  const want = new URLSearchParams(location.search).get('plano');
+  if (want && BOOT.store.plan !== 'pro') { history.replaceState(null, '', location.pathname); const b = want === 'anual' && $('#planyear') ? $('#planyear') : $('#planbuy'); if (b) buy(b); }
   if ($('#plancancel')) $('#plancancel').onclick = async () => { if (!confirm('Cancelar a assinatura? A vitrine continua no ar até o fim do período já pago e depois sai do ar.')) return;
     try { const j = await api('POST', '/api/billing/cancel'); BOOT.store = { ...BOOT.store, ...j.store }; renderPainel(); toast('Assinatura cancelada'); } catch (e) { toast(e.message); } };
   if ($('#savedomain')) $('#savedomain').onclick = async () => { $('#domerr').hidden = true;

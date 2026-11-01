@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Zap Catálogo · Sua vitrine com pedido no WhatsApp</title>
-<meta name="description" content="Crie em minutos uma vitrine bonita para o link da bio, com catálogo, vídeos e pedidos direto no seu WhatsApp.">
+<title>Zap Catálogo · Sua vitrine digital completa, pronta para vender</title>
+<meta name="description" content="Crie sua vitrine online com a identidade da sua marca e receba os pedidos direto no WhatsApp. Tudo em um único link, com seu próprio subdomínio.">
 <meta property="og:title" content="Zap Catálogo · Sua vitrine com pedido no WhatsApp">
-<meta property="og:description" content="Link da bio com catálogo, vídeos e pedido pronto no WhatsApp. R$ 47 por mês, sem taxa por venda.">
+<meta property="og:description" content="Catálogo com fotos e vídeos, carrinho e pedido pronto no WhatsApp. Plano mensal R$ 47 ou anual R$ 299,99.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="/static/site.css">
@@ -55,11 +55,41 @@
   .faq p { margin: 10px 0 0; color: var(--muted); font-size: 14.5px; }
   .final { margin-top: 64px; background: #2A1A22; color: #fff; border-radius: 28px; padding: 38px 24px; text-align: center; }
   .final h2 { font-size: clamp(26px, 4vw, 36px); margin: 0 auto 10px; } .final p { color: #E7CFD9; margin: 0 0 22px; }
+  .hero .tag { display: inline-flex; gap: 6px; align-items: center; background: var(--soft); color: var(--acc); font-weight: 700; font-size: 13px; padding: 6px 12px; border-radius: 99px; margin-bottom: 16px; }
+  .hero p.lead + p.lead { margin-top: -12px; }
+  .hl { font-weight: 700; color: var(--fg); }
+  .flow { display: grid; gap: 12px; margin-top: 26px; }
+  .flow div { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 18px 20px; display: grid; grid-template-columns: 44px 1fr; gap: 14px; align-items: center; }
+  .flow b { display: block; } .flow p { margin: 2px 0 0; color: var(--muted); font-size: 14.5px; }
+  .blk > p.txt { color: var(--muted); font-size: 17px; max-width: 640px; margin: 14px 0 0; }
+  .blk > p.txt strong { color: var(--fg); }
+  .checks { list-style: none; margin: 26px 0 0; padding: 0; display: grid; gap: 10px; }
+  .checks li { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px 14px 48px; position: relative; font-weight: 500; }
+  .checks li::before { content: ""; position: absolute; left: 16px; top: 50%; width: 20px; height: 20px; margin-top: -10px; border-radius: 50%; background: var(--acc) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5 9-10'/%3E%3C/svg%3E") center / 12px no-repeat; }
+  .split { display: grid; gap: 34px; align-items: center; }
+  .vphone { justify-self: center; width: 230px; aspect-ratio: 9/16; border-radius: 30px; background: linear-gradient(165deg, #F3C9D6, #B9476F 70%, #6E2343); position: relative; box-shadow: 0 30px 60px -30px rgba(80,20,50,.5); overflow: hidden; }
+  .vphone .play { position: absolute; left: 50%; top: 45%; width: 62px; height: 62px; margin: -31px 0 0 -31px; border-radius: 50%; background: rgba(255,255,255,.92); display: grid; place-items: center; }
+  .vphone .play::after { content: ""; border-left: 18px solid var(--acc); border-top: 11px solid transparent; border-bottom: 11px solid transparent; margin-left: 5px; }
+  .vphone .cap { position: absolute; left: 12px; right: 12px; bottom: 14px; background: rgba(42,26,34,.7); color: #fff; font-size: 12.5px; font-weight: 700; border-radius: 99px; padding: 8px 12px; text-align: center; }
+  .vphone .bar { position: absolute; left: 12px; right: 12px; top: 12px; height: 3px; border-radius: 3px; background: rgba(255,255,255,.4); } .vphone .bar i { display: block; width: 40%; height: 100%; border-radius: 3px; background: #fff; }
+  .tut { display: grid; gap: 12px; margin-top: 24px; }
+  .tut div { display: flex; gap: 12px; align-items: center; font-weight: 700; }
+  .plans2 { display: grid; gap: 16px; margin-top: 26px; }
+  .plan .sub { color: var(--muted); margin: 0; font-size: 14.5px; }
+  .plan .save { background: #E3F6EA; color: #137A3D; font-size: 13px; font-weight: 700; border-radius: 10px; padding: 8px 12px; }
+  .plan.best { border: 2px solid var(--acc); position: relative; }
+  .plan.best::after { content: "Mais vantajoso"; position: absolute; top: -12px; right: 20px; background: var(--acc); color: #fff; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 99px; }
+  .plan .btn { width: 100%; }
   @media (min-width: 760px) {
     .hero { grid-template-columns: 1.15fr .85fr; padding-top: 50px; }
     .feats { grid-template-columns: repeat(3, 1fr); }
     .steps { grid-template-columns: repeat(3, 1fr); }
     .plans { max-width: 440px; }
+    .flow { grid-template-columns: repeat(3, 1fr); } .flow div { grid-template-columns: 1fr; align-items: start; }
+    .checks { grid-template-columns: repeat(3, 1fr); } .checks li { display: flex; align-items: center; }
+    .split { grid-template-columns: 1.1fr .9fr; }
+    .tut { grid-template-columns: repeat(3, 1fr); }
+    .plans2 { grid-template-columns: 1fr 1fr; max-width: 820px; }
   }
 </style>
 </head>
@@ -67,15 +97,17 @@
 <div class="container">
   <nav class="nav">
     <a class="logo" href="/"><i>Z</i>Zap Catálogo</a>
-    <div class="nav-links"><a class="btn ghost" href="/entrar">Entrar</a><a class="btn" href="/cadastro">Criar minha vitrine</a></div>
+    <div class="nav-links"><a class="btn ghost" href="/entrar">Entrar</a><a class="btn" href="#planos">Ver planos</a></div>
   </nav>
 
   <header class="hero">
     <div>
-      <h1>Sua vitrine no link da bio, com pedido <em>direto no WhatsApp</em></h1>
-      <p class="lead">Mostre seus produtos com fotos e vídeos, deixe a cliente escolher e receba o pedido pronto no seu WhatsApp. Sem site complicado, sem taxa por venda.</p>
-      <div class="cta"><a class="btn big" href="/cadastro">Criar minha vitrine</a><a class="btn big soft" href="#planos">Ver planos</a>
-        <small>R$ 47 por mês, sem taxa por venda.</small></div>
+      <span class="tag">ZAP CATÁLOGO 💗</span>
+      <h1>Sua vitrine digital completa, <em>pronta para vender!</em></h1>
+      <p class="lead">Você tem uma lojinha, vende produtos ou oferece serviços?</p>
+      <p class="lead">Com o Zap Catálogo, você cria sua própria vitrine online, personalizada com a identidade da sua marca, e recebe os pedidos diretamente no WhatsApp.</p>
+      <p class="lead hl">Tudo em um único link, com seu próprio subdomínio!</p>
+      <div class="cta"><a class="btn big" href="/cadastro">QUERO CRIAR MEU CATÁLOGO</a><a class="btn big soft" href="#planos">Ver planos</a></div>
     </div>
     <div class="phone" aria-hidden="true"><div class="screen">
       <div class="sb"><small>Nova coleção</small><b>Sua loja</b></div>
@@ -89,53 +121,85 @@
   </header>
 
   <section class="blk">
-    <p class="eyebrow">Feito para quem vende no Instagram</p>
-    <h2>Tudo o que sua cliente precisa para comprar, num link só</h2>
-    <div class="feats">
-      <div class="feat"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l1.6-4.8A8.5 8.5 0 1 1 8 19.6z"/></svg></span><b>Pedido pronto no WhatsApp</b><p>Produto, tamanho, quantidade, entrega e pagamento chegam numa mensagem só.</p></div>
-      <div class="feat"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="13" height="14" rx="2"/><path d="m16 10 5-3v10l-5-3"/></svg></span><b>Fotos e vídeos dos produtos</b><p>Até 5 fotos por produto e vídeo no estilo stories, como a cliente já está acostumada.</p></div>
-      <div class="feat"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></svg></span><b>Pix com valor certo</b><p>QR Code e copia e cola gerados com o total do pedido. O dinheiro cai direto na sua conta.</p></div>
-      <div class="feat"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s7 7.5 7 12a7 7 0 0 1-14 0c0-4.5 7-12 7-12z"/></svg></span><b>Com a cara da sua marca</b><p>Banner, logo, temas prontos, fontes e uma cor para cada parte da vitrine.</p></div>
-      <div class="feat"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6"/></svg></span><b>Relatórios simples</b><p>Visitas, produtos mais vistos, cliques no Eu quero e pedidos enviados.</p></div>
-      <div class="feat"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span><b>Para qualquer negócio</b><p>Roupas, perucas, doces, beleza, serviços com agendamento e infoprodutos.</p></div>
+    <p class="eyebrow">📲 Pedido pronto no WhatsApp</p>
+    <h2>Seu cliente escolhe, clica e o pedido chega!</h2>
+    <p class="txt">Chega de ficar enviando fotos e explicando os mesmos produtos toda hora!</p>
+    <div class="flow">
+      <div><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg></span><span><b>Escolhe</b><p>Seu cliente acessa o catálogo e escolhe o que deseja.</p></span></div>
+      <div><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V5a2 2 0 0 1 4 0v6"/><path d="M13 9a2 2 0 0 1 4 0v3a7 7 0 0 1-7 7h-.5a5 5 0 0 1-4.2-2.3L3 14a1.8 1.8 0 0 1 3-2l3 3"/></svg></span><span><b>Clica</b><p>Um toque e o pedido sai prontinho, com os produtos escolhidos.</p></span></div>
+      <div><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l1.6-4.8A8.5 8.5 0 1 1 8 19.6z"/></svg></span><span><b>O pedido chega</b><p>Direto no seu WhatsApp. Simples para ele, muito mais prático para você!</p></span></div>
     </div>
   </section>
 
   <section class="blk">
-    <p class="eyebrow">Como funciona</p>
-    <h2>Sua vitrine no ar em três passos</h2>
-    <div class="steps">
-      <div class="step"><div><b>Crie sua conta</b><p>Só nome, nome da loja, e-mail e senha.</p></div></div>
-      <div class="step"><div><b>Cadastre os produtos</b><p>Envie as fotos pelo celular, escreva o preço e pronto.</p></div></div>
-      <div class="step"><div><b>Coloque o link na bio</b><p>Copie o link da vitrine e cole no Instagram e no TikTok.</p></div></div>
+    <p class="eyebrow">✨ Tudo incluído</p>
+    <h2>Tudo que sua vitrine precisa</h2>
+    <ul class="checks">
+      <li>Catálogo de produtos e serviços</li>
+      <li>Fotos e vídeos para mostrar cada detalhe</li>
+      <li>Categorias para organizar sua vitrine</li>
+      <li>Carrinho de pedidos integrado ao WhatsApp</li>
+      <li>Personalização de cores, banners e identidade visual</li>
+      <li>Links para suas redes sociais</li>
+      <li>Seu próprio subdomínio exclusivo</li>
+      <li>Painel para atualizar seus produtos quando quiser</li>
+      <li>Tutorial ensinando a configurar o catálogo e adicionar vídeos em poucos minutos</li>
+    </ul>
+  </section>
+
+  <section class="blk split">
+    <div>
+      <p class="eyebrow">🎥 Vídeos nos produtos</p>
+      <h2>Mostre seus produtos em vídeo!</h2>
+      <p class="txt" style="color:var(--muted);font-size:17px;margin:14px 0 0">Fotos são importantes, mas seus clientes também querem ver os detalhes!</p>
+      <p class="txt" style="color:var(--muted);font-size:17px;margin:12px 0 0">Com o Zap Catálogo, você pode adicionar vídeos aos seus produtos e apresentar tudo de maneira mais completa.</p>
+      <p style="font-size:17px;font-weight:700;margin:12px 0 0">Mostre cores, tamanhos, acabamentos e detalhes que fazem diferença na hora da escolha.</p>
+    </div>
+    <div class="vphone" aria-hidden="true"><div class="bar"><i></i></div><div class="play"></div><div class="cap">Assista ao vídeo dos detalhes</div></div>
+  </section>
+
+  <section class="blk">
+    <p class="eyebrow">💗 A gente te ensina</p>
+    <h2>Não sabe como montar? A gente te ensina!</h2>
+    <p class="txt"><strong>Você não precisa entender de programação!</strong> Com nosso tutorial passo a passo, você aprende a personalizar seu catálogo, cadastrar produtos e adicionar fotos e vídeos em poucos minutos. Tudo pelo seu próprio painel.</p>
+    <div class="tut">
+      <div><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3s7 7.5 7 12a7 7 0 0 1-14 0c0-4.5 7-12 7-12z"/></svg></span>Personalize seu catálogo</div>
+      <div><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="M3 8l9 5 9-5M12 13v8"/></svg></span>Cadastre seus produtos</div>
+      <div><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="13" height="14" rx="2"/><path d="m16 10 5-3v10l-5-3"/></svg></span>Adicione fotos e vídeos</div>
     </div>
   </section>
 
   <section class="blk" id="planos">
-    <p class="eyebrow">Planos</p>
-    <h2>Um plano só, com tudo incluído</h2>
-    <div class="plans">
-      <div class="plan pro"><h3>Zap Catálogo</h3><div class="price">R$ 47 <small>por mês</small></div>
-        <ul><li>Produtos, fotos e vídeos ilimitados</li><li>Pedido pronto no WhatsApp</li><li>Pix com QR Code no valor do pedido</li><li>Relatórios de visitas, cliques e pedidos</li><li>Pixel do Meta e Google Analytics</li><li>Domínio próprio (www.sualoja.com.br)</li><li>Sem taxa por venda</li></ul>
-        <a class="btn" href="/cadastro">Assinar</a><small class="note" style="text-align:center">Cancele quando quiser, direto no painel.</small></div>
+    <p class="eyebrow">💰 Planos</p>
+    <h2>Escolha seu plano</h2>
+    <div class="plans2">
+      <div class="plan"><h3>Plano mensal</h3><div class="price">R$ 47,00 <small>/mês</small></div>
+        <p class="sub">Seu catálogo completo, com todas as funcionalidades disponíveis.</p>
+        <a class="btn big" href="/cadastro?plano=mensal">QUERO O PLANO MENSAL</a></div>
+      <div class="plan best"><h3>Plano anual</h3><div class="price">R$ 299,99 <small>/ano</small></div>
+        <p class="sub">Equivalente a apenas <b>R$ 25 por mês</b>.</p>
+        <div class="save">Economize R$ 264,01 em comparação com 12 mensalidades!</div>
+        <p class="sub">Todas as funcionalidades incluídas.</p>
+        <a class="btn big" href="/cadastro?plano=anual">QUERO O PLANO ANUAL</a></div>
     </div>
+    <p class="note" style="margin-top:14px">Pagamento seguro pela Kiwify. Use na compra o mesmo e-mail da sua conta.</p>
   </section>
 
   <section class="blk">
     <p class="eyebrow">Dúvidas</p>
     <h2>Perguntas frequentes</h2>
     <div class="faq">
-      <details><summary>Vocês cobram taxa por venda?</summary><p>Não. Você paga só a mensalidade de R$ 47. O pagamento da cliente vai direto para você.</p></details>
+      <details><summary>Vocês cobram taxa por venda?</summary><p>Não. Você paga só o plano. O pagamento do seu cliente vai direto para você.</p></details>
       <details><summary>Preciso de CNPJ?</summary><p>Não. Funciona para quem vende como pessoa física ou como empresa.</p></details>
-      <details><summary>Como cancelo?</summary><p>No próprio painel, em um toque. A vitrine fica no ar até o fim do mês pago. Seus produtos continuam salvos se quiser voltar.</p></details>
-      <details><summary>Posso usar no computador?</summary><p>Sim. A vitrine e o painel se ajustam ao celular e ao computador.</p></details>
+      <details><summary>Como cancelo?</summary><p>Pela área do cliente da Kiwify, com o link do e-mail da compra. Sua vitrine fica no ar até o fim do período pago, e seus produtos continuam salvos se quiser voltar.</p></details>
+      <details><summary>Posso usar no computador?</summary><p>Sim. A vitrine e o painel se ajustam ao celular, ao tablet e ao computador.</p></details>
     </div>
   </section>
 
   <section class="final">
-    <h2>Sua próxima venda começa no link da bio</h2>
-    <p>Crie sua vitrine agora e comece a vender hoje.</p>
-    <a class="btn big" href="/cadastro">Criar minha vitrine</a>
+    <h2>Sua marca merece uma vitrine profissional!</h2>
+    <p>Tenha seus produtos, serviços, fotos, vídeos e pedidos organizados em um só lugar. Crie seu Zap Catálogo e compartilhe seu link com seus clientes!</p>
+    <a class="btn big" href="#planos">QUERO MEU ZAP CATÁLOGO</a>
   </section>
 
   <footer class="site"><span>© Zap Catálogo</span><span><a href="/termos">Termos de uso</a> · <a href="/privacidade">Privacidade</a> · <a href="/entrar">Entrar</a></span></footer>

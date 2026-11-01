@@ -47,3 +47,13 @@ Na tela do webhook da Kiwify, use **Testar webhook**: a Kiwify manda um aviso de
 - **Comprou com outro e-mail:** a loja não é liberada sozinha. Libere em `/admin` com **Liberar 30 dias**.
 - **Comprou antes de criar a conta:** a compra fica guardada e a loja é liberada quando ela criar a conta com o mesmo e-mail.
 - **Cancelar:** a lojista cancela pela área do cliente da Kiwify (link no e-mail da compra). O botão Cancelar do painel explica isso.
+
+## Plano anual
+
+Crie um segundo produto de assinatura **anual** (R$ 299,99) com o mesmo webhook marcado para ele também, e coloque o link do checkout em:
+
+```
+KIWIFY_CHECKOUT_ANUAL=https://pay.kiwify.com.br/seu-link-anual
+```
+
+Com isso, o painel mostra os dois planos e os botões da página de vendas abrem o checkout certo depois que a pessoa cria a conta.
