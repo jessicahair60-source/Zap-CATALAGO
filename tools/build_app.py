@@ -328,9 +328,9 @@ rep("""body: JSON.stringify({ state: S }) });""", """body: JSON.stringify({ stat
 rep("""    swapUrls(S, j.state); setSaveState""", """    swapUrls(S, j.state); mergeWa(j.state.products, j.state.cats); sync.base = j.savedAt || sync.base; setSaveState""")
 rep("""    <h3 class="pgroup">Produtos<small>Cadastre, organize e controle o estoque</small></h3>""",
 """    <h3 class="pgroup">Produtos<small>Cadastre, organize e controle o estoque</small></h3>
-    ${MODE === 'panel' ? sec('whats', 'Cadastrar pelo WhatsApp', 'Mande foto e texto, o produto entra sozinho', '<div id="wabox"><p class="note">Carregando...</p></div>') : ''}""")
+    ${MODE === 'panel' && BOOT.wa ? sec('whats', 'Cadastrar pelo WhatsApp', 'Mande foto e texto, o produto entra sozinho', '<div id="wabox"><p class="note">Carregando...</p></div>') : ''}""")
 rep("""  const rel = document.querySelector('details[data-sec="relatorio"]');""", """  const wsec = document.querySelector('details[data-sec="whats"]');
-  wsec.addEventListener('toggle', () => { if (wsec.open) loadWa(); }); if (wsec.open) loadWa();
+  if (wsec) { wsec.addEventListener('toggle', () => { if (wsec.open) loadWa(); }); if (wsec.open) loadWa(); }
   const rel = document.querySelector('details[data-sec="relatorio"]');""")
 rep("""async function loadStats() {""", """// Produtos que o robô do WhatsApp cadastrou entram no painel sem recarregar a página
 function mergeWa(list, cats) {
@@ -360,7 +360,7 @@ async function loadWa(force) {
 const fmtPhone = p => '+' + String(p).replace(/^(\\d{2})(\\d{2})(\\d{4,5})(\\d{4})$/, '$1 ($2) $3-$4');
 function renderWa() {
   const box = $('#wabox'); if (!box || !WA) return;
-  if (!WA.enabled) { box.innerHTML = '<p class="note">O cadastro pelo WhatsApp ainda não foi ligado na plataforma. Em breve!</p>'; return; }
+  if (!WA.enabled) { const d = box.closest('details'); if (d) d.hidden = true; return; } // robô desligado na plataforma: a opção nem aparece
   const link = WA.code && WA.number ? `https://wa.me/${WA.number}?text=${encodeURIComponent('ZAP-' + WA.code)}` : '';
   box.innerHTML = `<p class="note" style="margin:0 0 12px">Mande a foto do produto com o texto no modelo para o WhatsApp ${WA.number ? `<b>${fmtPhone(WA.number)}</b>` : 'da plataforma'}. O produto aparece na sua vitrine na hora.</p>
     ${WA.phones.length ? `<div class="opt-label">Números ligados à sua loja</div><div class="walist">${WA.phones.map(p => `<div class="warow"><span>${fmtPhone(p.phone)}</span><button class="tg danger" data-waoff="${esc(p.phone)}">Desligar</button></div>`).join('')}</div>` : ''}

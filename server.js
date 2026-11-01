@@ -260,7 +260,7 @@ app.get('/painel', (req, res) => {
   const store = db.prepare('SELECT * FROM stores WHERE user_id = ?').get(u.id);
   if (!store) return res.redirect('/admin');
   let state = null; try { state = JSON.parse(store.state || 'null'); } catch (e) {}
-  const boot = { mode: 'panel', state, store: storeInfo(store), user: { name: u.name, email: u.email, admin: isAdmin(u) }, brand: CFG.brand, home: CFG.publicUrl };
+  const boot = { mode: 'panel', state, store: storeInfo(store), user: { name: u.name, email: u.email, admin: isAdmin(u) }, brand: CFG.brand, home: CFG.publicUrl, wa: wa.enabled() || CFG.fakePayments };
   const html = APP_HTML().replace('<!--HEAD-->', `<title>Painel · ${escHtml(store.name)}</title><meta name="robots" content="noindex">${APP_HEAD}`).replace('<!--BOOT-->', `<script>window.__BOOT__=${jsonForScript(boot)}</script>`);
   res.set('Cache-Control', 'no-store');
   sendApp(res, html);
