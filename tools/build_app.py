@@ -201,6 +201,8 @@ function planCard() {
   const sub = st.plan === 'pro' ? `${st.subscribed ? 'Renova' : 'Vale'} até ${fmtDate(st.proUntil)}` : st.plan === 'trial' ? `Termina em ${fmtDate(st.trialUntil)}. Assine para a vitrine continuar no ar.` : 'Sua vitrine está fora do ar para as clientes.';
   return `<section class="plan plan-${st.plan}"><div class="plan-top"><div><b>${label}</b><small>${sub}</small></div>
     ${st.plan === 'pro' && st.subscribed ? '<button class="tg" id="plancancel">Cancelar</button>' : `<button class="hcopy" id="planbuy">${st.plan === 'pro' ? 'Renovar' : 'Assinar'} · ${brl(st.proPrice)}/mês</button>`}</div>
+    ${st.plan === 'pro' && !st.subscribed && st.proUntil - Date.now() < 5 * 864e5 ? `<p class="plan-warn">Sua assinatura vence em ${Math.max(0, Math.ceil((st.proUntil - Date.now()) / 864e5))} dia(s). Renove para a vitrine não sair do ar.</p>` : ''}
+    ${st.lastPayment && st.lastPayment !== 'approved' ? '<p class="plan-warn">O último pagamento não foi aprovado. Confira o cartão no Mercado Pago para a assinatura continuar.</p>' : ''}
     ${st.plan === 'expired' ? '<p class="plan-warn">Assine para colocar a vitrine de volta no ar. Seus produtos e configurações continuam salvos.</p>' : ''}
     ${st.payments === 'teste' ? '<p class="note" style="margin:6px 0 0">Modo de teste: o pagamento é simulado.</p>' : ''}</section>`;
 }

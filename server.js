@@ -62,6 +62,7 @@ function storeInfo(store) {
   return {
     id: store.id, slug: store.slug, name: store.name, plan: planOf(store), proUntil: store.pro_until, trialUntil: store.trial_until,
     subscribed: !!store.mp_preapproval, customDomain: store.custom_domain, blocked: !!store.blocked, blockedReason: store.blocked_reason,
+    lastPayment: (db.prepare('SELECT status FROM payments WHERE store_id = ? ORDER BY created_at DESC, id DESC LIMIT 1').get(store.id) || {}).status || '',
     publicUrl: publicUrlOf(store), proPrice: CFG.proPrice, brand: CFG.brand, payments: mp.enabled() ? 'mercadopago' : CFG.fakePayments ? 'teste' : 'off', savedAt: store.updated_at
   };
 }
@@ -152,7 +153,7 @@ function sendApp(res, html, extraScriptHosts = '') {
     `default-src 'self'`, `script-src 'nonce-${nonce}' ${extraScriptHosts}`.trim(), `style-src 'self' 'unsafe-inline' https://fonts.googleapis.com`,
     `font-src https://fonts.gstatic.com`, `img-src 'self' data: blob: https:`, `media-src 'self' data: blob:`,
     `connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://connect.facebook.net https://www.facebook.com`,
-    `frame-src 'self' https://www.facebook.com`, `object-src 'none'`, `base-uri 'none'`, `form-action 'self'`, `frame-ancestors 'self'`
+    `frame-src 'self' https://www.facebook.com`, `worker-src 'self'`, `object-src 'none'`, `base-uri 'none'`, `form-action 'self'`, `frame-ancestors 'self'`
   ].join('; '));
   res.type('html').send(html.replace(/<script(?=[\s>])/g, `<script nonce="${nonce}"`));
 }

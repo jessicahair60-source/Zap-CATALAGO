@@ -68,6 +68,8 @@ html, body { overflow-x: clip; }
 .ico-tt { background: #000; }
 .ico-zap { background: #25D366; color: #fff; }
 .ico-map { background: #fff; border: 1px solid #eee; }
+.ico-site { background: #3B6FD8; color: #fff; } .ico-yt { background: #FF0000; color: #fff; } .ico-link { background: var(--c-buyBg); color: var(--c-buyText); }
+.r45 .thumb, .r45 .slide, .r45 .pslide, .r45 .mthumb { aspect-ratio: 4/5; }
 
 /* Busca e categorias */
 .cat-title { font-family: var(--f-display); font-weight: 800; font-size: 20px; letter-spacing: .04em; text-transform: uppercase; color: var(--c-title); margin: 22px 0 0; text-align: center; text-wrap: balance; }
@@ -544,6 +546,7 @@ body.painel .stats { margin: 14px 0 6px; }
   .wrap, .topbar-in { max-width: 760px; }
   .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
   .lst { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .lst .card:nth-child(2), .lst .sec-h + .card + .card { border-top: 0 !important; padding-top: 4px; }
   .sheet { top: 0; bottom: 0; margin: auto; height: fit-content; max-height: 92vh; max-width: 600px; border-radius: 20px; padding-bottom: 22px; }
   .sheet .grab { visibility: hidden; }
   .cartbar { background: none; pointer-events: none; }
@@ -711,6 +714,9 @@ const ICONS = {
   tt: (() => { const d = 'M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07Z';
     return `<svg viewBox="-2 -2 28 28"><path d="${d}" fill="#25F4EE" transform="translate(-.9 -.7)"/><path d="${d}" fill="#FE2C55" transform="translate(.9 .7)"/><path d="${d}" fill="#fff"/></svg>`; })(),
   map: '<svg viewBox="0 0 24 24"><path d="M12 1.5A7.5 7.5 0 0 0 4.5 9c0 5.6 7.5 13.5 7.5 13.5S19.5 14.6 19.5 9A7.5 7.5 0 0 0 12 1.5Z" fill="#EA4335"/><circle cx="12" cy="9" r="2.8" fill="#A52714"/></svg>',
+  site: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.6 3.8 5.6 3.8 9s-1.3 6.4-3.8 9c-2.5-2.6-3.8-5.6-3.8-9S9.5 5.6 12 3z"/></svg>',
+  yt: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M22 8.2a3 3 0 0 0-2.1-2.1C18 5.6 12 5.6 12 5.6s-6 0-7.9.5A3 3 0 0 0 2 8.2 31 31 0 0 0 1.6 12c0 1.3.1 2.5.4 3.8a3 3 0 0 0 2.1 2.1c1.9.5 7.9.5 7.9.5s6 0 7.9-.5a3 3 0 0 0 2.1-2.1c.3-1.3.4-2.5.4-3.8s-.1-2.5-.4-3.8zM10 15.1V8.9l5.2 3.1z"/></svg>',
+  link: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>',
   grid: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/></svg>',
   bag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 8h14l-1 12H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/><path d="M12 12v4M10 14h4"/></svg>',
   plus: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14M5 12h14"/></svg>',
@@ -980,6 +986,7 @@ function applyColors() {
   st.setProperty('--f-title', tf[1]); document.body.classList.toggle('serif', tf[2]);
   st.setProperty('--r-card', r[1] + 'px'); st.setProperty('--r-btn', r[2] + 'px'); st.setProperty('--r-link', r[3] + 'px'); st.setProperty('--r-banner', r[4] + 'px');
   $('#view-loja').classList.toggle('anim', !!S.store.anim);
+  document.body.classList.toggle('r45', S.store.ratio === '45');
 }
 function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 2400); }
 
@@ -987,9 +994,14 @@ const LINKTYPES = {
   ig: { name: 'Instagram', field: 'Seu @ do Instagram', cls: 'ico-ig', url: v => `https://instagram.com/${v.replace('@','')}` },
   tt: { name: 'TikTok', field: 'Seu @ do TikTok', cls: 'ico-tt', url: v => `https://www.tiktok.com/@${v.replace('@','')}` },
   zap: { name: 'WhatsApp', field: 'Número (vazio = WhatsApp da loja)', cls: 'ico-zap', url: v => `https://wa.me/${(v || S.store.phone).replace(/\D/g,'')}` },
-  map: { name: 'Localização', field: 'Endereço da loja', cls: 'ico-map', url: v => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v)}` }
+  map: { name: 'Localização', field: 'Endereço da loja', cls: 'ico-map', url: v => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(v)}` },
+  yt: { name: 'YouTube', field: 'Link do canal', cls: 'ico-yt', url: v => webUrl(v) },
+  site: { name: 'Site', field: 'Endereço do site', cls: 'ico-site', url: v => webUrl(v) },
+  link: { name: 'Outro link', field: 'Endereço (link)', cls: 'ico-link', url: v => webUrl(v) }
 };
-const socialLinks = () => S.links.filter(l => l.on && (l.value || l.type === 'zap')).map(l => ({ icon: l.type, cls: LINKTYPES[l.type].cls, text: l.text, url: LINKTYPES[l.type].url(l.value) }));
+const webUrl = v => { v = String(v || '').trim(); return /^https?:\/\//i.test(v) ? v : 'https://' + v; };
+const LINK_TEXT = { ig: 'Siga no Instagram', tt: 'Siga no TikTok', zap: 'Fale no WhatsApp', map: 'Como chegar na loja', yt: 'Inscreva-se no canal', site: 'Visite nosso site', link: 'Meu link' };
+const socialLinks = () => S.links.filter(l => LINKTYPES[l.type] && l.on && (l.value || l.type === 'zap')).map(l => ({ icon: l.type, cls: LINKTYPES[l.type].cls, text: l.text, url: LINKTYPES[l.type].url(l.value) }));
 function catImg(c) {
   if (S.catImgs[c]) return `<img src="${S.catImgs[c]}" alt="">`;
   const p = S.products.find(p => p.cat === c && mainImg(p)) || S.products.find(p => p.cat === c);
@@ -1006,8 +1018,8 @@ function renderLoja() {
     $('#goon').onclick = () => show('painel'); return; }
   const cats = ['Todos', ...S.cats];
   $('#view-loja').innerHTML = `
-    <div class="banner">${s.bannerImg || s.bannerImgM ? `<picture>${s.bannerImg && s.bannerImgM ? `<source media="(min-width: 760px)" srcset="${s.bannerImg}">` : ''}<img src="${s.bannerImgM || s.bannerImg}" alt="${esc(s.bannerTitle)}"></picture>` :
-      `<div class="bart" aria-hidden="true">${[1, 5, 3].map(id => prod(id) ? `<img src="${artSrc(prod(id)) || ''}" alt="">` : '').join('')}</div><div class="bdeco"><small>${esc(s.bannerKicker)}</small><strong>${esc(s.bannerTitle)}</strong></div>`}</div>
+    <div class="banner">${s.bannerImg || s.bannerImgM ? `<picture>${s.bannerImg && s.bannerImgM ? `<source media="(min-width: 760px)" srcset="${s.bannerImg}">` : ''}<img src="${s.bannerImgM || s.bannerImg}" alt="${esc(s.bannerTitle)}"></picture>${s.bannerInfo === true && (s.bannerKicker || s.bannerTitle) ? `<div class="bdeco"><small>${esc(s.bannerKicker)}</small><strong>${esc(s.bannerTitle)}</strong></div>` : ''}` :
+      `<div class="bart" aria-hidden="true">${[1, 5, 3].map(id => prod(id) ? `<img src="${artSrc(prod(id)) || ''}" alt="">` : '').join('')}</div>${s.bannerInfo === false ? '' : `<div class="bdeco"><small>${esc(s.bannerKicker)}</small><strong>${esc(s.bannerTitle)}</strong></div>`}`}</div>
     <aside class="side"><section class="intro">${s.logo ? `<img class="logo" src="${s.logo}" alt="${esc(s.name)}">` : ''}${!s.logo || s.showName ? `<h1 class="store-name">${esc(s.name)}</h1>` : ''}<p class="bio">${esc(s.bio)}</p></section>
     <nav class="links" aria-label="Redes e contato">
       ${socialLinks().map(l => `<a class="link" href="${esc(l.url)}" target="_blank" rel="noopener"><span class="ico ${l.cls}">${ICONS[l.icon]}</span>${esc(l.text)}<span class="dots" aria-hidden="true">›</span></a>`).join('')}
@@ -1036,7 +1048,7 @@ function renderLoja() {
 const norm = t => t.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
 function renderGrid() {
   const q = norm(ui.q.trim());
-  let list = S.products.filter(p => visible(p) && (ui.cat === 'Todos' || p.cat === ui.cat) && (!q || q.split(/\s+/).every(w => norm(`${p.name} ${p.cat} ${p.desc || ''}`).includes(w))));
+  let list = S.products.filter(p => visible(p) && (ui.cat === 'Todos' || p.cat === ui.cat) && (!q || q.split(/\s+/).every(w => norm(`${p.name} ${p.cat} ${p.desc || ''} ${(p.sizes || []).join(' ')} ${(p.specs || []).map(x => typeof x === 'object' ? Object.values(x).join(' ') : x).join(' ')}`).includes(w))));
   const by = { top: (a,b) => b.sales - a.sales, low: (a,b) => a.price - b.price, high: (a,b) => b.price - a.price,
     new: (a,b) => (b.badge === 'new') - (a.badge === 'new'), rel: (a,b) => soldOut(a) - soldOut(b) };
   list.sort(by[ui.sort]);
@@ -1293,7 +1305,7 @@ function renderPainel() {
         <div style="min-width:0">${esc(p.name)}<small>${KINDS[p.kind]} · ${brl(p.price)}${!p.active ? ' · desativado' : soldOut(p) ? (zeroMode(p) === 'hide' ? ' · zerado, oculto' : ' · esgotado') : ''}${firstVid(p) ? ' · com vídeo' : ''}</small></div>
         <span class="lact"><label class="chk" style="padding:0"><input type="checkbox" data-act="${p.id}" ${p.active ? 'checked' : ''}> Ativo</label>
           ${p.track ? `<label class="chk" style="padding:0">${p.kind === 'fisico' ? 'Estoque' : 'Vagas'} <input class="in stockin" data-stock="${p.id}" value="${p.stock}" inputmode="numeric" aria-label="Estoque de ${esc(p.name)}"></label>` : ''}
-          <button class="tg" data-edit="${p.id}">Editar</button><button class="tg danger" data-del="${p.id}">Excluir</button></span></div>`).join('')}</div>`)}
+          <button class="tg" data-edit="${p.id}">Editar</button><button class="tg" data-dup="${p.id}">Duplicar</button><button class="tg danger" data-del="${p.id}">Excluir</button></span></div>`).join('')}</div>`)}
     ${sec('cats', 'Categorias', `${S.cats.length} categorias`, `
       <div class="plist">${S.cats.map((c, i) => `<div class="cli"><label class="mini" for="cimg${i}" title="Trocar foto">${catImg(c)}</label>
         <input class="in" data-cname="${i}" value="${esc(c)}" aria-label="Nome da categoria">
@@ -1319,8 +1331,9 @@ function renderPainel() {
           <div class="bbtns"><label class="tg" for="sbanner">${s.bannerImg ? 'Trocar' : 'Enviar'}</label>${s.bannerImg ? '<button class="tg danger" id="rmbanner">Remover</button>' : ''}</div>
           <input id="sbanner" type="file" accept="image/*" hidden></div>
       </div>
-      <p class="note" style="margin:8px 0 0">JPG ou PNG até 2 MB. Deixe textos e rostos no centro da imagem. Se enviar só um, ele vale para os dois tamanhos. Com imagem, a chamada e o título abaixo ficam escondidos.</p>
+      <p class="note" style="margin:8px 0 0">JPG ou PNG até 2 MB. Deixe textos e rostos no centro da imagem. Se enviar só um, ele vale para os dois tamanhos.</p>
       <div class="two">${f('skick', 'Chamada pequena', s.bannerKicker)}${f('stitle', 'Título do banner', s.bannerTitle)}</div>
+      ${ck('sbinfo', 'Mostrar a chamada e o título no banner', s.bannerInfo === undefined ? !(s.bannerImg || s.bannerImgM) : s.bannerInfo)}
       <div class="field"><label>Logo <span style="font-weight:400;color:var(--p-muted)">· 600 x 200 px, PNG com fundo transparente</span></label><div><label class="tg" for="slogo" style="cursor:pointer;padding:8px 12px;display:inline-block">${s.logo ? 'Trocar logo' : 'Enviar logo'}</label></div><input id="slogo" type="file" accept="image/*" hidden></div>
       ${s.logo ? `<p class="note" style="margin:4px 0 0"><img src="${s.logo}" alt="" style="max-height:32px;vertical-align:middle;margin-right:8px">Logo enviado. <button class="more" id="rmlogo">Remover logo</button></p>${ck('sshowname', 'Mostrar o nome da loja embaixo do logo', s.showName)}` : ''}
       ${f('sname', 'Nome da loja (embaixo do banner)', s.name)}
@@ -1350,6 +1363,8 @@ function renderPainel() {
         <button data-layout="grid" aria-pressed="${s.layout !== 'list'}"><i class="g"><b></b><b></b><b></b><b></b></i>Grade</button>
         <button data-layout="list" aria-pressed="${s.layout === 'list'}"><i class="l"><b></b><b></b><b></b></i>Lista (estilo WhatsApp)</button>
       </div>
+      <div class="field"><label>Formato das fotos dos produtos</label><div class="segp" role="group" aria-label="Formato das fotos">
+        <button data-ratio="916" aria-pressed="${s.ratio !== '45'}">Em pé 9:16</button><button data-ratio="45" aria-pressed="${s.ratio === '45'}">4:5 (Instagram)</button></div></div>
       ${ck('ssort', 'Mostrar a contagem de itens e o filtro de ordenar (Mais vendidos, Menor preço...)', !!s.showSort)}
       ${ck('sgroup', 'Separar os produtos por categoria, com título (ex.: CACHEADOS 👇)', s.groupCats === true)}
       ${f('semoji', 'Emoji depois do título da categoria (vazio = sem emoji)', s.secEmoji ?? '👇')}
@@ -1365,9 +1380,9 @@ function renderPainel() {
       <div class="lrow">
         <div class="lhead"><span class="ico ${LINKTYPES[l.type].cls}">${ICONS[l.type]}</span><b>${LINKTYPES[l.type].name}</b>
           <span class="lact"><button class="tg" data-lup="${i}" ${i ? '' : 'disabled'} aria-label="Subir">↑</button><button class="tg" data-ldown="${i}" ${i < S.links.length - 1 ? '' : 'disabled'} aria-label="Descer">↓</button>
-          <label class="chk"><input type="checkbox" data-lon="${i}" ${l.on ? 'checked' : ''}> Mostrar</label></span></div>
+          <label class="chk"><input type="checkbox" data-lon="${i}" ${l.on ? 'checked' : ''}> Mostrar</label><button class="tg danger" data-ldel="${i}" aria-label="Tirar este link">Tirar</button></span></div>
         <div class="two">${f('lt' + i, 'Texto do botão', l.text, `data-ltext="${i}"`)}${f('lv' + i, LINKTYPES[l.type].field, l.value, `data-lval="${i}"`)}</div>
-      </div>`).join(''))}
+      </div>`).join('') + `<div class="field"><label for="lnew">Adicionar outro link</label><div style="display:flex;gap:8px"><select class="in" id="lnew">${Object.entries(LINKTYPES).map(([k, v]) => `<option value="${k}">${v.name}</option>`).join('')}</select><button class="tg" id="ladd" style="padding:8px 14px">Adicionar</button></div></div>`)}
     ${sec('depo', 'Depoimentos e avaliações', `${S.testimonials.length} depoimentos`, `
       ${f('stesti', 'Título da seção', s.testiTitle)}
       <div class="plist">${S.testimonials.map((t, i) => `<div class="drow">
@@ -1399,7 +1414,7 @@ function renderPainel() {
     el.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
   document.querySelectorAll('details[data-sec]').forEach(el => el.ontoggle = () => { el.open ? pui.open.add(el.dataset.sec) : pui.open.delete(el.dataset.sec); });
   const bind = (id, key, fn = v => v) => { const el = $('#' + id); el.oninput = el.onchange = () => { s[key] = fn(el.type === 'checkbox' ? el.checked : el.value); save(); }; };
-  bind('sname','name'); bind('sbio','bio'); bind('sphone','phone'); bind('skick','bannerKicker'); bind('stitle','bannerTitle');
+  bind('sname','name'); bind('sbio','bio'); bind('sphone','phone'); bind('skick','bannerKicker'); if ($('#sbinfo')) $('#sbinfo').onchange = e => { s.bannerInfo = e.target.checked; save(); }; bind('stitle','bannerTitle');
   bind('sgreet','greeting'); bind('spay','payments'); bind('sdel','delivery'); bind('spick','pickup'); bind('scoupon','coupon');
   bind('scpct','couponPct', v => Math.min(100, Math.max(0, parseInt(v) || 0))); bind('sinst','installments', v => Math.max(1, parseInt(v) || 1));
   bind('sbuy','buyText'); bind('sgroup','groupCats'); bind('ssort','showSort', v => { document.body.classList.toggle('showsort', v); return v; }); bind('semoji','secEmoji'); bind('scattitle','catalogTitle'); bind('sfoot','footer'); bind('sshowstock','showStock'); bind('slow','lowStock', v => Math.max(0, parseInt(v) || 0)); bind('szero','zeroStock');
@@ -1415,6 +1430,7 @@ function renderPainel() {
     Object.assign(s, e.store, { bannerImg: '', bannerImgM: '' }); S.cats = e.cats; S.catImgs = {}; S.products = e.products.map(normP); applyColors();
     cart = []; ui.cat = 'Todos'; ui.q = ''; pui.editId = null; pui.draft = null; save(); renderPainel(); updateCartBar(); toast(`Exemplo de ${EXAMPLES[b.dataset.ex].label} carregado`);
   });
+  document.querySelectorAll('[data-ratio]').forEach(b => b.onclick = () => { s.ratio = b.dataset.ratio; save(); applyColors(); renderPainel(); toast(s.ratio === '45' ? 'Fotos em 4:5' : 'Fotos em 9:16'); });
   document.querySelectorAll('[data-layout]').forEach(b => b.onclick = () => { s.layout = b.dataset.layout; save(); renderPainel(); toast(s.layout === 'list' ? 'Catálogo em lista' : 'Catálogo em grade'); });
   const readImg = (input, cb, max, png) => { const fl = input.files[0]; if (!fl) return; toBlob(fl, max, png).then(b => { const r = new FileReader(); r.onload = () => cb(r.result); r.readAsDataURL(b); }); };
   document.querySelectorAll('[data-theme]').forEach(b => b.onclick = () => { const t = THEMES[b.dataset.theme];
@@ -1449,6 +1465,10 @@ function renderPainel() {
   document.querySelectorAll('[data-ltext]').forEach(el => el.oninput = () => { S.links[+el.dataset.ltext].text = el.value; save(); });
   document.querySelectorAll('[data-lval]').forEach(el => el.oninput = () => { S.links[+el.dataset.lval].value = el.value; save(); });
   document.querySelectorAll('[data-lon]').forEach(el => el.onchange = () => { S.links[+el.dataset.lon].on = el.checked; save(); });
+  document.querySelectorAll('[data-ldel]').forEach(b => b.onclick = () => {
+    if (b.dataset.sure !== '1') { b.dataset.sure = '1'; b.textContent = 'Confirmar'; return; }
+    S.links.splice(+b.dataset.ldel, 1); save(); renderPainel(); toast('Link tirado'); });
+  if ($('#ladd')) $('#ladd').onclick = () => { const t = $('#lnew').value; S.links.push({ type: t, on: true, text: LINK_TEXT[t], value: '' }); save(); renderPainel(); toast('Link adicionado: preencha o endereço'); };
   document.querySelectorAll('[data-lup]').forEach(b => b.onclick = () => swap(S.links, +b.dataset.lup, +b.dataset.lup - 1));
   document.querySelectorAll('[data-ldown]').forEach(b => b.onclick = () => swap(S.links, +b.dataset.ldown, +b.dataset.ldown + 1));
 
@@ -1505,6 +1525,11 @@ function renderPainel() {
     document.querySelector('[data-sec="prod"]').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
   document.querySelectorAll('[data-act]').forEach(el => el.onchange = () => { prod(+el.dataset.act).active = el.checked; save(); renderPainel(); toast(el.checked ? 'Produto ativado' : 'Produto desativado'); });
   document.querySelectorAll('[data-stock]').forEach(el => el.onchange = () => { prod(+el.dataset.stock).stock = Math.max(0, parseInt(el.value) || 0); save(); renderPainel(); toast('Estoque atualizado'); });
+  document.querySelectorAll('[data-dup]').forEach(b => b.onclick = () => {
+    const src = prod(+b.dataset.dup); const copy = JSON.parse(JSON.stringify(src));
+    copy.id = Math.max(0, ...S.products.map(x => +x.id || 0)) + 1; copy.name = src.name + ' (cópia)'; copy.sales = 0;
+    S.products.splice(S.products.indexOf(src) + 1, 0, copy); save(); renderPainel(); toast('Produto duplicado: ajuste o que for diferente');
+  });
   document.querySelectorAll('[data-del]').forEach(b => b.onclick = () => {
     if (b.dataset.sure !== '1') { b.dataset.sure = '1'; b.textContent = 'Confirmar'; return; }
     const id = +b.dataset.del; const p = prod(id); (p.media || []).forEach(m => { if (m.id !== 'demo') idb.del(m.id); });
