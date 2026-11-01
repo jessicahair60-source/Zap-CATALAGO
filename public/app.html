@@ -877,12 +877,13 @@ const DEFAULT_TESTI = [
 ];
 const RATINGS = { 1: [4.9, 32], 2: [4.8, 57], 3: [5, 14], 4: [4.7, 41], 5: [4.9, 12], 6: [4.8, 26], 7: [4.6, 9], 8: [4.9, 88], 101: [5, 64], 102: [4.9, 23], 201: [4.9, 210], 202: [5, 18], 301: [4.9, 47], 303: [5, 31] };
 Object.values(EXAMPLES).forEach(e => e.products.forEach(p => { const r = RATINGS[p.id]; if (r) [p.rating, p.reviewsCount] = r; }));
+const MSG_DEFAULT = 'Olá! 👋\nAcabei de escolher alguns produtos no seu catálogo e gostaria de finalizar meu pedido! 🛍️\n\nProdutos escolhidos:\n{nome_dos_produtos}';
 const DEFAULT = {
   v: 4,
   store: { name: 'Ateliê Exemplo', bannerImg: '', bannerKicker: 'Nova coleção', bannerTitle: 'Verão 2026',
     bio: 'Moda feminina do P ao GG · Enviamos para todo o Brasil', phone: '5511999999999',
     coupon: 'BEMVINDA10', couponPct: 10, installments: 3, buyText: 'EU QUERO', payments: 'Pix, Cartão, Dinheiro', delivery: true, pickup: true,
-    greeting: 'Olá! Quero fazer este pedido:', footer: 'Feito com Vitrine Zap',
+    greeting: MSG_DEFAULT, footer: 'Feito com Vitrine Zap',
     layout: 'grid', showStock: true, lowStock: 5, zeroStock: 'soldout', igRing: true, igVideo: true,
     theme: 'rosa', titleFont: 'bricolage', radius: 'round', anim: true, logo: '', showName: true,
     badgeNames: { new: 'Lançamento', top: 'Mais vendido', promo: 'Promoção' } },
@@ -925,6 +926,7 @@ if (!S.store.p4) { S.store.layout = 'list'; S.store.p4 = true; }
 if (!S.store.p3) { if (S.store.theme === 'rosa') Object.assign(S.colors, { bNew: '#FFFFFF', bTop: '#FFFFFF', bPromo: '#FFFFFF', badgeText: '#2A1A22' }); S.store.p3 = true; }
 if (!S.store.p2) { if (S.store.theme === 'rosa') S.colors = { ...DEFAULT_COLORS }; S.store.p2 = true; }
 if (!S.testimonials) S.testimonials = FRESH ? [] : JSON.parse(JSON.stringify(DEFAULT_TESTI));
+if (!S.store.greeting || S.store.greeting === 'Olá! Quero fazer este pedido:') S.store.greeting = MSG_DEFAULT;
 S.products = S.products.map(normP);
 function save() {
   if (MODE === 'panel') return scheduleSync();
@@ -1299,7 +1301,9 @@ function buildMsg() {
   const t = totals();
   const lines = cart.map(c => { const p = prod(c.id); return `• ${c.qty}x ${p.name}${c.size ? ` (${p.optLabel}: ${c.size})` : ''} — ${hasPrice(p) ? (p.fromPrice ? 'a partir de ' : '') + brl(p.price * c.qty) : 'valor a consultar'}`; });
   const ent = cartHas('fisico') ? co.entrega : '';
-  return `${S.store.greeting}\n\n${lines.join('\n')}\n\nSubtotal: ${brl(t.sub)}${t.disc ? `\nCupom ${S.store.coupon}: − ${brl(t.disc)}` : ''}\n*Total: ${brl(t.total)}*\n\nNome: ${co.nome || '—'}${ent === 'Entrega' ? `\nEntrega em: ${co.end || '—'}` : ent === 'Retirada' ? '\nVou retirar na loja' : ''}${cartHas('servico') ? `\nMelhor dia e horário: ${co.data || '—'}` : ''}${cartHas('digital') ? `\nE-mail para o acesso: ${co.email || '—'}` : ''}${co.pag ? `\nPagamento: ${co.pag}` : ''}`;
+  const g = S.store.greeting || MSG_DEFAULT; const list = lines.join('\n');
+  const head = g.includes('{nome_dos_produtos}') ? g.split('{nome_dos_produtos}').join(list) : `${g}\n\n${list}`;
+  return `${head}${t.sub ? `\n\nSubtotal: ${brl(t.sub)}${t.disc ? `\nCupom ${S.store.coupon}: − ${brl(t.disc)}` : ''}\n*Total: ${brl(t.total)}*` : ''}\n\nNome: ${co.nome || '—'}${ent === 'Entrega' ? `\nEntrega em: ${co.end || '—'}` : ent === 'Retirada' ? '\nVou retirar na loja' : ''}${cartHas('servico') ? `\nMelhor dia e horário: ${co.data || '—'}` : ''}${cartHas('digital') ? `\nE-mail para o acesso: ${co.email || '—'}` : ''}${co.pag ? `\nPagamento: ${co.pag}` : ''}`;
 }
 function openCheckout() {
   if (!entList().includes(co.entrega)) co.entrega = entList()[0] || '';
@@ -1504,7 +1508,7 @@ function renderPainel() {
       <p class="note">A forma de pagamento precisa ter a palavra Pix (veja em Carrinho e pedido no WhatsApp).</p>`)}
     ${sec('pedido', 'Carrinho e pedido no WhatsApp', 'Pagamento, entrega, cupom e mensagem', `
       ${f('sphone', 'WhatsApp que recebe os pedidos (com 55 e DDD)', s.phone, 'inputmode="tel"')}
-      ${f('sgreet', 'Primeira linha da mensagem do pedido', s.greeting)}
+      <div class="field"><label for="sgreet">Mensagem do pedido no WhatsApp <span style="font-weight:400;color:var(--p-muted)">· {nome_dos_produtos} vira a lista dos produtos</span></label><textarea class="in" id="sgreet" rows="6">${esc(s.greeting)}</textarea></div>
       ${f('spay', 'Formas de pagamento (separe por vírgula)', s.payments)}
       <div class="field"><label>Opções de recebimento</label><div class="radios">${ck('sdel', 'Entrega', s.delivery)}${ck('spick', 'Retirada na loja', s.pickup)}</div></div>
       <div class="two">${f('scoupon', 'Cupom (vazio = sem cupom)', s.coupon)}${f('scpct', 'Desconto do cupom (%)', s.couponPct, 'inputmode="numeric"')}</div>`)}
