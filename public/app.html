@@ -1321,9 +1321,9 @@ function renderLoja() {
     <section class="main">${s.catalogTitle !== '' ? `<h2 class="cat-title">${esc((s.catalogTitle ?? 'Conheça nossos produtos').replace('{loja}', s.name))}</h2>` : ''}
     ${KITS_SOON ? '' : kitsHTML()}
     <label class="search">${ICONS.search}<input id="q" type="search" placeholder="Buscar no catálogo" value="${esc(ui.q)}" aria-label="Buscar produtos"></label>
-    <section class="howto" aria-label="Como fazer seu pedido"><h3>🛍️ Como fazer seu pedido</h3><ol>
-      <li><span>1</span><p><b class="ht">Escolha seu cabelo 💖</b>Gostou de um modelo? Toque em <b>“${esc((S.store.buyText || 'EU QUERO').toLowerCase().replace(/^\S/, c => c.toUpperCase()))}”</b> para enviar seu pedido diretamente pelo WhatsApp.</p></li>
-      <li><span>2</span><p><b class="ht">Quer mais de um modelo? 🛒</b>Toque no <b>“+”</b> dos produtos que deseja adicionar. Depois, clique em <b>“Ver pedido”</b> e envie tudo de uma vez pelo WhatsApp!</p></li></ol></section>
+    <section class="howto" aria-label="Como fazer seu pedido"><h3>Como fazer seu pedido</h3><ol>
+      <li><span>1</span><p><b class="ht">Escolha seu cabelo</b>Toque em <b>“${esc((S.store.buyText || 'EU QUERO').toLowerCase().replace(/^\S/, c => c.toUpperCase()))}”</b> e peça direto pelo WhatsApp.</p></li>
+      <li><span>2</span><p><b class="ht">Quer mais de um?</b>Toque no <b>“+”</b> de cada produto e depois em <b>“Ver pedido”</b>.</p></li></ol></section>
     <div class="cats" role="group" aria-label="Categorias">
       ${cats.map(c => `<button class="cat" data-cat="${esc(c)}" aria-pressed="${ui.cat === c}"><span class="ring"><span>${c === 'Todos' ? `<span class="all">${ICONS.grid}</span>` : catImg(c)}</span></span><em>${esc(c)}</em></button>`).join('')}
     </div>
