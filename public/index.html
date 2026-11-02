@@ -20,7 +20,13 @@
   .phone { justify-self: center; width: 280px; aspect-ratio: 9/18.5; border-radius: 40px; background: #2A1A22; padding: 10px; box-shadow: 0 30px 60px -30px rgba(80,20,50,.5); }
   .phone { margin: 0; position: relative; }
   .screen { width: 100%; height: 100%; border-radius: 31px; overflow: hidden; background: #FBF3F5; }
-  .screen img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .screen { position: relative; }
+  .rola { position: absolute; left: 0; top: 0; display: block; width: 100%; height: auto; will-change: transform; }
+  .screen .rola { animation: rolaTopo 24s ease-in-out infinite; }
+  .vphone .rola { animation: rolaVideo 22s ease-in-out infinite; }
+  @keyframes rolaTopo { 0%, 10% { transform: translateY(0); } 85%, 92% { transform: translateY(-74.5%); } 100% { transform: translateY(0); } }
+  @keyframes rolaVideo { 0%, 8% { transform: translateY(-30%); } 82%, 90% { transform: translateY(-77.5%); } 100% { transform: translateY(-30%); } }
+  @media (prefers-reduced-motion: reduce) { .screen .rola { animation: none; } .vphone .rola { animation: none; transform: translateY(-30%); } }
   .phone figcaption { position: absolute; left: 50%; bottom: -14px; transform: translateX(-50%); white-space: nowrap; background: #fff; border: 1px solid var(--line); color: var(--fg); font-size: 12.5px; font-weight: 700; padding: 6px 12px; border-radius: 99px; box-shadow: 0 8px 20px -10px rgba(80,20,50,.35); }
   .demo-top { margin-top: 26px; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; box-shadow: 0 30px 60px -36px rgba(80,20,50,.45); }
   .demo-top .bar { display: flex; gap: 6px; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--line); font-size: 12px; color: var(--muted); }
@@ -91,10 +97,10 @@
   .checks li { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px 14px 48px; position: relative; font-weight: 500; }
   .checks li::before { content: ""; position: absolute; left: 16px; top: 50%; width: 20px; height: 20px; margin-top: -10px; border-radius: 50%; background: var(--acc) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5 9-10'/%3E%3C/svg%3E") center / 12px no-repeat; }
   .split { display: grid; gap: 34px; align-items: center; }
-  .vphone { justify-self: center; width: 230px; aspect-ratio: 9/16; border-radius: 30px; background: #FBF3F5 url("/static/exemplo/vitrine-video.webp") center top / cover no-repeat; position: relative; box-shadow: 0 30px 60px -30px rgba(80,20,50,.5); overflow: hidden; }
+  .vphone { justify-self: center; width: 230px; aspect-ratio: 9/16; border-radius: 32px; border: 8px solid #2A1A22; box-sizing: border-box; background: #FBF3F5; position: relative; box-shadow: 0 30px 60px -30px rgba(80,20,50,.5); overflow: hidden; }
   .vphone .play { position: absolute; left: 50%; top: 45%; width: 62px; height: 62px; margin: -31px 0 0 -31px; border-radius: 50%; background: rgba(255,255,255,.92); display: grid; place-items: center; }
   .vphone .play::after { content: ""; border-left: 18px solid var(--acc); border-top: 11px solid transparent; border-bottom: 11px solid transparent; margin-left: 5px; }
-  .vphone .cap { position: absolute; left: 12px; right: 12px; bottom: 14px; background: rgba(42,26,34,.7); color: #fff; font-size: 12.5px; font-weight: 700; border-radius: 99px; padding: 8px 12px; text-align: center; }
+  .vphone .cap { position: absolute; z-index: 1; left: 12px; right: 12px; bottom: 14px; background: rgba(42,26,34,.7); color: #fff; font-size: 12.5px; font-weight: 700; border-radius: 99px; padding: 8px 12px; text-align: center; }
   .vphone .bar { position: absolute; left: 12px; right: 12px; top: 12px; height: 3px; border-radius: 3px; background: rgba(255,255,255,.4); } .vphone .bar i { display: block; width: 40%; height: 100%; border-radius: 3px; background: #fff; }
   .tut { display: grid; gap: 12px; margin-top: 24px; }
   .tut div { display: flex; gap: 12px; align-items: center; font-weight: 700; }
@@ -137,7 +143,7 @@
       <p class="lead hl">Tudo em um único link, com seu próprio subdomínio!</p>
       <div class="cta"><a class="btn big" href="/cadastro">QUERO CRIAR MEU CATÁLOGO</a><a class="btn big soft" href="#planos">Ver planos</a></div>
     </div>
-    <figure class="phone"><div class="screen"><img src="/static/exemplo/vitrine-celular.webp" width="560" height="1136" alt="Vitrine da loja Jessica Hair aberta no celular, com o banner da loja" fetchpriority="high"></div>
+    <figure class="phone"><div class="screen"><img class="rola" src="/static/exemplo/vitrine-rolando.webp" width="520" height="4267" alt="Vitrine da loja Jessica Hair no celular, rolando pelo banner e pelos produtos" fetchpriority="high"></div>
       <figcaption>Vitrine real: Jessica Hair</figcaption></figure>
   </header>
 
@@ -214,7 +220,7 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
       <p class="txt" style="color:var(--muted);font-size:17px;margin:12px 0 0">Com o Zap Catálogo, você pode adicionar vídeos aos seus produtos e apresentar tudo de maneira mais completa.</p>
       <p style="font-size:17px;font-weight:700;margin:12px 0 0">Mostre cores, tamanhos, acabamentos e detalhes que fazem diferença na hora da escolha.</p>
     </div>
-    <div class="vphone" role="img" aria-label="Vitrine da Jessica Hair: cada produto com vídeo mostra a bolinha de play"><div class="cap">▶ = este produto tem vídeo</div></div>
+    <div class="vphone"><img class="rola" src="/static/exemplo/vitrine-rolando.webp" width="520" height="4267" loading="lazy" decoding="async" alt="Produtos da Jessica Hair rolando na vitrine, cada um com a bolinha de vídeo"><div class="cap">▶ Produto com vídeo</div></div>
   </section>
 
   <section class="blk">
