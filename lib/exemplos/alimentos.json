@@ -1,0 +1,212 @@
+{
+ "v": 4,
+ "store": {
+  "theme": "rosa",
+  "titleFont": "bricolage",
+  "radius": "round",
+  "anim": true,
+  "logo": "",
+  "showName": true,
+  "testiTitle": "O que as clientes dizem",
+  "name": "Doceria Exemplo",
+  "bannerImg": "",
+  "bannerKicker": "Encomendas abertas",
+  "bannerTitle": "Doces de festa",
+  "bio": "Bolos e doces artesanais · Entrega na cidade e retirada",
+  "phone": "5537999529778",
+  "couponPct": 10,
+  "installments": 3,
+  "buyText": "Eu quero",
+  "payments": "Pix, Cartão, Dinheiro",
+  "delivery": true,
+  "pickup": true,
+  "greeting": "Eu quero os produtos:\n{nome_dos_produtos}",
+  "layout": "grid",
+  "showStock": true,
+  "lowStock": 5,
+  "zeroStock": "soldout",
+  "igRing": true,
+  "igVideo": true,
+  "badgeNames": {
+   "new": "Lançamento",
+   "top": "Mais vendido",
+   "promo": "Promoção"
+  },
+  "catalogTitle": "Conheça nossos produtos",
+  "groupCats": false,
+  "p5": true,
+  "p4": true,
+  "p3": true,
+  "p2": true,
+  "bannerImgM": "",
+  "online": true,
+  "perks": [
+   "Feito no dia",
+   "Ingredientes selecionados",
+   "Entrega na cidade"
+  ]
+ },
+ "colors": {
+  "bg": "#FBF3F5",
+  "text": "#4A3540",
+  "title": "#2A1A22",
+  "muted": "#9A8790",
+  "bannerBg": "#D9A3B5",
+  "bannerText": "#FFFFFF",
+  "linkBg": "#FFFFFF",
+  "linkText": "#2A1A22",
+  "linkBorder": "#F0DCE3",
+  "searchBg": "#FFFFFF",
+  "catRing": "#B9476F",
+  "catText": "#4A3540",
+  "cardBg": "#FFFFFF",
+  "cardBorder": "#F1E1E7",
+  "name": "#2A1A22",
+  "price": "#2A1A22",
+  "videoRing": "#B9476F",
+  "star": "#D9A441",
+  "buyBg": "#B9476F",
+  "buyText": "#FFFFFF",
+  "cartBg": "#2A1A22",
+  "cartText": "#FFFFFF",
+  "bNew": "#FFFFFF",
+  "bTop": "#FFFFFF",
+  "bPromo": "#FFFFFF",
+  "badgeText": "#2A1A22"
+ },
+ "links": [
+  {
+   "type": "ig",
+   "on": true,
+   "text": "Siga no Instagram",
+   "value": "doceriaexemplo"
+  },
+  {
+   "type": "tt",
+   "on": true,
+   "text": "Siga no TikTok",
+   "value": "doceriaexemplo"
+  },
+  {
+   "type": "zap",
+   "on": true,
+   "text": "Encomende pelo WhatsApp",
+   "value": ""
+  }
+ ],
+ "catImgs": {},
+ "cats": [
+  "Bolos",
+  "Kits",
+  "Bebidas"
+ ],
+ "products": [
+  {
+   "active": true,
+   "zero": "default",
+   "media": [
+    {
+     "id": "demo",
+     "type": "video"
+    }
+   ],
+   "sizes": [
+    "Ninho com morango",
+    "Chocolate belga",
+    "Limão siciliano"
+   ],
+   "optLabel": "Sabor",
+   "track": true,
+   "link": "",
+   "duration": "",
+   "fromPrice": false,
+   "sales": 230,
+   "stock": 24,
+   "specs": [],
+   "price": 15,
+   "id": 101,
+   "name": "Bolo de Pote",
+   "cat": "Bolos",
+   "badge": "top",
+   "hue": 340,
+   "desc": "Pote de 250 ml, feito no dia.",
+   "rating": 5,
+   "reviewsCount": 64,
+   "kind": "fisico"
+  },
+  {
+   "active": true,
+   "zero": "default",
+   "media": [],
+   "sizes": [
+    "Caixa simples",
+    "Caixa presente"
+   ],
+   "optLabel": "Embalagem",
+   "track": true,
+   "link": "",
+   "duration": "",
+   "fromPrice": false,
+   "sales": 88,
+   "stock": 10,
+   "specs": [],
+   "price": 45,
+   "id": 102,
+   "name": "Kit 25 Brigadeiros Gourmet",
+   "cat": "Kits",
+   "badge": "new",
+   "hue": 20,
+   "desc": "Sabores sortidos em forminhas douradas.",
+   "rating": 4.9,
+   "reviewsCount": 23,
+   "kind": "fisico"
+  },
+  {
+   "active": true,
+   "zero": "default",
+   "media": [],
+   "sizes": [
+    "Ninho com morango",
+    "Prestígio",
+    "Doce de leite"
+   ],
+   "optLabel": "Recheio",
+   "track": false,
+   "link": "",
+   "duration": "",
+   "fromPrice": true,
+   "sales": 40,
+   "stock": 0,
+   "specs": [],
+   "price": 160,
+   "id": 103,
+   "name": "Bolo de Aniversário 2 kg",
+   "cat": "Bolos",
+   "hue": 300,
+   "desc": "Encomende com 3 dias de antecedência. Decoração combinada pelo WhatsApp.",
+   "kind": "fisico"
+  },
+  {
+   "active": true,
+   "zero": "default",
+   "media": [],
+   "sizes": [],
+   "optLabel": "Opção",
+   "track": false,
+   "link": "",
+   "duration": "",
+   "fromPrice": false,
+   "sales": 61,
+   "stock": 0,
+   "specs": [],
+   "price": 14,
+   "id": 104,
+   "name": "Café Gelado Cremoso",
+   "cat": "Bebidas",
+   "hue": 30,
+   "desc": "400 ml com chantilly e calda de caramelo.",
+   "kind": "fisico"
+  }
+ ],
+ "testimonials": []
+}

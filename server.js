@@ -755,6 +755,15 @@ app.get('/og/:slug.png', (req, res) => {
 });
 
 /* ---------- vitrine pelo endereço /nome-da-loja ---------- */
+// Vitrines de exemplo da página de vendas (serviço e alimento): vêm de arquivos, não são lojas de verdade
+const EXEMPLOS = { servicos: 'Studio Beleza Exemplo', alimentos: 'Doceria Exemplo' };
+app.get('/exemplo/:tipo', (req, res) => {
+  const tipo = String(req.params.tipo);
+  if (!EXEMPLOS[tipo]) return res.status(404).send(simplePage('Exemplo não encontrado', 'Confira o endereço digitado.'));
+  let state = ''; try { state = fs.readFileSync(path.join(__dirname, 'lib', 'exemplos', tipo + '.json'), 'utf8'); } catch (e) { return res.status(404).end(); }
+  renderStore(res, { slug: 'exemplo-' + tipo, name: EXEMPLOS[tipo], state, pro_until: Number.MAX_SAFE_INTEGER, updated_at: 0 }, true);
+});
+
 app.get('/:slug', (req, res, next) => {
   const store = db.prepare('SELECT * FROM stores WHERE slug = ?').get(String(req.params.slug).toLowerCase());
   if (!store) return res.status(404).send(simplePage('Vitrine não encontrada', 'Confira o endereço digitado.', `<p><a href="/">Conheça a ${escHtml(CFG.brand)}</a></p>`));
