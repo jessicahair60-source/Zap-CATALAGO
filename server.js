@@ -188,7 +188,8 @@ function trackingTags(st) {
   return out;
 }
 
-function renderStore(res, store) {
+// embed = vitrine mostrada dentro da página de vendas: sem pixel nem Google Analytics, para não contar visita falsa
+function renderStore(res, store, embed = false) {
   if (store.blocked) return res.status(403).send(simplePage('Loja indisponível', 'Esta vitrine está temporariamente indisponível.'));
   if (!isPro(store)) return res.status(402).send(simplePage(store.name, 'Esta vitrine está indisponível no momento. Volte em breve!'));
   const state = publicState(store);
@@ -199,7 +200,7 @@ function renderStore(res, store) {
   const desc = escHtml(bio || 'Veja nossos produtos e faça seu pedido pelo WhatsApp.');
   // prévia do link no WhatsApp: imagem com "CATÁLOGO" e o nome da loja, que muda quando a loja muda
   const og = `${CFG.publicUrl}/og/${encodeURIComponent(store.slug)}.png?v=${store.updated_at || 0}`;
-  const head = `<title>${title}</title><meta name="description" content="${desc}"><meta property="og:type" content="website"><meta property="og:site_name" content="${title}"><meta property="og:title" content="Catálogo ${title}"><meta property="og:description" content="${desc}"><meta property="og:url" content="${escHtml(publicUrlOf(store))}"><meta property="og:image" content="${og}"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">${trackingTags(st)}`;
+  const head = `<title>${title}</title><meta name="description" content="${desc}"><meta property="og:type" content="website"><meta property="og:site_name" content="${title}"><meta property="og:title" content="Catálogo ${title}"><meta property="og:description" content="${desc}"><meta property="og:url" content="${escHtml(publicUrlOf(store))}"><meta property="og:image" content="${og}"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">${embed ? '<meta name="robots" content="noindex">' : trackingTags(st)}`;
   const html = APP_HTML().replace('<!--HEAD-->', head).replace('<!--BOOT-->', `<script>window.__BOOT__=${jsonForScript(boot)}</script>`);
   res.set('Cache-Control', 'no-cache');
   sendApp(res, html, 'https://connect.facebook.net https://www.googletagmanager.com');
@@ -751,7 +752,7 @@ app.get('/og/:slug.png', (req, res) => {
 app.get('/:slug', (req, res, next) => {
   const store = db.prepare('SELECT * FROM stores WHERE slug = ?').get(String(req.params.slug).toLowerCase());
   if (!store) return res.status(404).send(simplePage('Vitrine não encontrada', 'Confira o endereço digitado.', `<p><a href="/">Conheça a ${escHtml(CFG.brand)}</a></p>`));
-  renderStore(res, store);
+  renderStore(res, store, req.query.embed === '1');
 });
 
 app.use((err, req, res, next) => {

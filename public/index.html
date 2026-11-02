@@ -58,6 +58,16 @@
   .wa-msg { justify-self: end; max-width: 92%; background: #D9FDD3; border-radius: 12px 4px 12px 12px; padding: 9px 11px 6px; font-size: 14.5px; line-height: 1.4; color: #111B21; box-shadow: 0 1px 1px rgba(0,0,0,.08); white-space: pre-line; }
   .wa-msg time { display: block; text-align: right; font-size: 11px; color: #667781; margin-top: 2px; }
   .wa-msg time b { color: #53BDEB; font-weight: 700; margin-left: 3px; }
+  .realshot { margin: 0; justify-self: center; width: 100%; max-width: 340px; background: #F4F2F3; border: 1px solid var(--line); border-radius: 22px; padding: 10px; box-shadow: 0 30px 60px -36px rgba(80,20,50,.45); }
+  .realshot img { display: block; width: 100%; height: auto; border-radius: 14px; }
+  .rev .realshot { max-width: 420px; }
+  .pass3 { list-style: none; counter-reset: p; margin: 20px 0 0; padding: 0; display: grid; gap: 10px; }
+  .pass3 li { counter-increment: p; position: relative; padding: 2px 0 0 46px; min-height: 36px; color: var(--muted); font-size: 14.5px; }
+  .pass3 li::before { content: counter(p); position: absolute; left: 0; top: 0; width: 34px; height: 34px; border-radius: 50%; background: var(--acc); color: #fff; display: grid; place-items: center; font: 800 16px var(--f-display); }
+  .pass3 b { display: block; color: var(--fg); font-size: 16px; }
+  [data-vitrine] iframe { position: absolute; left: 0; top: 0; width: 390px; border: 0; transform-origin: 0 0; pointer-events: none; opacity: 0; transition: opacity .6s; background: #FBF3F5; }
+  [data-vitrine].ao-vivo iframe { opacity: 1; }
+  [data-vitrine].ao-vivo .rola { visibility: hidden; animation: none; }
   section.blk { padding: 56px 0 0; }
   .eyebrow { font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--acc); font-weight: 700; margin: 0 0 10px; }
   .blk h2 { font-size: clamp(28px, 4.5vw, 40px); max-width: 640px; }
@@ -120,6 +130,7 @@
     .checks { grid-template-columns: repeat(3, 1fr); } .checks li { display: flex; align-items: center; }
     .split { grid-template-columns: 1.1fr .9fr; }
     .zapdemo { grid-template-columns: 1fr 1fr; }
+    .rev > figure { order: -1; }
     .story { padding: 40px 44px; }
     .shots { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     .tut { grid-template-columns: repeat(3, 1fr); }
@@ -143,7 +154,7 @@
       <p class="lead hl">Tudo em um único link, com seu próprio subdomínio!</p>
       <div class="cta"><a class="btn big" href="/cadastro">QUERO CRIAR MEU CATÁLOGO</a><a class="btn big soft" href="#planos">Ver planos</a></div>
     </div>
-    <figure class="phone"><div class="screen"><img class="rola" src="/static/exemplo/vitrine-rolando.webp" width="520" height="4267" alt="Vitrine da loja Jessica Hair no celular, rolando pelo banner e pelos produtos" fetchpriority="high"></div>
+    <figure class="phone"><div class="screen" data-vitrine="jessica-hair"><img class="rola" src="/static/exemplo/vitrine-rolando.webp" width="520" height="4267" alt="Vitrine da loja Jessica Hair no celular, rolando pelo banner e pelos produtos" fetchpriority="high"></div>
       <figcaption>Vitrine real: Jessica Hair</figcaption></figure>
   </header>
 
@@ -220,7 +231,30 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
       <p class="txt" style="color:var(--muted);font-size:17px;margin:12px 0 0">Com o Zap Catálogo, você pode adicionar vídeos aos seus produtos e apresentar tudo de maneira mais completa.</p>
       <p style="font-size:17px;font-weight:700;margin:12px 0 0">Mostre cores, tamanhos, acabamentos e detalhes que fazem diferença na hora da escolha.</p>
     </div>
-    <div class="vphone"><img class="rola" src="/static/exemplo/vitrine-rolando.webp" width="520" height="4267" loading="lazy" decoding="async" alt="Produtos da Jessica Hair rolando na vitrine, cada um com a bolinha de vídeo"><div class="cap">▶ Produto com vídeo</div></div>
+    <div class="vphone" data-vitrine="jessica-hair" data-inicio=".cats"><img class="rola" src="/static/exemplo/vitrine-rolando.webp" width="520" height="4267" loading="lazy" decoding="async" alt="Produtos da Jessica Hair rolando na vitrine, cada um com a bolinha de vídeo"><div class="cap">▶ Produto com vídeo</div></div>
+  </section>
+
+  <section class="blk split">
+    <div>
+      <p class="eyebrow">🚀 Rápido de montar</p>
+      <h2>Seu catálogo no ar em 3 passos</h2>
+      <p class="txt">O painel te guia do começo ao fim. Cada passo concluído fica marcado, e quando os três estão prontos sua vitrine já está no ar, com o link para copiar e compartilhar.</p>
+      <ol class="pass3">
+        <li><b>Informações da loja</b>Nome, WhatsApp, frase e links</li>
+        <li><b>Banner, logo e cores</b>Deixe a vitrine com a cara da sua marca</li>
+        <li><b>Subir produtos</b>Fotos, vídeos, preços e categorias</li>
+      </ol>
+    </div>
+    <figure class="realshot"><img src="/static/exemplo/painel-3-passos.webp" width="600" height="965" loading="lazy" decoding="async" alt="Painel da Jessica Hair com a vitrine no ar e os 3 passos feitos"></figure>
+  </section>
+
+  <section class="blk split rev">
+    <div>
+      <p class="eyebrow">📊 Relatório</p>
+      <h2>Veja quantas pessoas visitaram e clicaram</h2>
+      <p class="txt">No painel você acompanha as visitas da vitrine, os cliques no “Eu quero” e os produtos ativos. E no relatório completo, as visitas, cliques e pedidos de cada dia.</p>
+    </div>
+    <figure class="realshot"><img src="/static/exemplo/painel-relatorio.webp" width="640" height="504" loading="lazy" decoding="async" alt="Relatório do painel: 47 pessoas visitaram, 1 clique no Eu quero, 7 produtos ativos"></figure>
   </section>
 
   <section class="blk">
@@ -269,5 +303,44 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
 
   <footer class="site"><span>© Zap Catálogo</span><span><a href="/termos">Termos de uso</a> · <a href="/privacidade">Privacidade</a> · <a href="/entrar">Entrar</a></span></footer>
 </div>
+<script>
+/* Vitrine de verdade, ao vivo, dentro dos celulares. Se não abrir, fica a imagem. */
+(function () {
+  var parado = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function montar(box) {
+    var f = document.createElement('iframe');
+    f.name = 'zcdemo'; f.title = 'Vitrine real da Jessica Hair, ao vivo'; f.tabIndex = -1; f.setAttribute('aria-hidden', 'true');
+    function medir() { var k = box.clientWidth / 390; f.style.transform = 'scale(' + k + ')'; f.style.height = Math.ceil(box.clientHeight / k) + 'px'; }
+    medir(); window.addEventListener('resize', medir);
+    f.onload = function () {
+      var w, d; try { w = f.contentWindow; d = f.contentDocument; } catch (e) { return f.remove(); }
+      if (!d || !d.querySelector('.cats')) return f.remove();
+      setTimeout(function () { box.classList.add('ao-vivo'); rolar(w, d); }, 700);
+    };
+    f.src = '/' + box.dataset.vitrine + '?embed=1';
+    box.appendChild(f);
+    function rolar(w, d) {
+      var el = d.scrollingElement || d.documentElement, alvo = box.dataset.inicio && d.querySelector(box.dataset.inicio);
+      var ini = alvo ? Math.max(0, alvo.getBoundingClientRect().top + el.scrollTop - 8) : 0;
+      el.scrollTop = ini; if (parado) return;
+      var pos = ini, fase = 'espera', t0 = performance.now(), ult = t0;
+      function passo(t) {
+        var dt = Math.min(64, t - ult); ult = t;
+        var fim = Math.min(el.scrollHeight - w.innerHeight, ini + 3800);
+        if (fase === 'espera' && t - t0 > 1800) fase = 'desce';
+        else if (fase === 'desce') { pos += dt * 0.06; if (pos >= fim) { pos = fim; fase = 'pausa'; t0 = t; } }
+        else if (fase === 'pausa' && t - t0 > 1500) fase = 'sobe';
+        else if (fase === 'sobe') { pos -= dt * 0.9; if (pos <= ini) { pos = ini; fase = 'espera'; t0 = t; } }
+        el.scrollTop = pos; requestAnimationFrame(passo);
+      }
+      requestAnimationFrame(passo);
+    }
+  }
+  var caixas = document.querySelectorAll('[data-vitrine]');
+  if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { io.unobserve(e.target); montar(e.target); } }); }, { rootMargin: '200px' });
+  window.addEventListener('load', function () { caixas.forEach(function (b) { io.observe(b); }); });
+})();
+</script>
 </body>
 </html>
