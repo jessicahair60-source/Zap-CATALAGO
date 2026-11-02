@@ -16,6 +16,8 @@ h1, h2, h3 { font-family: var(--f-display); line-height: 1.1; margin: 0; text-wr
 .logo i { width: 30px; height: 30px; flex: none; background: url(/static/logo.svg) center / contain no-repeat; font-size: 0; color: transparent; }
 .nav-links { display: flex; align-items: center; gap: 6px; }
 .logo, .nav .btn { white-space: nowrap; }
+.logo .marca { height: 52px; width: auto; display: block; }
+@media (max-width: 420px) { .logo .marca { height: 40px; } }
 @media (max-width: 420px) { .nav .btn { padding: 10px 12px; font-size: 14px; } .logo { font-size: 18px; } }
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; border-radius: 12px; padding: 12px 20px; font: 700 15px/1 var(--f-body); text-decoration: none; cursor: pointer; background: var(--acc); color: var(--acc-fg); }
 .btn.ghost { background: transparent; color: var(--fg); }

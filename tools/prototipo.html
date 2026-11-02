@@ -585,6 +585,27 @@ body.painel .stats { margin: 14px 0 6px; }
 #view-painel .opt-label { color: var(--p-acc); margin: 18px 0 6px; }
 .subrows { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 4px 0 10px; } .subrows div { background: var(--p-soft); border-radius: 12px; padding: 10px 12px; }
 .subrows small { display: block; font-size: 11.5px; color: var(--p-muted); } .subrows b { font-size: 15px; } .subrows .big { grid-column: 1 / -1; text-align: center; } .subrows .big b { font-size: 26px; font-family: var(--f-display); }
+.req { display: inline-block; vertical-align: middle; margin-left: 4px; font: 700 10px/1 var(--f-body, inherit); letter-spacing: .04em; text-transform: uppercase; background: #FDE7EE; color: #B42357; padding: 4px 7px; border-radius: 999px; }
+.req.opt { background: var(--p-soft); color: var(--p-muted); }
+#view-painel .in.need, #view-painel .upl.need { border-color: #E0527F; background: #FFF6F9; box-shadow: 0 0 0 3px rgba(224,82,127,.14); }
+.needhint { margin: 5px 2px 0; font-size: 12px; color: #B42357; font-weight: 600; }
+details.pcard.need { border-color: #F1A7BF; box-shadow: 0 0 0 3px rgba(224,82,127,.08); }
+.flash { animation: flash 1.6s ease; } @keyframes flash { 0%, 60% { box-shadow: 0 0 0 4px rgba(224,82,127,.45); } 100% { box-shadow: none; } }
+.guide { background: var(--p-surface); border: 1.5px solid var(--p-acc); border-radius: 18px; padding: 14px; margin: 0 0 12px; }
+.guide.done { border-color: var(--p-line); }
+.g-top { display: flex; align-items: center; gap: 12px; } .g-top small { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; color: var(--p-acc); } .g-top b { font-size: 16px; }
+.g-n { width: 34px; height: 34px; flex: none; border-radius: 50%; background: var(--p-acc); color: #fff; display: grid; place-items: center; font-weight: 800; }
+.g-c { margin-left: auto; font-size: 12px; color: var(--p-muted); font-weight: 600; }
+.g-tip { margin: 8px 0 6px; font-size: 13px; color: var(--p-muted); }
+.g-list { display: grid; }
+.g-it { display: flex; align-items: center; gap: 10px; width: 100%; background: none; border: 0; border-top: 1px solid var(--p-line); padding: 10px 2px; font: inherit; font-size: 14px; color: var(--p-fg); text-align: left; cursor: pointer; }
+.g-it em { margin-left: auto; font-style: normal; font-size: 11px; font-weight: 700; color: #B42357; background: #FDE7EE; padding: 3px 8px; border-radius: 999px; } .g-it em.opt { color: var(--p-muted); background: var(--p-soft); }
+.g-it.ok { color: var(--p-muted); }
+.g-ck { width: 20px; height: 20px; flex: none; border-radius: 50%; border: 1.5px solid var(--p-acc); display: grid; place-items: center; font-size: 11px; font-weight: 800; color: #fff; }
+.g-it.ok .g-ck { background: var(--p-acc); }
+.g-next { width: 100%; margin-top: 8px; border: 0; border-radius: 12px; padding: 12px; font: inherit; font-weight: 700; font-size: 14px; background: var(--p-soft); color: var(--p-acc); cursor: pointer; }
+.guide.done .g-next { background: var(--p-acc); color: #fff; }
+.fs-item.next { background: #FFF6F9; border-radius: 12px; outline: 1.5px solid #F1A7BF; }
 .kpihead { display: flex; justify-content: space-between; align-items: baseline; margin: 18px 2px 8px; } .kpihead b { font-size: 15px; } .kpihead small { font-size: 12px; color: var(--p-muted); }
 .fs-n { width: 24px; height: 24px; flex: none; border-radius: 50%; border: 1.5px solid var(--p-acc); color: var(--p-acc); display: grid; place-items: center; font-size: 12px; font-weight: 700; }
 .fs-item.ok { color: var(--p-muted); text-decoration: line-through; } .fs-item.ok .fs-n { background: var(--p-acc); color: #fff; border-color: var(--p-acc); }
@@ -1876,7 +1897,69 @@ function applyTabs() {
     const sec = box.querySelector(`details[data-sec="${b.dataset.go}"]`); if (sec) setTab(sec.dataset.tab); go(); }; });
   setTab(pui.tab);
 }
-{ const rp0 = renderPainel; renderPainel = function () { rp0.apply(this, arguments); applySimple(); if (!PV) applyTabs(); }; }
+/* Guia: cada passo mostra o que falta, destaca os campos obrigatórios e leva para o próximo */
+const GUIDE = {
+  loja: { n: 1, title: 'Informações da loja', tip: 'Preencha o que está marcado. O resto é opcional e pode ficar para depois.', next: 'visual' },
+  visual: { n: 2, title: 'Banner, logo e cores', tip: 'Envie o banner, escolha a logo e as cores. A prévia mostra como a vitrine fica.', next: 'produtos' },
+  produtos: { n: 3, title: 'Subir produtos', tip: 'Cadastre um produto de cada vez: nome e foto são obrigatórios.', next: null }};
+function guideItems() {
+  const s = S.store, d = pui.draft || {};
+  return [
+    { tab: 'loja', sec: 'info', field: 'sname', label: 'Nome da loja', ok: !!String(s.name || '').trim(), req: true },
+    { tab: 'loja', sec: 'info', field: 'sphone', label: 'WhatsApp que recebe os pedidos', ok: String(s.phone || '').replace(/\D/g, '').length >= 12, req: true, hint: 'Com 55 e DDD, só números. Ex.: 5511999999999' },
+    { tab: 'loja', sec: 'info', field: 'sbio', label: 'Frase sobre a loja', ok: !!String(s.bio || '').trim() },
+    { tab: 'visual', sec: 'banner', field: 'sbannerm', label: 'Banner da loja', ok: !!(s.bannerImg || s.bannerImgM), req: true, hint: 'Envie a imagem do celular (1080 x 608 px)' },
+    { tab: 'visual', sec: 'banner', field: lkind() === 'img' ? 'slogo' : 'slogotxt', label: 'Logo (foto ou escrita)', ok: !!(s.logo || s.logoText) },
+    { tab: 'visual', sec: 'tema', field: null, label: 'Cores da vitrine', ok: !!s.themeSet || !!s.theme },
+    { tab: 'produtos', sec: 'prod', field: 'pname', label: 'Nome do produto', ok: S.products.length > 0 || !!String(d.name || '').trim(), req: true, fieldOnly: true },
+    { tab: 'produtos', sec: 'prod', field: 'madd', label: 'Foto ou vídeo do produto', ok: S.products.length > 0 || (d.media || []).length > 0, req: true, fieldOnly: true, hint: 'Adicione pelo menos uma foto ou vídeo' },
+    { tab: 'produtos', sec: 'prod', field: null, label: 'Primeiro produto publicado', ok: S.products.length > 0, req: true }];
+}
+pui.autoOpened = pui.autoOpened || new Set();
+function goField(it) {
+  const sec = document.querySelector(`details[data-sec="${it.sec}"]`); if (!sec) return;
+  setTab(sec.dataset.tab); sec.open = true; pui.open.add(it.sec);
+  const el = it.field && $('#' + it.field); const target = el ? (el.type === 'file' ? document.querySelector(`label[for="${it.field}"]`) || sec : el) : sec;
+  setTimeout(() => { target.scrollIntoView({ behavior: 'smooth', block: 'center' }); if (el && el.type !== 'file') el.focus({ preventScroll: true }); target.classList.add('flash'); setTimeout(() => target.classList.remove('flash'), 1600); }, 60);
+}
+function guide() {
+  const box = $('#view-painel'); const items = guideItems();
+  // campos: selo de obrigatório e destaque quando estão vazios
+  items.forEach(it => {
+    if (!it.field) return; const el = $('#' + it.field); if (!el) return;
+    const lab = el.type === 'file' ? document.querySelector(`label[for="${it.field}"]`) : document.querySelector(`label[for="${it.field}"]`);
+    const head = el.type === 'file' ? (el.closest('.field') || el.parentElement).querySelector(':scope > label:not(.upl)') || lab : lab;
+    if (head && !head.querySelector('.req')) head.insertAdjacentHTML('beforeend', ` <span class="req ${it.req ? '' : 'opt'}">${it.req ? 'Obrigatório' : 'Recomendado'}</span>`);
+    const mark = el.type === 'file' ? lab : el; if (!mark) return;
+    const upd = () => { const empty = it.field === 'madd' ? !((pui.draft || {}).media || []).length : el.type === 'file' ? !it.ok : !String(el.value || '').trim() || (it.field === 'sphone' && String(el.value).replace(/\D/g, '').length < 12);
+      mark.classList.toggle('need', !!(it.req && empty)); let h = mark.nextElementSibling && mark.nextElementSibling.classList.contains('needhint') ? mark.nextElementSibling : null;
+      if (it.req && empty && !h) { h = document.createElement('p'); h.className = 'needhint'; h.textContent = it.hint || 'Preencha este campo'; mark.after(h); } else if (!(it.req && empty) && h) h.remove(); };
+    upd(); if (el.type !== 'file') el.addEventListener('input', upd);
+  });
+  // seções com algo obrigatório faltando: selo no título e abrem sozinhas na primeira vez
+  [...new Set(items.filter(i => i.req && !i.ok && !i.fieldOnly).map(i => i.sec))].forEach(id => {
+    const d = box.querySelector(`details[data-sec="${id}"]`); if (!d) return;
+    d.classList.add('need'); const h = d.querySelector('summary h3'); if (h && !h.querySelector('.req')) h.insertAdjacentHTML('beforeend', ' <span class="req">Falta preencher</span>');
+    if (!pui.autoOpened.has(id)) { pui.autoOpened.add(id); d.open = true; pui.open.add(id); }
+  });
+  // cartão no topo de cada passo
+  Object.entries(GUIDE).forEach(([tab, g]) => {
+    const h = box.querySelector(`:scope > h3.pgroup[data-ptab="${tab}"]`); if (!h) return;
+    const list = items.filter(i => i.tab === tab); const done = list.filter(i => i.ok).length; const reqLeft = list.filter(i => i.req && !i.ok).length;
+    const c = document.createElement('section'); c.className = 'guide' + (reqLeft ? '' : ' done');
+    c.innerHTML = `<div class="g-top"><span class="g-n">${g.n}</span><div><small>Passo ${g.n} de 3</small><b>${g.title}</b></div><span class="g-c">${done}/${list.length}</span></div>
+      <p class="g-tip">${reqLeft ? g.tip : 'Tudo certo neste passo. Você pode ajustar o que quiser abaixo.'}</p>
+      <div class="g-list">${list.map((it, i) => `<button class="g-it${it.ok ? ' ok' : ''}" data-gi="${items.indexOf(it)}"><span class="g-ck">${it.ok ? '✓' : ''}</span>${it.label}${it.ok ? '' : `<em class="${it.req ? '' : 'opt'}">${it.req ? 'Falta' : 'Opcional'}</em>`}</button>`).join('')}</div>
+      ${g.next ? `<button class="g-next" data-gnext="${g.next}">Próximo: Passo ${GUIDE[g.next].n} · ${GUIDE[g.next].title} →</button>` : `<button class="g-next" data-gview="1">Ver minha vitrine →</button>`}`;
+    h.after(c);
+    c.querySelectorAll('[data-gi]').forEach(b => b.onclick = () => goField(items[+b.dataset.gi]));
+    c.querySelectorAll('[data-gnext]').forEach(b => b.onclick = () => setTab(b.dataset.gnext, true));
+    c.querySelectorAll('[data-gview]').forEach(b => b.onclick = () => { const o = $('#openstore'); if (o) o.click(); });
+  });
+  // início: o próximo passo a fazer fica destacado
+  const nx = box.querySelector('.fsteps .fs-item:not(.ok)'); if (nx) { nx.classList.add('next'); nx.querySelector('.fs-t small').insertAdjacentHTML('beforeend', ' <span class="req">Comece aqui</span>'); }
+}
+{ const rp0 = renderPainel; renderPainel = function () { rp0.apply(this, arguments); applySimple(); if (!PV) { guide(); applyTabs(); } }; }
 
 /* Prévia ao vivo: a mesma página roda num mini celular e recebe os dados a cada mudança */
 const pv = { frame: null, t: 0 };

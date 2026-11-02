@@ -20,6 +20,7 @@
   .box { width: 100%; max-width: 400px; }
   .mark { display: grid; justify-items: center; gap: 10px; margin-bottom: 22px; text-align: center; text-decoration: none; color: var(--fg); }
   .mark img { width: 64px; height: 64px; filter: drop-shadow(0 10px 24px rgba(185,71,111,.35)); }
+  .mark img.marca, .bs-top img.marca { width: auto; height: 84px; max-width: 100%; filter: drop-shadow(0 8px 20px rgba(185,71,111,.25)); }
   .mark b { font: 800 22px var(--f-display); letter-spacing: -.01em; }
   .card2 { background: var(--surface); border: 1px solid var(--line); border-radius: 24px; padding: 22px; box-shadow: 0 20px 50px rgba(42,26,34,.08); }
   .seg { display: grid; grid-template-columns: 1fr 1fr; background: var(--soft); border-radius: 14px; padding: 4px; margin-bottom: 18px; }
@@ -76,7 +77,7 @@
 <body>
 <div class="wrap2">
   <aside class="brandside" aria-hidden="true">
-    <div class="bs-top"><img src="/static/logo.svg" alt="">Zap Catálogo</div>
+    <div class="bs-top"><img class="marca" src="/static/marca.webp" alt="Zap Catálogo"></div>
     <div class="bs-mid">
       <h2>Sua vitrine no link da bio, com pedido <em>direto no WhatsApp</em></h2>
       <ul>
@@ -90,7 +91,7 @@
 
   <main class="formside">
     <div class="box">
-      <a class="mark" href="/"><img src="/static/logo.svg" alt=""><b>Zap Catálogo</b></a>
+      <a class="mark" href="/"><img class="marca" src="/static/marca.webp" alt="Zap Catálogo"></a>
       <div class="card2">
         <div class="seg" role="tablist" id="seg">
           <button role="tab" id="t-in" aria-selected="true">Entrar</button>
