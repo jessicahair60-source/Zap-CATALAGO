@@ -329,6 +329,12 @@ html, body { overflow-x: clip; }
 .btn:disabled { opacity: .5; cursor: default; }
 .kitcfg { border: 1px solid var(--p-line); border-radius: 14px; padding: 4px 12px 10px; margin-bottom: 10px; }
 .kitcfg-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; gap: 10px; }
+.banner img.blogo, .banner:has(picture) img.blogo { position: absolute; z-index: 2; inset: 14px auto auto 50%; transform: translateX(-50%); width: auto; height: auto; max-height: 56px; max-width: min(240px, 60%); object-fit: contain; filter: drop-shadow(0 2px 8px rgba(0,0,0,.35)); }
+.banner:has(.blogo)::before { content: ""; position: absolute; inset: 0 0 auto; height: 40%; z-index: 1; background: linear-gradient(rgba(0,0,0,.28), transparent); pointer-events: none; }
+@media (min-width: 760px) { .banner img.blogo, .banner:has(picture) img.blogo { top: 22px; max-height: 84px; max-width: 340px; } }
+.lbadge { position: relative; z-index: 3; width: 96px; height: 96px; margin: -48px auto 0; border-radius: 50%; background: var(--c-cardBg, #fff); box-shadow: 0 8px 24px -8px rgba(40,10,25,.4); border: 3px solid var(--c-cardBg, #fff); display: grid; place-items: center; overflow: hidden; }
+.lbadge img { width: 100%; height: 100%; object-fit: contain; padding: 8px; }
+@media (min-width: 760px) { .lbadge { width: 120px; height: 120px; margin-top: -60px; } }
 .ltop { position: relative; display: flex; justify-content: center; align-items: center; width: 100vw; margin: 0 0 0 calc(50% - 50vw); padding: 18px 20px 16px;
   background: var(--c-cardBg, #fff); border-bottom: 1px solid var(--c-cardBorder, rgba(0,0,0,.06)); box-shadow: 0 8px 24px -18px rgba(40,10,25,.35); z-index: 1; }
 .ltop::after { content: ""; position: absolute; left: 50%; bottom: -1px; width: 56px; height: 2px; margin-left: -28px; border-radius: 2px; background: var(--c-buyBg, #B9476F); opacity: .85; }
@@ -610,7 +616,7 @@ body.painel .stats { margin: 14px 0 6px; }
 @media (min-width: 1000px) {
   .wrap, .topbar-in { max-width: 1240px; }
   #view-loja { display: grid; grid-template-columns: 330px minmax(0, 1fr); column-gap: 44px; align-items: start; padding-top: 8px; }
-  #view-loja > .banner, #view-loja > .foot, #view-loja > .ltop, #view-loja > .promo { grid-column: 1 / -1; }
+  #view-loja > .banner, #view-loja > .foot, #view-loja > .ltop, #view-loja > .promo, #view-loja > .lbadge { grid-column: 1 / -1; }
   #view-loja > .banner .bdeco strong { font-size: 54px; }
   #view-loja { padding-top: 0; }
   .side { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 72px); padding-top: 8px; }
@@ -1095,10 +1101,11 @@ function renderLoja() {
   const cats = ['Todos', ...S.cats];
   $('#view-loja').innerHTML = `
     ${promoHTML()}
-    ${s.logo && s.logoTop ? `<header class="ltop"><img class="logo" src="${s.logo}" alt="${esc(s.name)}"></header>` : ''}
-    <div class="banner">${s.bannerImg || s.bannerImgM ? `<picture>${s.bannerImg && s.bannerImgM ? `<source media="(min-width: 760px)" srcset="${s.bannerImg}">` : ''}<img src="${s.bannerImgM || s.bannerImg}" alt="${esc(s.bannerTitle)}"></picture>${s.bannerInfo === true && (s.bannerKicker || s.bannerTitle) ? `<div class="bdeco"><small>${esc(s.bannerKicker)}</small><strong>${esc(s.bannerTitle)}</strong></div>` : ''}` :
+    ${lpos() === 'bar' ? `<header class="ltop"><img class="logo" src="${s.logo}" alt="${esc(s.name)}"></header>` : ''}
+    <div class="banner">${lpos() === 'over' ? `<img class="blogo" src="${s.logo}" alt="${esc(s.name)}">` : ''}${s.bannerImg || s.bannerImgM ? `<picture>${s.bannerImg && s.bannerImgM ? `<source media="(min-width: 760px)" srcset="${s.bannerImg}">` : ''}<img src="${s.bannerImgM || s.bannerImg}" alt="${esc(s.bannerTitle)}"></picture>${s.bannerInfo === true && (s.bannerKicker || s.bannerTitle) ? `<div class="bdeco"><small>${esc(s.bannerKicker)}</small><strong>${esc(s.bannerTitle)}</strong></div>` : ''}` :
       `<div class="bart" aria-hidden="true">${[1, 5, 3].map(id => prod(id) ? `<img src="${artSrc(prod(id)) || ''}" alt="">` : '').join('')}</div>${s.bannerInfo === false ? '' : `<div class="bdeco"><small>${esc(s.bannerKicker)}</small><strong>${esc(s.bannerTitle)}</strong></div>`}`}</div>
-    <aside class="side"><section class="intro">${s.logo && !s.logoTop ? `<img class="logo" src="${s.logo}" alt="${esc(s.name)}">` : ''}${!s.logo || s.showName ? `<h1 class="store-name">${esc(s.name)}</h1>` : ''}${s.bio && s.bio !== 'Escreva aqui uma frase sobre a sua loja' ? `<p class="bio">${esc(s.bio)}</p>` : ''}</section>${perksHTML()}
+    ${lpos() === 'badge' ? `<div class="lbadge"><img src="${s.logo}" alt="${esc(s.name)}"></div>` : ''}
+    <aside class="side"><section class="intro">${lpos() === 'below' ? `<img class="logo" src="${s.logo}" alt="${esc(s.name)}">` : ''}${!s.logo || s.showName ? `<h1 class="store-name">${esc(s.name)}</h1>` : ''}${s.bio && s.bio !== 'Escreva aqui uma frase sobre a sua loja' ? `<p class="bio">${esc(s.bio)}</p>` : ''}</section>${perksHTML()}
     ${socialLinks().length && (s.linksTitle ?? 'Conecte-se com a gente') ? `<div class="links-h"><b>${esc(s.linksTitle ?? 'Conecte-se com a gente')}</b>${(s.linksSub ?? 'Toque na opção desejada') ? `<small>${esc(s.linksSub ?? 'Toque na opção desejada')}</small>` : ''}</div>` : ''}
     <nav class="links" aria-label="Redes e contato">
       ${socialLinks().map(l => `<a class="link" href="${esc(l.url)}" target="_blank" rel="noopener"><span class="ico ${l.cls}">${ICONS[l.icon]}</span>${esc(l.text)}<span class="dots" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span></a>`).join('')}
@@ -1161,12 +1168,20 @@ function renderGrid() {
   g.querySelectorAll('[data-video]').forEach(b => b.onclick = () => openVideo(+b.dataset.video));
 }
 
+/* Onde a logo fica: por cima do banner, redonda na borda, numa faixa acima ou embaixo do banner */
+const lpos = () => !S.store.logo ? '' : (S.store.logoPos || (S.store.logoTop ? 'over' : 'below'));
 /* Cronômetro de promoção */
-const promoOn = () => { const p = S.store.promo || {}; return !!(p.on && p.end && Date.parse(p.end) > Date.now()); };
+// Duração em minutos a partir de "start"; com "loop" recomeça sozinho. Lojas antigas usam "end" (dia e hora).
+function promoMs() {
+  const p = S.store.promo || {}; if (!p.on) return 0;
+  if (p.dur > 0) { const d = p.dur * 6e4, el = Date.now() - (p.start || 0); return p.loop ? d - (((el % d) + d) % d) : d - el; }
+  return p.end ? Date.parse(p.end) - Date.now() : 0;
+}
+const promoOn = () => promoMs() > 0;
 function promoLeft() {
-  const ms = Math.max(0, Date.parse(S.store.promo.end) - Date.now()); const d = Math.floor(ms / 864e5), h = Math.floor(ms / 36e5) % 24, m = Math.floor(ms / 6e4) % 60, sec = Math.floor(ms / 1e3) % 60;
+  const ms = Math.max(0, promoMs()); const d = Math.floor(ms / 864e5), h = Math.floor(ms / 36e5) % 24, m = Math.floor(ms / 6e4) % 60, sec = Math.floor(ms / 1e3) % 60;
   const two = n => String(n).padStart(2, '0');
-  return `${d ? `<span><b>${d}</b>d</span>` : ''}<span><b>${two(h)}</b>h</span><span><b>${two(m)}</b>m</span><span><b>${two(sec)}</b>s</span>`;
+  return `${d ? `<span><b>${d}</b>d</span>` : ''}${d || h ? `<span><b>${two(h)}</b>h</span>` : ''}<span><b>${two(m)}</b>m</span><span><b>${two(sec)}</b>s</span>`;
 }
 function promoHTML() {
   if (!promoOn()) return '';
@@ -1473,7 +1488,7 @@ function renderPainel() {
       <div class="two">${f('skick', 'Chamada pequena', s.bannerKicker)}${f('stitle', 'Título do banner', s.bannerTitle)}</div>
       ${ck('sbinfo', 'Mostrar a chamada e o título no banner', s.bannerInfo === undefined ? !(s.bannerImg || s.bannerImgM) : s.bannerInfo)}
       <div class="field"><label>Logo <span style="font-weight:400;color:var(--p-muted)">· 600 x 200 px, PNG com fundo transparente</span></label><div><label class="tg" for="slogo" style="cursor:pointer;padding:8px 12px;display:inline-block">${s.logo ? 'Trocar logo' : 'Enviar logo'}</label></div><input id="slogo" type="file" accept="image/*" hidden></div>
-      ${s.logo ? `<p class="note" style="margin:4px 0 0"><img src="${s.logo}" alt="" style="max-height:32px;vertical-align:middle;margin-right:8px">Logo enviado. <button class="more" id="rmlogo">Remover logo</button></p>${ck('slogotop', 'Logo em cima de tudo, acima do banner', !!s.logoTop)}${ck('sshowname', 'Mostrar o nome da loja', s.showName)}` : ''}
+      ${s.logo ? `<p class="note" style="margin:4px 0 0"><img src="${s.logo}" alt="" style="max-height:32px;vertical-align:middle;margin-right:8px">Logo enviado. <button class="more" id="rmlogo">Remover logo</button></p><div class="field"><label>Onde fica a logo</label><div class="radios">${[['over', 'Por cima do banner'], ['badge', 'Redonda na borda do banner'], ['bar', 'Numa faixa acima do banner'], ['below', 'Embaixo do banner']].map(([k, l]) => `<button class="opt" data-lpos="${k}" aria-pressed="${lpos() === k}">${l}</button>`).join('')}</div></div>${ck('sshowname', 'Mostrar o nome da loja', s.showName)}` : ''}
       ${f('sname', 'Nome da loja (embaixo do banner)', s.name)}
       <div class="field"><label>Diferenciais (com ícone, embaixo da frase; vazio = esconder)</label>${(s.perks || PERKS_DEFAULT).map((t, i) => `<input class="in" data-perk="${i}" value="${esc(t)}" style="margin-top:${i ? 6 : 0}px" aria-label="Diferencial ${i + 1}">`).join('')}</div>
       <div class="field"><label for="sbio">Frase embaixo do nome</label><textarea class="in" id="sbio" rows="2" placeholder="Ex.: Perucas e cabelos realistas com entrega para todo o Brasil">${esc(s.bio)}</textarea></div>
@@ -1512,8 +1527,11 @@ function renderPainel() {
     ${sec('promo', 'Cronômetro de promoção', promoOn() ? 'Ligado: aparece no topo da vitrine' : 'Contagem regressiva no topo da vitrine', `
       ${ck('spromo', 'Ligar o cronômetro', !!(s.promo || {}).on)}
       ${f('spromot', 'Texto da faixa', (s.promo || {}).text ?? 'Promoção termina em', 'placeholder="Ex.: Black Friday termina em"')}
-      ${f('spromoe', 'Termina em (dia e hora)', (s.promo || {}).end || '', 'type="datetime-local"')}
-      <p class="note" style="margin:6px 0 0">Quando o tempo acaba, a faixa some sozinha.</p>`)}
+      <div class="field"><label>Quanto tempo dura</label><div class="radios">${[[10, '10 min'], [30, '30 min'], [60, '1 hora'], [120, '2 horas'], [1440, '24 horas']].map(([m, l]) => `<button class="opt" data-pdur="${m}" aria-pressed="${(s.promo || {}).dur === m}">${l}</button>`).join('')}</div></div>
+      <div class="two"><div class="field"><label for="spdn">Ou escolha outro tempo</label><input class="in" id="spdn" inputmode="numeric" value="${(() => { const d = (s.promo || {}).dur || 0; return !d ? '' : d % 1440 === 0 ? d / 1440 : d % 60 === 0 ? d / 60 : d; })()}" placeholder="Ex.: 45"></div>
+        <div class="field"><label for="spdu">&nbsp;</label><select class="in" id="spdu">${[['1', 'minutos'], ['60', 'horas'], ['1440', 'dias']].map(([v, l]) => { const d = (s.promo || {}).dur || 0; const cur = !d ? '1' : d % 1440 === 0 ? '1440' : d % 60 === 0 ? '60' : '1'; return `<option value="${v}" ${v === cur ? 'selected' : ''}>${l}</option>`; }).join('')}</select></div></div>
+      ${ck('sploop', 'Recomeçar sozinho quando acabar (fica sempre contando)', (s.promo || {}).loop !== false)}
+      <p class="note" style="margin:6px 0 0">${promoOn() ? `Agora faltam ${Math.ceil(promoMs() / 6e4)} min. ` : ''}A contagem começa quando você escolhe o tempo.${(s.promo || {}).loop === false ? ' Quando acabar, a faixa some sozinha.' : ''}</p>`)}
     ${sec('kits', 'Montagem de kits', `${(S.kits || []).filter(k => k.on !== false).length} kits ativos`, `
       <p class="note" style="margin:0 0 8px">A cliente escolhe os itens do kit na vitrine e o kit entra no pedido com a lista do que ela escolheu.</p>
       ${(S.kits || []).map((k, i) => `<div class="kitcfg">
@@ -1605,13 +1623,16 @@ function renderPainel() {
     S.testimonials.splice(+b.dataset.tdel, 1); save(); renderPainel(); toast('Depoimento excluído'); });
   $('#addtesti').onclick = () => { S.testimonials.push({ name: 'Nome da cliente', stars: 5, photo: '', text: 'Escreva aqui o depoimento.' }); pui.open.add('depo'); save(); renderPainel(); };
   $('#sanim').onchange = e => { s.anim = e.target.checked; applyColors(); save(); };
-  $('#slogo').onchange = e => readImg(e.target, u => { if (!s.logo && s.logoTop === undefined) s.logoTop = true; s.logo = u; save(); renderPainel(); toast('Logo atualizado'); }, 600, true);
+  $('#slogo').onchange = e => readImg(e.target, u => { if (!s.logoPos) s.logoPos = 'over'; s.logo = u; save(); renderPainel(); toast('Logo atualizado'); }, 600, true);
   if ($('#rmlogo')) $('#rmlogo').onclick = () => { s.logo = ''; save(); renderPainel(); };
   // cronômetro
-  const pr = () => (s.promo = s.promo || { on: false, text: 'Promoção termina em', end: '' });
-  if ($('#spromo')) $('#spromo').onchange = e => { pr().on = e.target.checked; if (pr().on && !pr().end) { const d = new Date(Date.now() + 864e5); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); pr().end = d.toISOString().slice(0, 16); } save(); renderPainel(); };
+  const pr = () => (s.promo = s.promo || { on: false, text: 'Promoção termina em', dur: 10, loop: true, start: Date.now() });
+  const setDur = m => { pr().dur = m; pr().start = Date.now(); pr().end = ''; if (pr().loop === undefined) pr().loop = true; save(); renderPainel(); };
+  document.querySelectorAll('[data-pdur]').forEach(b => b.onclick = () => setDur(+b.dataset.pdur));
+  if ($('#spdn')) { const custom = () => { const n = parseInt($('#spdn').value, 10); if (n > 0) setDur(n * +$('#spdu').value); }; $('#spdn').onchange = custom; $('#spdu').onchange = custom; }
+  if ($('#sploop')) $('#sploop').onchange = e => { pr().loop = e.target.checked; pr().start = Date.now(); save(); renderPainel(); };
+  if ($('#spromo')) $('#spromo').onchange = e => { pr().on = e.target.checked; if (pr().on && !(pr().dur > 0) && !(Date.parse(pr().end) > Date.now())) { pr().dur = 10; pr().loop = true; } if (pr().on) { pr().start = Date.now(); if (pr().dur > 0) pr().end = ''; } save(); renderPainel(); };
   if ($('#spromot')) $('#spromot').oninput = e => { pr().text = e.target.value; save(); };
-  if ($('#spromoe')) $('#spromoe').onchange = e => { pr().end = e.target.value; save(); renderPainel(); };
   // kits
   if ($('#kitnew')) $('#kitnew').onclick = () => { S.kits = S.kits || []; S.kits.push({ id: Math.max(0, ...S.kits.map(k => +k.id || 0)) + 1, name: '', n: 3, price: 0, desc: '', cats: [], on: true }); pui.open.add('kits'); save(); renderPainel(); toast('Kit criado: dê um nome e escolha quantos itens'); };
   document.querySelectorAll('[data-kf]').forEach(el => el.oninput = () => { const [i, key] = el.dataset.kf.split(':'); const k = S.kits[+i];
@@ -1619,7 +1640,7 @@ function renderPainel() {
   document.querySelectorAll('[data-kcat]').forEach(el => el.onchange = () => { const k = S.kits[+el.dataset.kcat]; k.cats = [...document.querySelectorAll(`[data-kcat="${el.dataset.kcat}"]:checked`)].map(x => x.value); save(); });
   document.querySelectorAll('[data-kon]').forEach(el => el.onchange = () => { S.kits[+el.dataset.kon].on = el.checked; save(); renderPainel(); });
   document.querySelectorAll('[data-kdelc]').forEach(b => b.onclick = () => { if (b.dataset.sure) { S.kits.splice(+b.dataset.kdelc, 1); save(); renderPainel(); } else { b.dataset.sure = 1; b.textContent = 'Toque de novo para tirar'; } });
-  if ($('#slogotop')) $('#slogotop').onchange = e => { s.logoTop = e.target.checked; save(); };
+  document.querySelectorAll('[data-lpos]').forEach(b => b.onclick = () => { s.logoPos = b.dataset.lpos; save(); renderPainel(); });
   if ($('#sshowname')) $('#sshowname').onchange = e => { s.showName = e.target.checked; save(); };
   $('#sbanner').onchange = e => readImg(e.target, u => { s.bannerImg = u; save(); renderPainel(); toast('Banner do computador atualizado'); }, 1920);
   $('#sbannerm').onchange = e => readImg(e.target, u => { s.bannerImgM = u; save(); renderPainel(); toast('Banner do celular atualizado'); }, 1080);
