@@ -309,6 +309,8 @@ html, body { overflow-x: clip; }
 @media (min-width: 760px) { .banner:has(picture) { width: min(1100px, calc(100vw - 48px)); max-width: none; margin: 18px auto 0; justify-self: center; border-radius: 22px; } }
 .banner .bdeco { z-index: 1; }
 .logo { display: block; max-height: 64px; max-width: 70%; object-fit: contain; }
+.ltop { display: flex; justify-content: center; align-items: center; padding: 14px 16px 12px; }
+.ltop .logo { margin: 0 auto; max-height: 56px; }
 .card { transition: transform .2s ease, box-shadow .2s ease; }
 .card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
 .anim .banner, .anim .intro, .anim .links, .anim .cat-title { animation: rise .6s cubic-bezier(.2,.7,.2,1) both; }
@@ -643,7 +645,7 @@ body.painel .stats { margin: 14px 0 6px; }
 @media (min-width: 1000px) {
   .wrap, .topbar-in { max-width: 1240px; }
   #view-loja { display: grid; grid-template-columns: 330px minmax(0, 1fr); column-gap: 44px; align-items: start; padding-top: 8px; }
-  #view-loja > .banner, #view-loja > .foot { grid-column: 1 / -1; }
+  #view-loja > .banner, #view-loja > .foot, #view-loja > .ltop { grid-column: 1 / -1; }
   #view-loja > .banner .bdeco strong { font-size: 54px; }
   #view-loja { padding-top: 0; }
   .side { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 72px); padding-top: 8px; }
@@ -1173,9 +1175,10 @@ function renderLoja() {
     if ($('#goon')) $('#goon').onclick = () => show('painel'); return; }
   const cats = ['Todos', ...S.cats];
   $('#view-loja').innerHTML = `
+    ${s.logo && s.logoTop ? `<header class="ltop"><img class="logo" src="${s.logo}" alt="${esc(s.name)}"></header>` : ''}
     <div class="banner">${s.bannerImg || s.bannerImgM ? `<picture>${s.bannerImg && s.bannerImgM ? `<source media="(min-width: 760px)" srcset="${s.bannerImg}">` : ''}<img src="${s.bannerImgM || s.bannerImg}" alt="${esc(s.bannerTitle)}"></picture>${s.bannerInfo === true && (s.bannerKicker || s.bannerTitle) ? `<div class="bdeco"><small>${esc(s.bannerKicker)}</small><strong>${esc(s.bannerTitle)}</strong></div>` : ''}` :
       `<div class="bart" aria-hidden="true">${[1, 5, 3].map(id => prod(id) ? `<img src="${artSrc(prod(id)) || ''}" alt="">` : '').join('')}</div>${s.bannerInfo === false ? '' : `<div class="bdeco"><small>${esc(s.bannerKicker)}</small><strong>${esc(s.bannerTitle)}</strong></div>`}`}</div>
-    <aside class="side"><section class="intro">${s.logo ? `<img class="logo" src="${s.logo}" alt="${esc(s.name)}">` : ''}${!s.logo || s.showName ? `<h1 class="store-name">${esc(s.name)}</h1>` : ''}${s.bio && s.bio !== 'Escreva aqui uma frase sobre a sua loja' ? `<p class="bio">${esc(s.bio)}</p>` : ''}</section>${perksHTML()}
+    <aside class="side"><section class="intro">${s.logo && !s.logoTop ? `<img class="logo" src="${s.logo}" alt="${esc(s.name)}">` : ''}${!s.logo || s.showName ? `<h1 class="store-name">${esc(s.name)}</h1>` : ''}${s.bio && s.bio !== 'Escreva aqui uma frase sobre a sua loja' ? `<p class="bio">${esc(s.bio)}</p>` : ''}</section>${perksHTML()}
     ${socialLinks().length && (s.linksTitle ?? 'Conecte-se com a gente') ? `<div class="links-h"><b>${esc(s.linksTitle ?? 'Conecte-se com a gente')}</b>${(s.linksSub ?? 'Toque na opção desejada') ? `<small>${esc(s.linksSub ?? 'Toque na opção desejada')}</small>` : ''}</div>` : ''}
     <nav class="links" aria-label="Redes e contato">
       ${socialLinks().map(l => `<a class="link" href="${esc(l.url)}" target="_blank" rel="noopener"><span class="ico ${l.cls}">${ICONS[l.icon]}</span>${esc(l.text)}<span class="dots" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span></a>`).join('')}
@@ -1531,7 +1534,7 @@ function renderPainel() {
       <div class="two">${f('skick', 'Chamada pequena', s.bannerKicker)}${f('stitle', 'Título do banner', s.bannerTitle)}</div>
       ${ck('sbinfo', 'Mostrar a chamada e o título no banner', s.bannerInfo === undefined ? !(s.bannerImg || s.bannerImgM) : s.bannerInfo)}
       <div class="field"><label>Logo <span style="font-weight:400;color:var(--p-muted)">· 600 x 200 px, PNG com fundo transparente</span></label><div><label class="tg" for="slogo" style="cursor:pointer;padding:8px 12px;display:inline-block">${s.logo ? 'Trocar logo' : 'Enviar logo'}</label></div><input id="slogo" type="file" accept="image/*" hidden></div>
-      ${s.logo ? `<p class="note" style="margin:4px 0 0"><img src="${s.logo}" alt="" style="max-height:32px;vertical-align:middle;margin-right:8px">Logo enviado. <button class="more" id="rmlogo">Remover logo</button></p>${ck('sshowname', 'Mostrar o nome da loja embaixo do logo', s.showName)}` : ''}
+      ${s.logo ? `<p class="note" style="margin:4px 0 0"><img src="${s.logo}" alt="" style="max-height:32px;vertical-align:middle;margin-right:8px">Logo enviado. <button class="more" id="rmlogo">Remover logo</button></p>${ck('slogotop', 'Logo em cima de tudo, acima do banner', !!s.logoTop)}${ck('sshowname', 'Mostrar o nome da loja', s.showName)}` : ''}
       ${f('sname', 'Nome da loja (embaixo do banner)', s.name)}
       <div class="field"><label>Diferenciais (com ícone, embaixo da frase; vazio = esconder)</label>${(s.perks || PERKS_DEFAULT).map((t, i) => `<input class="in" data-perk="${i}" value="${esc(t)}" style="margin-top:${i ? 6 : 0}px" aria-label="Diferencial ${i + 1}">`).join('')}</div>
       <div class="field"><label for="sbio">Frase embaixo do nome</label><textarea class="in" id="sbio" rows="2" placeholder="Ex.: Perucas e cabelos realistas com entrega para todo o Brasil">${esc(s.bio)}</textarea></div>
@@ -1682,6 +1685,7 @@ function renderPainel() {
   $('#sanim').onchange = e => { s.anim = e.target.checked; applyColors(); save(); };
   $('#slogo').onchange = e => readImg(e.target, u => { s.logo = u; save(); renderPainel(); toast('Logo atualizado'); }, 600, true);
   if ($('#rmlogo')) $('#rmlogo').onclick = () => { s.logo = ''; save(); renderPainel(); };
+  if ($('#slogotop')) $('#slogotop').onchange = e => { s.logoTop = e.target.checked; save(); };
   if ($('#sshowname')) $('#sshowname').onchange = e => { s.showName = e.target.checked; save(); };
   $('#sbanner').onchange = e => readImg(e.target, u => { s.bannerImg = u; save(); renderPainel(); toast('Banner do computador atualizado'); }, 1920);
   $('#sbannerm').onchange = e => readImg(e.target, u => { s.bannerImgM = u; save(); renderPainel(); toast('Banner do celular atualizado'); }, 1080);
