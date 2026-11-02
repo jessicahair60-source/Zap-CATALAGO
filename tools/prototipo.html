@@ -148,6 +148,18 @@ html, body { overflow-x: clip; }
 .empty { grid-column: 1 / -1; text-align: center; padding: 30px 10px; color: var(--c-muted); }
 .foot { text-align: center; font-size: 12px; color: var(--c-muted); margin-top: 30px; }
 
+/* Bolinha flutuante de vídeo */
+.vbub { position: fixed; left: max(14px, env(safe-area-inset-left, 0px)); bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 29; display: grid; justify-items: center; gap: 6px;
+  background: none; border: 0; padding: 0; width: 92px; cursor: pointer; transition: bottom .25s; animation: vbin .5s ease both; }
+.hascart .vbub { bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
+.vbub-v { position: relative; width: 78px; height: 78px; border-radius: 50%; overflow: hidden; background: #000; box-shadow: 0 0 0 3px var(--c-buyBg, #B9476F), 0 0 0 5px #fff, 0 8px 22px rgba(0,0,0,.25); }
+.vbub-v video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.vbub-v i { position: absolute; inset: auto 0 6px; display: grid; place-items: center; } .vbub-v i svg { width: 18px; height: 18px; fill: #fff; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5)); }
+.vbub-t { background: var(--c-buyBg, #B9476F); color: var(--c-buyText, #fff); font-size: 11px; font-weight: 700; line-height: 1.2; padding: 5px 8px; border-radius: 10px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,.18); }
+.vbub-x { position: absolute; top: -4px; right: 2px; width: 22px; height: 22px; border-radius: 50%; border: 0; background: #fff; color: #333; font-size: 15px; line-height: 1; box-shadow: 0 2px 6px rgba(0,0,0,.25); display: grid; place-items: center; padding: 0; }
+@keyframes vbin { from { opacity: 0; transform: translateY(16px) scale(.9); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .vbub { animation: none; } }
+
 /* Carrinho */
 .cartbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
   background: linear-gradient(to top, var(--c-bg) 70%, transparent); }
@@ -565,6 +577,10 @@ body.painel .stats { margin: 14px 0 6px; }
 .fs-bar { height: 6px; border-radius: 6px; background: var(--p-soft); margin: 8px 0 6px; overflow: hidden; } .fs-bar i { display: block; height: 100%; background: var(--p-acc); border-radius: 6px; }
 .fs-item { width: 100%; display: flex; align-items: center; gap: 10px; background: none; border: 0; border-top: 1px solid var(--p-line); padding: 11px 2px; font: inherit; font-size: 14px; color: inherit; text-align: left; cursor: pointer; }
 .fs-item:first-of-type { border-top: 0; } .fs-item .chev { margin-left: auto; color: var(--p-muted); }
+.fs-t { display: grid; text-align: left; gap: 1px; font-weight: 600; } .fs-t small { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--p-acc); }
+.fs-t em { font-style: normal; font-weight: 400; font-size: 12.5px; color: var(--p-muted); }
+.fs-item.ok.fs-item { text-decoration: none; } .fs-item.ok .fs-t b { text-decoration: line-through; color: var(--p-muted); } .fs-t b { font-weight: 600; }
+.kpihead { display: flex; justify-content: space-between; align-items: baseline; margin: 18px 2px 8px; } .kpihead b { font-size: 15px; } .kpihead small { font-size: 12px; color: var(--p-muted); }
 .fs-n { width: 24px; height: 24px; flex: none; border-radius: 50%; border: 1.5px solid var(--p-acc); color: var(--p-acc); display: grid; place-items: center; font-size: 12px; font-weight: 700; }
 .fs-item.ok { color: var(--p-muted); text-decoration: line-through; } .fs-item.ok .fs-n { background: var(--p-acc); color: #fff; border-color: var(--p-acc); }
 .pgroup { margin: 26px 2px 10px; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--p-acc); font-weight: 700; }
@@ -1092,6 +1108,25 @@ function catImg(c) {
 }
 
 /* ---------- Vitrine ---------- */
+/* Bolinha flutuante: um vídeo de produto rodando, que abre o vídeo com o botão de pedir */
+function vbubProd() {
+  const vb = S.store.vbubble || {};
+  const ok = p => p && p.active !== false && firstVid(p);
+  return S.products.find(p => String(p.id) === String(vb.pid) && ok(p)) || S.products.find(ok);
+}
+function vbubHTML() {
+  const vb = S.store.vbubble || {}; if (!vb.on) return '';
+  let gone = false; try { gone = sessionStorage.getItem('vz-vbub') === '1'; } catch (e) {} if (gone && !PV) return '';
+  const p = vbubProd(); if (!p) return '';
+  return `<div class="vbub" role="button" tabindex="0" data-vbub="${p.id}" aria-label="${esc(vb.text || 'Assistir vídeo dos detalhes')}: ${esc(p.name)}">
+    <span class="vbub-v"><video src="${MEDIA[firstVid(p).id]}" muted loop autoplay playsinline preload="metadata" aria-hidden="true"></video><i><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></i></span>
+    <span class="vbub-t">${esc(vb.text || 'Assistir vídeo dos detalhes')}</span>
+    <button class="vbub-x" data-vbubx aria-label="Fechar">×</button></div>`;
+}
+document.addEventListener('click', e => {
+  if (e.target.closest('[data-vbubx]')) { e.stopPropagation(); try { sessionStorage.setItem('vz-vbub', '1'); } catch (er) {} const b = e.target.closest('.vbub'); if (b) b.remove(); return; }
+  const b = e.target.closest('[data-vbub]'); if (b) { const p = S.products.find(x => String(x.id) === b.dataset.vbub); if (p) openVideo(p.id); }
+});
 function renderLoja() {
   const s = S.store;
   if (s.online === false) { $('#view-loja').innerHTML = `<div class="offbar">Só você vê esta faixa: sua vitrine está fora do ar. <button class="more" id="goon">Ligar no painel</button></div>
@@ -1101,6 +1136,7 @@ function renderLoja() {
     $('#goon').onclick = () => show('painel'); return; }
   const cats = ['Todos', ...S.cats];
   $('#view-loja').innerHTML = `
+    ${vbubHTML()}
     ${promoHTML()}
     ${lpos() === 'bar' ? `<header class="ltop">${hasImg() ? `<img class="logo" src="${s.logo}" alt="${esc(s.name)}">` : ltext('ltop-name')}</header>` : ''}
     <div class="banner">${lpos() === 'over' ? `<img class="blogo" src="${s.logo}" alt="${esc(s.name)}">` : ''}${s.bannerImg || s.bannerImgM ? `<picture>${s.bannerImg && s.bannerImgM ? `<source media="(min-width: 760px)" srcset="${s.bannerImg}">` : ''}<img src="${s.bannerImgM || s.bannerImg}" alt="${esc(s.bannerTitle)}"></picture>${s.bannerInfo === true && (s.bannerKicker || s.bannerTitle) ? `<div class="bdeco"><small>${esc(s.bannerKicker)}</small><strong>${esc(s.bannerTitle)}</strong></div>` : ''}` :
@@ -1174,7 +1210,7 @@ function renderGrid() {
 const lkind = () => S.store.logoKind || (S.store.logo ? 'img' : 'text');
 const hasImg = () => lkind() === 'img' && !!S.store.logo;
 const lfont = () => (TITLE_FONTS[S.store.logoFont] || TITLE_FONTS[S.store.titleFont] || TITLE_FONTS.bricolage)[1].replace(/"/g, "'");
-const ltext = cls => `<span class="${cls}" style="font-family:${lfont()}">${esc(S.store.name)}</span>`;
+const ltext = cls => `<span class="${cls}" style="font-family:${lfont()}">${esc(S.store.logoText || S.store.name)}</span>`;
 const lpos = () => { const p = S.store.logoPos || 'bar'; return !hasImg() && (p === 'over' || p === 'badge') ? 'bar' : p; };
 /* Cronômetro de promoção */
 // Duração em minutos a partir de "start"; com "loop" recomeça sozinho. Lojas antigas usam "end" (dia e hora).
@@ -1301,7 +1337,7 @@ function totals() {
 }
 function updateCartBar() {
   cart = cart.filter(c => cp(c));
-  const t = totals(); $('#cartbar').hidden = t.n === 0 || !$('#view-painel').hidden;
+  const t = totals(); $('#cartbar').hidden = t.n === 0 || !$('#view-painel').hidden; document.body.classList.toggle('hascart', !$('#cartbar').hidden);
   $('#cartcnt').textContent = t.n; $('#carttot').textContent = t.total > 0 ? brl(t.total) : '';
   const b = $('#cartbtn'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump');
 }
@@ -1389,19 +1425,17 @@ const MEDIDAS_HTML = `<div class="sizes-t">
 function sec(id, title, sub, body) {
   return `<details class="pcard" data-sec="${id}" ${pui.open.has(id) ? 'open' : ''}><summary><span><h3>${title}</h3><small>${sub}</small></span><span class="chev" aria-hidden="true">›</span></summary><div class="sbody">${body}</div></details>`;
 }
-/* Primeiros passos: some sozinho quando tudo estiver feito */
+/* Crie a sua loja em 3 passos: cada passo leva para a aba dele */
 function firstSteps() {
-  const s = S.store; let copied = false; try { copied = localStorage.getItem('vz-copied') === '1'; } catch (e) {}
+  const s = S.store;
   const steps = [
-    ['pedido', 'Coloque o WhatsApp que recebe os pedidos', String(s.phone || '').replace(/\D/g, '').length >= 12],
-    ['banner', 'Envie o banner e a logo da sua loja', !!(s.bannerImg || s.bannerImgM || s.logo)],
-    ['prod', 'Cadastre seu primeiro produto', S.products.length > 0],
-    ['link', 'Copie o link e coloque na bio do Instagram', copied]];
-  const done = steps.filter(x => x[2]).length;
-  if (done === steps.length) return '';
-  return `<section class="fsteps"><div class="fs-top"><b>Primeiros passos</b><span>${done} de ${steps.length}</span></div>
-    <div class="fs-bar"><i style="width:${done / steps.length * 100}%"></i></div>
-    ${steps.map(([k, t, ok], i) => `<button class="fs-item${ok ? ' ok' : ''}" ${k === 'link' ? 'id="fslink"' : `data-go="${k}"`}><span class="fs-n">${ok ? '✓' : i + 1}</span>${t}<span class="chev" aria-hidden="true">›</span></button>`).join('')}</section>`;
+    ['info', 'Informações da loja', 'Nome, WhatsApp, frase e links', String(s.phone || '').replace(/\D/g, '').length >= 12],
+    ['banner', 'Banner, logo e cores', 'Deixe a vitrine com a cara da sua marca', !!(s.bannerImg || s.bannerImgM || s.logo || s.logoText)],
+    ['prod', 'Subir produtos', 'Fotos, vídeos, preços e categorias', S.products.some(p => !p.demo)]];
+  const done = steps.filter(x => x[3]).length;
+  return `<section class="fsteps"><div class="fs-top"><b>${done === 3 ? 'Sua loja está pronta 🎉' : 'Crie a sua loja em 3 passos'}</b><span>${done} de 3</span></div>
+    <div class="fs-bar"><i style="width:${done / 3 * 100}%"></i></div>
+    ${steps.map(([k, t, sub, ok], i) => `<button class="fs-item${ok ? ' ok' : ''}" data-go="${k}"><span class="fs-n">${ok ? '✓' : i + 1}</span><span class="fs-t"><small>Passo ${i + 1}${ok ? ' · feito' : ''}</small><b>${t}</b><em>${sub}</em></span><span class="chev" aria-hidden="true">›</span></button>`).join('')}</section>`;
 }
 function renderPainel() {
   const s = S.store;
@@ -1424,16 +1458,11 @@ function renderPainel() {
       ${s.online === false ? `<div class="field"><label for="soffmsg">Aviso que as clientes veem</label><input class="in" id="soffmsg" value="${esc(s.offMsg ?? 'Estamos repondo o estoque. Voltamos em breve!')}"></div>` : ''}
     </section>
     ${firstSteps()}
-    <div class="quick">
-      <button data-go="prod"><span>${ICONS.plus}</span>Novo produto</button>
-      <button data-go="lista"><span>${ICONS.grid}</span>Meus produtos</button>
-      <button data-go="banner"><span>${ICONS.img}</span>Banner</button>
-      <button data-go="tema"><span>${ICONS.drop}</span>Cores</button>
-    </div>
+    <div class="kpihead"><b>Relatórios</b><small>Últimos 30 dias</small></div>
     <div class="stats">
+      <div class="stat"><b id="kpiv">${MODE === 'panel' ? '·' : '0'}</b><span>pessoas visitaram</span></div>
+      <div class="stat"><b id="kpic">${MODE === 'panel' ? '·' : '0'}</b><span>cliques no Eu quero</span></div>
       <div class="stat"><b>${active}</b><span>produtos ativos</span></div>
-      <div class="stat"><b>${S.products.filter(p => soldOut(p)).length}</b><span>sem estoque</span></div>
-      <div class="stat"><b>${S.products.filter(p => firstVid(p)).length}</b><span>com vídeo</span></div>
     </div>
     <h3 class="pgroup">Produtos<small>Cadastre, organize e controle o estoque</small></h3>
     ${sec('prod', ed ? 'Editar item' : 'Novo produto ou serviço', ed ? esc(d.name) : 'Físico, digital ou serviço, com fotos e vídeos', `
@@ -1480,7 +1509,13 @@ function renderPainel() {
       <p class="note">Cada produto pode ter uma regra própria, no cadastro dele.</p>`)}
     ${sec('selos', 'Selos dos produtos', 'Nomes dos selos', `<div class="two">${Object.keys(BADGES).map(k => f('bn' + k, `Selo ${k === 'new' ? '1' : k === 'top' ? '2' : '3'}`, s.badgeNames[k], `data-bn="${k}"`)).join('')}</div>`)}
     <h3 class="pgroup">Aparência<small>Banner, cores e jeito da vitrine</small></h3>
-    ${sec('banner', 'Banner, logo e texto do topo', 'Imagem, logo, chamada e frase', `
+    ${sec('info', 'Informações da loja', 'Nome, WhatsApp, frase e diferenciais', `
+      ${f('sname', 'Nome da loja', s.name, 'placeholder="Ex.: Jessica Hair"')}
+      ${f('sphone', 'WhatsApp que recebe os pedidos (com 55 e DDD)', s.phone, 'inputmode="tel" placeholder="Ex.: 5511999999999"')}
+      <div class="field"><label for="sbio">Frase embaixo do banner</label><textarea class="in" id="sbio" rows="2" placeholder="Ex.: Perucas e cabelos realistas com entrega para todo o Brasil">${esc(s.bio)}</textarea></div>
+      <div class="field"><label>Diferenciais (com ícone, embaixo da frase; vazio = esconder)</label>${(s.perks || PERKS_DEFAULT).map((t, i) => `<input class="in" data-perk="${i}" value="${esc(t)}" style="margin-top:${i ? 6 : 0}px" aria-label="Diferencial ${i + 1}">`).join('')}</div>
+      ${f('scattitle', 'Título acima da busca ({loja} vira o nome da loja; vazio = esconder)', s.catalogTitle ?? 'Conheça nossos produtos')}`)}
+    ${sec('banner', 'Banner e logo', 'Imagem do topo, logo e chamada', `
       <div class="bups">
         <div class="bup"><div class="bprev r169">${s.bannerImgM || s.bannerImg ? `<img src="${s.bannerImgM || s.bannerImg}" alt="">` : '<span>16:9</span>'}</div>
           <div class="binfo"><b>Celular</b><code>1080 x 608 px</code></div>
@@ -1499,12 +1534,10 @@ function renderPainel() {
       ${lkind() === 'img' ? `
         <div class="field"><div><label class="tg" for="slogo" style="cursor:pointer;padding:8px 12px;display:inline-block">${s.logo ? 'Trocar foto da logo' : 'Escolher foto da logo'}</label></div><input id="slogo" type="file" accept="image/*" hidden>
         <p class="note" style="margin:6px 0 0">${s.logo ? `<img src="${s.logo}" alt="" style="max-height:32px;vertical-align:middle;margin-right:8px">Logo enviada. <button class="more" id="rmlogo">Remover</button>` : 'PNG com fundo transparente, 600 x 200 px.'}</p></div>
-        ${f('sname', 'Nome da loja <span style="font-weight:400;color:var(--p-muted)">· não aparece na vitrine, só no título da página</span>', s.name)}` : `
-        <div class="two">${f('sname', 'Escreva a logo', s.name, 'placeholder="Ex.: Jessica Hair"')}<div class="field"><label for="slfont">Letra da logo</label><select class="in" id="slfont">${Object.entries(TITLE_FONTS).map(([k, v]) => `<option value="${k}" ${(s.logoFont || s.titleFont) === k ? 'selected' : ''}>${v[0]}</option>`).join('')}</select></div></div>`}
+` : `
+        <div class="two">${f('slogotxt', 'Escreva a logo', s.logoText || '', `placeholder="${esc(s.name || 'Ex.: Jessica Hair')}"`)}<div class="field"><label for="slfont">Letra da logo</label><select class="in" id="slfont">${Object.entries(TITLE_FONTS).map(([k, v]) => `<option value="${k}" ${(s.logoFont || s.titleFont) === k ? 'selected' : ''}>${v[0]}</option>`).join('')}</select></div></div>`}
       <div class="field"><label>Onde fica a logo</label><div class="radios">${[['bar', 'Em cima do banner'], ...(hasImg() ? [['over', 'Por cima da imagem'], ['badge', 'Redonda na borda']] : []), ['below', 'Embaixo do banner']].map(([k, l]) => `<button class="opt" data-lpos="${k}" aria-pressed="${lpos() === k}">${l}</button>`).join('')}</div></div>
-      <div class="field"><label>Diferenciais (com ícone, embaixo da frase; vazio = esconder)</label>${(s.perks || PERKS_DEFAULT).map((t, i) => `<input class="in" data-perk="${i}" value="${esc(t)}" style="margin-top:${i ? 6 : 0}px" aria-label="Diferencial ${i + 1}">`).join('')}</div>
-      <div class="field"><label for="sbio">Frase embaixo do banner</label><textarea class="in" id="sbio" rows="2" placeholder="Ex.: Perucas e cabelos realistas com entrega para todo o Brasil">${esc(s.bio)}</textarea></div>
-      ${f('scattitle', 'Título acima da busca ({loja} vira o nome da loja; vazio = esconder)', s.catalogTitle ?? 'Conheça nossos produtos')}`)}
+`)}
     ${sec('tema', 'Cores', `${(THEMES[s.theme] || {}).label || 'Personalizado'}`, `
       <p class="note" style="margin:0 0 8px">1. Escolha um tema. Ele já vem com tudo combinando.</p>
       <div class="themes">${Object.entries(THEMES).map(([k, t]) => { const c = { ...DEFAULT_COLORS, ...t.colors }; const r = RADII[t.radius];
@@ -1536,6 +1569,11 @@ function renderPainel() {
       ${f('semoji', 'Depois do título da categoria: "seta" = seta animada, ou um emoji (vazio = nada)', (s.secEmoji ?? 'seta') === '👇' ? 'seta' : s.secEmoji ?? 'seta')}
       <div class="two">${f('sbuy', 'Texto do botão de compra', s.buyText)}${f('sinst', 'Parcelas sem juros (1 = esconder)', s.installments, 'inputmode="numeric"')}</div>`)}
     <h3 class="pgroup">Vendas e contato<small>WhatsApp, links e depoimentos</small></h3>
+    ${sec('vbub', 'Bolinha de vídeo na vitrine', (s.vbubble || {}).on ? 'Ligada: aparece no canto da vitrine' : 'Vídeo flutuante "Assistir vídeo dos detalhes"', (() => { const vids = S.products.filter(p => firstVid(p)); const vb = s.vbubble || {}; const cur = vbubProd(); return vids.length ? `
+      ${ck('svbon', 'Mostrar a bolinha flutuante com vídeo', !!vb.on)}
+      <div class="field"><label for="svbp">Vídeo de qual produto</label><select class="in" id="svbp">${vids.map(p => `<option value="${p.id}" ${cur && String(cur.id) === String(p.id) ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}</select></div>
+      ${f('svbt', 'Texto da bolinha', vb.text ?? 'Assistir vídeo dos detalhes')}
+      <p class="note" style="margin:6px 0 0">A cliente toca na bolinha e o vídeo abre em tela cheia, com o botão de pedir.</p>` : '<p class="note" style="margin:0">Adicione um vídeo em algum produto (Passo 3) para usar a bolinha.</p>'; })())}
     ${sec('promo', 'Cronômetro de promoção', promoOn() ? 'Ligado: aparece no topo da vitrine' : 'Contagem regressiva no topo da vitrine', `
       ${ck('spromo', 'Ligar o cronômetro', !!(s.promo || {}).on)}
       ${f('spromot', 'Texto da faixa', (s.promo || {}).text ?? 'Promoção termina em', 'placeholder="Ex.: Black Friday termina em"')}
@@ -1553,7 +1591,6 @@ function renderPainel() {
         <div class="kitcfg-foot"><label class="chk"><input type="checkbox" data-kon="${i}" ${k.on !== false ? 'checked' : ''}> Mostrar na vitrine</label><button class="tg" data-kdelc="${i}">Tirar kit</button></div></div>`).join('')}
       <button class="pbtn ghost" id="kitnew">+ Criar kit</button>`)}
     ${sec('pedido', 'Carrinho e pedido no WhatsApp', 'Pagamento, entrega, cupom e mensagem', `
-      ${f('sphone', 'WhatsApp que recebe os pedidos (com 55 e DDD)', s.phone, 'inputmode="tel"')}
       <div class="field"><label for="sgreet">Mensagem do pedido no WhatsApp <span style="font-weight:400;color:var(--p-muted)">· {nome_dos_produtos} vira a lista dos produtos</span></label><textarea class="in" id="sgreet" rows="6">${esc(s.greeting)}</textarea></div>
       ${f('spay', 'Formas de pagamento (separe por vírgula)', s.payments)}
       <div class="field"><label>Opções de recebimento</label><div class="radios">${ck('sdel', 'Entrega', s.delivery)}${ck('spick', 'Retirada na loja', s.pickup)}</div></div>
@@ -1596,7 +1633,9 @@ function renderPainel() {
     el.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
   document.querySelectorAll('details[data-sec]').forEach(el => el.ontoggle = () => { el.open ? pui.open.add(el.dataset.sec) : pui.open.delete(el.dataset.sec); });
   const bind = (id, key, fn = v => v) => { const el = $('#' + id); el.oninput = el.onchange = () => { s[key] = fn(el.type === 'checkbox' ? el.checked : el.value); save(); }; };
-  bind('sname','name'); bind('sbio','bio'); bind('sphone','phone'); bind('skick','bannerKicker'); if ($('#sbinfo')) $('#sbinfo').onchange = e => { s.bannerInfo = e.target.checked; save(); }; bind('stitle','bannerTitle');
+  { const vbs = k => v => { s.vbubble = { ...(s.vbubble || {}), [k]: v }; return s.vbubble; };
+    if ($('#svbon')) { $('#svbon').onchange = e => { vbs('on')(e.target.checked); save(); }; $('#svbp').onchange = e => { vbs('pid')(e.target.value); save(); }; $('#svbt').oninput = e => { vbs('text')(e.target.value); save(); }; } }
+  bind('sname','name'); if ($('#slogotxt')) bind('slogotxt','logoText'); bind('sbio','bio'); bind('sphone','phone'); bind('skick','bannerKicker'); if ($('#sbinfo')) $('#sbinfo').onchange = e => { s.bannerInfo = e.target.checked; save(); }; bind('stitle','bannerTitle');
   bind('sgreet','greeting'); bind('spay','payments'); bind('sdel','delivery'); bind('spick','pickup'); bind('scoupon','coupon');
   bind('scpct','couponPct', v => Math.min(100, Math.max(0, parseInt(v) || 0))); bind('sinst','installments', v => Math.max(1, parseInt(v) || 1));
   bind('sbuy','buyText'); bind('sgroup','groupCats'); bind('ssort','showSort', v => { document.body.classList.toggle('showsort', v); return v; }); bind('semoji','secEmoji'); document.querySelectorAll('[data-perk]').forEach(el => el.oninput = () => { s.perks = [...(s.perks || PERKS_DEFAULT)]; s.perks[+el.dataset.perk] = el.value; save(); }); if ($('#slt')) { bind('slt','linksTitle'); bind('sls','linksSub'); } bind('scattitle','catalogTitle'); bind('sfoot','footer'); bind('sshowstock','showStock'); bind('slow','lowStock', v => Math.max(0, parseInt(v) || 0)); bind('szero','zeroStock');
@@ -1768,15 +1807,14 @@ function show(view) {
 /* Painel simples: quem está começando vê só o básico; "Mais opções" mostra o resto */
 /* Organização: cada aba tem o principal em cima e os ajustes finos embaixo */
 const PANEL_LAYOUT = [
-  ['inicio', 'Relatórios', 'Visitas, cliques e pedidos da sua vitrine', ['relatorio']],
-  ['produtos', 'Produtos', 'Cadastre e organize o seu catálogo', ['prod', 'lista', 'cats', 'whats']],
-  ['produtos', 'Mais ajustes', 'Estoque e selos dos produtos', ['estoque', 'selos']],
-  ['aparencia', 'Aparência', 'Banner, cores, links e jeito da vitrine', ['banner', 'tema', 'layout', 'links']],
-  ['aparencia', 'Mais ajustes', 'Cores de cada parte, depoimentos e rodapé', ['cores', 'depo', 'rodape']],
-  ['vendas', 'Pedidos', 'Como o pedido chega no seu WhatsApp', ['pedido', 'pix']],
-  ['vendas', 'Promoções', 'Cronômetro e kits para vender mais', ['promo', 'kits']],
-  ['vendas', 'Divulgação', 'Anúncios e endereço próprio', ['marketing', 'dominio']],
+  ['inicio', 'Relatório completo', 'Visitas, cliques e pedidos de cada dia', ['relatorio']],
+  ['loja', 'Passo 1 · Informações da loja', 'Nome, WhatsApp, links e como o pedido chega', ['info', 'pedido', 'links', 'pix']],
+  ['visual', 'Passo 2 · Banner, logo e cores', 'Deixe a vitrine com a cara da sua marca', ['banner', 'tema', 'layout']],
+  ['visual', 'Mais ajustes', 'Cores de cada parte, depoimentos e rodapé', ['cores', 'depo', 'rodape']],
+  ['produtos', 'Passo 3 · Subir produtos', 'Cadastre e organize o seu catálogo', ['prod', 'lista', 'cats', 'whats']],
+  ['produtos', 'Para vender mais', 'Estoque, selos, cronômetro e kits', ['vbub', 'estoque', 'selos', 'promo', 'kits']],
   ['conta', 'Sua conta', '', ['conta']],
+  ['conta', 'Divulgação', 'Anúncios e endereço próprio', ['marketing', 'dominio']],
   ['conta', 'Ajuda', 'Tamanhos ideais e exemplos prontos', ['medidas', 'modelo']]];
 function applySimple() {
   const box = $('#view-painel');
@@ -1791,16 +1829,14 @@ function applySimple() {
   });
   Object.values(secs).forEach(d => { d.dataset.ptab = 'conta'; box.append(d); }); // qualquer parte nova não some
   tail.forEach(t => box.append(t));
-  const fl = $('#fslink'); if (fl) fl.onclick = () => { try { localStorage.setItem('vz-copied', '1'); } catch (e) {} $('#copylink').click(); renderPainel(); };
 }
 /* Abas: cada grupo do painel fica numa aba da barra de baixo */
 const PTABS = [
   ['inicio', 'Início', '<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>'],
-  ['produtos', 'Produtos', '<path d="M6 7h12l-1 13H7z"/><path d="M9 7a3 3 0 0 1 6 0"/>'],
-  ['aparencia', 'Aparência', '<circle cx="12" cy="12" r="9"/><circle cx="8.5" cy="10" r="1.3"/><circle cx="12" cy="7.5" r="1.3"/><circle cx="15.5" cy="10" r="1.3"/><path d="M12 21a2.5 2.5 0 0 1 0-5h2a3 3 0 0 0 3-3"/>'],
-  ['vendas', 'Vendas', '<path d="M4 5h16v11H8l-4 4z"/>'],
+  ['loja', '1 · Loja', '<path d="M4 9l1.5-5h13L20 9"/><path d="M4 9h16v2a3 3 0 0 1-5.3 2 3 3 0 0 1-5.4 0A3 3 0 0 1 4 11z"/><path d="M5 13v7h14v-7"/>'],
+  ['visual', '2 · Visual', '<circle cx="12" cy="12" r="9"/><circle cx="8.5" cy="10" r="1.3"/><circle cx="12" cy="7.5" r="1.3"/><circle cx="15.5" cy="10" r="1.3"/><path d="M12 21a2.5 2.5 0 0 1 0-5h2a3 3 0 0 0 3-3"/>'],
+  ['produtos', '3 · Produtos', '<path d="M6 7h12l-1 13H7z"/><path d="M9 7a3 3 0 0 1 6 0"/>'],
   ['conta', 'Conta', '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4.5-6 8-6s7 2 8 6"/>']];
-const TAB_OF_GROUP = { 'Produtos': 'produtos', 'Aparência': 'aparencia', 'Relatórios': 'inicio', 'Vendas e contato': 'vendas', 'Divulgação': 'vendas', 'Ajuda': 'conta', 'Sua conta': 'conta' };
 pui.tab = 'inicio';
 function setTab(t, top) {
   pui.tab = t; document.body.dataset.ptab = t; if (!PV && $('#pv')) pvFit();
@@ -1818,7 +1854,7 @@ function applyTabs() {
   if (!$('.ptabs')) {
     const nav = document.createElement('nav'); nav.className = 'ptabs'; nav.setAttribute('aria-label', 'Partes do painel');
     nav.innerHTML = PTABS.map(([k, l, d]) => `<button data-tab="${k}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>${l}</button>`).join('');
-    nav.querySelectorAll('button').forEach(b => b.onclick = () => { if (b.dataset.tab === 'inicio' && $('.fsteps')) { pui.tab = 'inicio'; renderPainel(); } setTab(b.dataset.tab, true); });
+    nav.querySelectorAll('button').forEach(b => b.onclick = () => { if (b.dataset.tab === 'inicio') { pui.tab = 'inicio'; renderPainel(); } setTab(b.dataset.tab, true); });
     document.body.appendChild(nav);
   }
   // atalhos do início (Novo produto, Cores...) levam para a aba certa

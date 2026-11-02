@@ -155,8 +155,8 @@ rep("""  $('#sslug').oninput = e => { const v = slugify(e.target.value); s.slug 
     BOOT.store = { ...BOOT.store, ...j.store }; renderPainel(); toast('Link atualizado. O endereço antigo deixou de funcionar.'); };""")
 
 # ---------- painel: plano, relatórios, Pix, marketing, domínio, conta ----------
-rep("""    <div class="stats">""", """    ${MODE === 'panel' ? planCard() : ''}
-    <div class="stats">""")
+rep("""    <div class="kpihead">""", """    ${MODE === 'panel' ? planCard() : ''}
+    <div class="kpihead">""")
 rep("""    <h3 class="pgroup">Vendas e contato<small>WhatsApp, links e depoimentos</small></h3>""",
 """    ${MODE === 'panel' ? `<h3 class="pgroup">Relatórios<small>Visitas, cliques e pedidos da sua vitrine</small></h3>
     ${sec('relatorio', 'Desempenho da vitrine', 'Últimos 30 dias', '<div id="statsbox"><p class="note">Carregando...</p></div>')}` : ''}
@@ -233,6 +233,14 @@ function bindPanelExtras(s) {
     catch (e) { $('#pwerr').textContent = e.message; $('#pwerr').hidden = false; } };
   const rel = document.querySelector('details[data-sec="relatorio"]');
   const load = () => loadStats(); rel.addEventListener('toggle', () => { if (rel.open) load(); }); if (rel.open) load();
+  loadKpi();
+}
+// Números do início (visitas e cliques), guardados por 1 minuto para não buscar a cada mudança
+const kpi = { at: 0, j: null };
+async function loadKpi() {
+  const put = j => { if ($('#kpiv')) $('#kpiv').textContent = j.totals.view.toLocaleString('pt-BR'); if ($('#kpic')) $('#kpic').textContent = j.totals.click.toLocaleString('pt-BR'); };
+  if (kpi.j && Date.now() - kpi.at < 60000) return put(kpi.j);
+  try { kpi.j = await api('GET', '/api/stats?days=30'); kpi.at = Date.now(); put(kpi.j); } catch (e) {}
 }
 async function loadStats() {
   const box = $('#statsbox'); if (!box) return;
