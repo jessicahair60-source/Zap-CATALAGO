@@ -2061,17 +2061,16 @@ function planCard() {
   const label = st.plan === 'pro' ? 'Assinatura ativa' : st.plan === 'trial' ? 'Teste grátis' : st.plan === 'expired' ? 'Assinatura vencida' : 'Assinatura liberada';
   const left = d.until ? Math.max(0, Math.ceil((d.until - Date.now()) / DAYMS)) : null;
   const canPay = st.payments && st.payments !== 'off';
-  const renew = !canPay
-    ? '<button class="hcopy" disabled style="width:100%;opacity:.6">Renovar assinatura · em breve</button>'
-    : st.plan === 'pro' && st.subscribed ? '<button class="tg" id="plancancel">Cancelar renovação automática</button>'
+  const go = (id, plan, txt) => canPay ? `<button class="pw-go" id="${id}" data-plan="${plan}">${txt}</button>` : '<button class="pw-go" disabled>Pagamento em breve</button>';
+  const renew = st.plan === 'pro' && st.subscribed ? '<button class="tg" id="plancancel">Cancelar renovação automática</button>'
     : `<p style="margin:16px 0 10px;font-weight:700">${st.plan === 'pro' ? 'Renovar assinatura' : 'Escolha seu plano'}</p>
        <div class="pw-plans">
        ${st.yearPrice ? `<div class="pw-plan best"><span class="pw-badge">Mais vantajoso</span><b>Plano anual</b><div class="pw-price">${brl(st.yearPrice)}<small>/ano</small></div>
          <p>Equivale a ${brl(st.yearPrice / 12)} por mês. Economize ${brl(st.proPrice * 12 - st.yearPrice)} em comparação com 12 mensalidades.</p>
-         <button class="pw-go" id="planyear" data-plan="anual">Quero o plano anual</button></div>` : ''}
+         ${go('planyear', 'anual', 'Quero o plano anual')}</div>` : ''}
        <div class="pw-plan"><b>Plano mensal</b><div class="pw-price">${brl(st.proPrice)}<small>/mês</small></div>
          <p>Seu catálogo completo, com todas as funcionalidades.</p>
-         <button class="pw-go" id="planbuy" data-plan="mensal">Quero o plano mensal</button></div>
+         ${go('planbuy', 'mensal', 'Quero o plano mensal')}</div>
        </div>`;
   return `<div class="plan-${st.plan}"><p style="margin:0 0 8px;font-weight:700">${label}</p>
     <div class="subrows">
@@ -2219,7 +2218,7 @@ const PANEL_LAYOUT = [
   ['conta', 'Sua conta', '', ['assinatura', 'conta']],
   ['conta', 'Ajuda', '', ['tutoriais']]];
 // partes guardadas por enquanto (voltam quando estiverem prontas)
-const PANEL_HIDE = ['pix', 'marketing', 'dominio', 'medidas', 'modelo'];
+const PANEL_HIDE = ['pix', 'marketing', 'dominio', 'medidas', 'modelo', 'vbub'];
 function applySimple() {
   const box = $('#view-painel');
   const firstH = box.querySelector(':scope > h3.pgroup'); if (!firstH) return;
