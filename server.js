@@ -68,7 +68,7 @@ function storeInfo(store) {
     proSince: store.pro_since || (db.prepare("SELECT MAX(created_at) AS t FROM payments WHERE store_id = ? AND status = 'approved'").get(store.id) || {}).t || null,
     subscribed: !!store.mp_preapproval, customDomain: store.custom_domain, blocked: !!store.blocked, blockedReason: store.blocked_reason,
     lastPayment: (db.prepare('SELECT status FROM payments WHERE store_id = ? ORDER BY created_at DESC, id DESC LIMIT 1').get(store.id) || {}).status || '',
-    publicUrl: publicUrlOf(store), proPrice: CFG.proPrice, yearPrice: kiwify.checkoutUrl('anual') ? CFG.yearPrice : 0, brand: CFG.brand, autoRelease: !kiwify.links() || kiwify.enabled(), support: CFG.support,
+    publicUrl: publicUrlOf(store), proPrice: CFG.proPrice, yearPrice: kiwify.checkoutUrl('anual') || !kiwify.links() ? CFG.yearPrice : 0, brand: CFG.brand, autoRelease: !kiwify.links() || kiwify.enabled(), support: CFG.support,
     payments: kiwify.enabled() || kiwify.links() ? 'kiwify' : mp.enabled() ? 'mercadopago' : CFG.fakePayments ? 'teste' : 'off', savedAt: store.updated_at
   };
 }
