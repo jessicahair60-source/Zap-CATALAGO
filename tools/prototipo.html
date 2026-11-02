@@ -305,8 +305,11 @@ html, body { overflow-x: clip; }
 @media (min-width: 760px) { .banner:has(picture) { width: min(1100px, calc(100vw - 48px)); max-width: none; margin: 18px auto 0; justify-self: center; border-radius: 22px; } }
 .banner .bdeco { z-index: 1; }
 .logo { display: block; max-height: 64px; max-width: 70%; object-fit: contain; }
-.ltop { display: flex; justify-content: center; align-items: center; padding: 14px 16px 12px; }
-.ltop .logo { margin: 0 auto; max-height: 56px; }
+.ltop { position: relative; display: flex; justify-content: center; align-items: center; width: 100vw; margin: 0 0 0 calc(50% - 50vw); padding: 18px 20px 16px;
+  background: var(--c-cardBg, #fff); border-bottom: 1px solid var(--c-cardBorder, rgba(0,0,0,.06)); box-shadow: 0 8px 24px -18px rgba(40,10,25,.35); z-index: 1; }
+.ltop::after { content: ""; position: absolute; left: 50%; bottom: -1px; width: 56px; height: 2px; margin-left: -28px; border-radius: 2px; background: var(--c-buyBg, #B9476F); opacity: .85; }
+.ltop .logo { margin: 0 auto; max-height: 58px; max-width: min(260px, 70%); }
+@media (min-width: 760px) { .ltop { padding: 22px 32px 20px; } .ltop .logo { max-height: 72px; max-width: 320px; } }
 .card { transition: transform .2s ease, box-shadow .2s ease; }
 .card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
 .anim .banner, .anim .intro, .anim .links, .anim .cat-title { animation: rise .6s cubic-bezier(.2,.7,.2,1) both; }
