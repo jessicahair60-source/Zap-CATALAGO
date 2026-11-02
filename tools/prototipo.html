@@ -524,6 +524,13 @@ body.painel #view-painel { padding-top: 8px; }
 .quick span { width: 48px; height: 48px; border-radius: 16px; display: grid; place-items: center; background: var(--p-surface); border: 1px solid var(--p-line); color: var(--p-acc); }
 .quick svg { width: 21px; height: 21px; }
 body.painel .stats { margin: 14px 0 6px; }
+.fsteps { background: var(--p-surface); border: 1px solid var(--p-line); border-radius: 18px; padding: 14px 14px 8px; margin-top: 14px; }
+.fs-top { display: flex; justify-content: space-between; align-items: baseline; } .fs-top b { font-size: 15px; } .fs-top span { font-size: 12px; color: var(--p-muted); }
+.fs-bar { height: 6px; border-radius: 6px; background: var(--p-soft); margin: 8px 0 6px; overflow: hidden; } .fs-bar i { display: block; height: 100%; background: var(--p-acc); border-radius: 6px; }
+.fs-item { width: 100%; display: flex; align-items: center; gap: 10px; background: none; border: 0; border-top: 1px solid var(--p-line); padding: 11px 2px; font: inherit; font-size: 14px; color: inherit; text-align: left; cursor: pointer; }
+.fs-item:first-of-type { border-top: 0; } .fs-item .chev { margin-left: auto; color: var(--p-muted); }
+.fs-n { width: 24px; height: 24px; flex: none; border-radius: 50%; border: 1.5px solid var(--p-acc); color: var(--p-acc); display: grid; place-items: center; font-size: 12px; font-weight: 700; }
+.fs-item.ok { color: var(--p-muted); text-decoration: line-through; } .fs-item.ok .fs-n { background: var(--p-acc); color: #fff; border-color: var(--p-acc); }
 .pgroup { margin: 26px 2px 10px; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--p-acc); font-weight: 700; }
 .pgroup small { display: block; text-transform: none; letter-spacing: 0; font-size: 12px; font-weight: 400; color: var(--p-muted); margin-top: 2px; }
 .pcard { margin-bottom: 8px; scroll-margin-top: 64px; }
@@ -665,6 +672,8 @@ body.painel.pv-on .pv { display: block; animation: pvIn .25s cubic-bezier(.2,.7,
   body.painel.pv-on #view-painel { margin-left: max(24px, calc((100vw - 860px - 380px) / 2)); margin-right: 380px; }
 }
 
+/* No celular a prévia só aparece nas abas em que se edita a vitrine */
+@media (max-width: 1099px) { body[data-ptab="inicio"] .pv:not(.big), body[data-ptab="conta"] .pv:not(.big), body[data-ptab="inicio"] .pv-tab, body[data-ptab="conta"] .pv-tab { display: none !important; } }
 @media (max-width: 1099px) {
   .pv:not(.big) { top: var(--tb, 50px); left: 0; right: 0; bottom: auto; z-index: 19; }
   body.painel.pv-on .pv:not(.big) { animation: none; }
@@ -1275,6 +1284,20 @@ const MEDIDAS_HTML = `<div class="sizes-t">
 function sec(id, title, sub, body) {
   return `<details class="pcard" data-sec="${id}" ${pui.open.has(id) ? 'open' : ''}><summary><span><h3>${title}</h3><small>${sub}</small></span><span class="chev" aria-hidden="true">›</span></summary><div class="sbody">${body}</div></details>`;
 }
+/* Primeiros passos: some sozinho quando tudo estiver feito */
+function firstSteps() {
+  const s = S.store; let copied = false; try { copied = localStorage.getItem('vz-copied') === '1'; } catch (e) {}
+  const steps = [
+    ['pedido', 'Coloque o WhatsApp que recebe os pedidos', String(s.phone || '').replace(/\D/g, '').length >= 12],
+    ['banner', 'Envie o banner e a logo da sua loja', !!(s.bannerImg || s.bannerImgM || s.logo)],
+    ['prod', 'Cadastre seu primeiro produto', S.products.length > 0],
+    ['link', 'Copie o link e coloque na bio do Instagram', copied]];
+  const done = steps.filter(x => x[2]).length;
+  if (done === steps.length) return '';
+  return `<section class="fsteps"><div class="fs-top"><b>Primeiros passos</b><span>${done} de ${steps.length}</span></div>
+    <div class="fs-bar"><i style="width:${done / steps.length * 100}%"></i></div>
+    ${steps.map(([k, t, ok], i) => `<button class="fs-item${ok ? ' ok' : ''}" ${k === 'link' ? 'id="fslink"' : `data-go="${k}"`}><span class="fs-n">${ok ? '✓' : i + 1}</span>${t}<span class="chev" aria-hidden="true">›</span></button>`).join('')}</section>`;
+}
 function renderPainel() {
   const s = S.store;
   if (!pui.draft) pui.draft = pui.editId ? JSON.parse(JSON.stringify(prod(pui.editId))) : newDraft();
@@ -1295,6 +1318,7 @@ function renderPainel() {
         <div class="slugrow"><span>${esc(STORE_DOMAIN)}/</span><input class="in" id="sslug" value="${esc(slugOf())}" autocomplete="off"></div></div>
       ${s.online === false ? `<div class="field"><label for="soffmsg">Aviso que as clientes veem</label><input class="in" id="soffmsg" value="${esc(s.offMsg ?? 'Estamos repondo o estoque. Voltamos em breve!')}"></div>` : ''}
     </section>
+    ${firstSteps()}
     <div class="quick">
       <button data-go="prod"><span>${ICONS.plus}</span>Novo produto</button>
       <button data-go="lista"><span>${ICONS.grid}</span>Meus produtos</button>
@@ -1599,19 +1623,31 @@ function show(view) {
 }
 
 /* Painel simples: quem está começando vê só o básico; "Mais opções" mostra o resto */
-const ADV_SECS = new Set(['estoque', 'selos', 'cores', 'layout', 'depo', 'rodape', 'modelo', 'marketing', 'dominio']);
-try { pui.adv = localStorage.getItem('vz-adv') === '1'; } catch (e) {}
+/* Organização: cada aba tem o principal em cima e os ajustes finos embaixo */
+const PANEL_LAYOUT = [
+  ['inicio', 'Relatórios', 'Visitas, cliques e pedidos da sua vitrine', ['relatorio']],
+  ['produtos', 'Produtos', 'Cadastre e organize o seu catálogo', ['prod', 'lista', 'cats', 'whats']],
+  ['produtos', 'Mais ajustes', 'Estoque e selos dos produtos', ['estoque', 'selos']],
+  ['aparencia', 'Aparência', 'Banner, cores, links e jeito da vitrine', ['banner', 'tema', 'layout', 'links']],
+  ['aparencia', 'Mais ajustes', 'Cores de cada parte, depoimentos e rodapé', ['cores', 'depo', 'rodape']],
+  ['vendas', 'Pedidos', 'Como o pedido chega no seu WhatsApp', ['pedido', 'pix']],
+  ['vendas', 'Divulgação', 'Anúncios e endereço próprio', ['marketing', 'dominio']],
+  ['conta', 'Sua conta', '', ['conta']],
+  ['conta', 'Ajuda', 'Tamanhos ideais e exemplos prontos', ['medidas', 'modelo']]];
 function applySimple() {
   const box = $('#view-painel');
-  box.querySelectorAll('details[data-sec]').forEach(d => { d.hidden = !pui.adv && ADV_SECS.has(d.dataset.sec) && !d.open; });
-  box.querySelectorAll('h3.pgroup').forEach(h => { let n = h.nextElementSibling, any = false;
-    for (; n && !n.matches('h3.pgroup'); n = n.nextElementSibling) if (n.matches('details') && !n.hidden) any = true; h.hidden = !any; });
-  const at = [...box.querySelectorAll('h3.pgroup')].find(h => /^(Sua conta|Ajuda)/.test(h.textContent));
-  if (!at) return;
-  const b = document.createElement('button'); b.className = 'pbtn ghost moreopts';
-  b.textContent = pui.adv ? 'Mostrar menos opções' : 'Mais opções: estoque, selos, depoimentos, todas as cores...';
-  b.onclick = () => { pui.adv = !pui.adv; try { localStorage.setItem('vz-adv', pui.adv ? '1' : '0'); } catch (e) {} renderPainel(); };
-  at.before(b);
+  const firstH = box.querySelector(':scope > h3.pgroup'); if (!firstH) return;
+  const tail = [...box.querySelectorAll(':scope > .legal')];
+  const secs = {}; box.querySelectorAll(':scope > details[data-sec]').forEach(d => { secs[d.dataset.sec] = d; d.remove(); });
+  box.querySelectorAll(':scope > h3.pgroup, :scope > .moreopts').forEach(h => h.remove());
+  PANEL_LAYOUT.forEach(([tab, title, sub, ids]) => {
+    const list = ids.map(id => secs[id]).filter(Boolean); if (!list.length) return;
+    const h = document.createElement('h3'); h.className = 'pgroup'; h.dataset.ptab = tab; h.innerHTML = `${title}${sub ? `<small>${sub}</small>` : ''}`;
+    box.append(h, ...list); list.forEach(d => { d.dataset.ptab = tab; delete secs[d.dataset.sec]; });
+  });
+  Object.values(secs).forEach(d => { d.dataset.ptab = 'conta'; box.append(d); }); // qualquer parte nova não some
+  tail.forEach(t => box.append(t));
+  const fl = $('#fslink'); if (fl) fl.onclick = () => { try { localStorage.setItem('vz-copied', '1'); } catch (e) {} $('#copylink').click(); renderPainel(); };
 }
 /* Abas: cada grupo do painel fica numa aba da barra de baixo */
 const PTABS = [
@@ -1623,7 +1659,7 @@ const PTABS = [
 const TAB_OF_GROUP = { 'Produtos': 'produtos', 'Aparência': 'aparencia', 'Relatórios': 'inicio', 'Vendas e contato': 'vendas', 'Divulgação': 'vendas', 'Ajuda': 'conta', 'Sua conta': 'conta' };
 pui.tab = 'inicio';
 function setTab(t, top) {
-  pui.tab = t;
+  pui.tab = t; document.body.dataset.ptab = t; if (!PV && $('#pv')) pvFit();
   $('#view-painel').querySelectorAll(':scope > *').forEach(el => el.classList.toggle('offtab', el.dataset.tab !== t && !(el.dataset.tab === 'all' && t !== 'inicio')));
   document.querySelectorAll('.ptabs button').forEach(b => b.setAttribute('aria-current', b.dataset.tab === t ? 'page' : 'false'));
   if (top) window.scrollTo(0, 0);
@@ -1631,14 +1667,14 @@ function setTab(t, top) {
 function applyTabs() {
   const box = $('#view-painel'); let cur = 'inicio';
   box.querySelectorAll(':scope > *').forEach(el => {
-    if (el.matches('h3.pgroup')) cur = TAB_OF_GROUP[el.firstChild.textContent.trim()] || cur;
+    if (el.dataset.ptab) cur = el.dataset.ptab;
     else if (el.matches('.legal')) cur = 'conta';
-    el.dataset.tab = el.matches('.moreopts') ? 'all' : cur;
+    el.dataset.tab = cur;
   });
   if (!$('.ptabs')) {
     const nav = document.createElement('nav'); nav.className = 'ptabs'; nav.setAttribute('aria-label', 'Partes do painel');
     nav.innerHTML = PTABS.map(([k, l, d]) => `<button data-tab="${k}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>${l}</button>`).join('');
-    nav.querySelectorAll('button').forEach(b => b.onclick = () => setTab(b.dataset.tab, true));
+    nav.querySelectorAll('button').forEach(b => b.onclick = () => { if (b.dataset.tab === 'inicio' && $('.fsteps')) { pui.tab = 'inicio'; renderPainel(); } setTab(b.dataset.tab, true); });
     document.body.appendChild(nav);
   }
   // atalhos do início (Novo produto, Cores...) levam para a aba certa
@@ -1674,8 +1710,8 @@ function pvFit() {
   if (box.classList.contains('big')) box.style.setProperty('--k', Math.min((innerWidth - 60) / 390, (innerHeight - 120) / 800, 1).toFixed(3));
   else if (mob) box.style.setProperty('--k', (box.classList.contains('typing') ? Math.max(.16, innerHeight * .15 / 800) : Math.min(.36, innerHeight * .3 / 800)).toFixed(3));
   else box.style.removeProperty('--k');
-  requestAnimationFrame(() => document.body.style.setProperty('--pvh', mob && document.body.classList.contains('pv-on') && !box.classList.contains('big') ? box.offsetHeight + 'px' : '0px'));
-  setTimeout(() => document.body.style.setProperty('--pvh', mob && document.body.classList.contains('pv-on') && !box.classList.contains('big') ? box.offsetHeight + 'px' : '0px'), 260);
+  requestAnimationFrame(() => document.body.style.setProperty('--pvh', mob && document.body.classList.contains('pv-on') && !box.classList.contains('big') && getComputedStyle(box).display !== 'none' ? box.offsetHeight + 'px' : '0px'));
+  setTimeout(() => document.body.style.setProperty('--pvh', mob && document.body.classList.contains('pv-on') && !box.classList.contains('big') && getComputedStyle(box).display !== 'none' ? box.offsetHeight + 'px' : '0px'), 260);
 }
 function pvOpen(on) {
   document.body.classList.toggle('pv-on', on);
