@@ -8,7 +8,7 @@
   "logo": "",
   "showName": true,
   "testiTitle": "O que as alunas dizem",
-  "name": "Mentoria Exemplo",
+  "name": "Mentora Jéssica Ferreira",
   "bannerImg": "/static/exemplo/mentoria-banner.webp",
   "bannerKicker": "Turma aberta",
   "bannerTitle": "Mentoria com Propósito",
@@ -45,7 +45,8 @@
    "Suporte no WhatsApp",
    "Conteúdo prático"
   ],
-  "bannerInfo": false
+  "bannerInfo": false,
+  "ratio": "45"
  },
  "colors": {
   "bg": "#1A1210",
@@ -122,7 +123,7 @@
    "name": "Mentoria com Propósito",
    "cat": "Mentorias",
    "hue": 340,
-   "desc": "Acompanhamento individual com estratégia, posicionamento e plano de vendas para o seu negócio. Poucas vagas por mês.",
+   "desc": "Acompanhamento individual com a mentora Jéssica Ferreira: estratégia, posicionamento e plano de vendas para o seu negócio. Poucas vagas por mês.",
    "rating": 5.0,
    "reviewsCount": 64,
    "kind": "servico",
@@ -157,7 +158,6 @@
    "reviewsCount": 64,
    "kind": "digital",
    "old": 67,
-   "badge": "new",
    "reviews": 112
   },
   {
