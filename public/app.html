@@ -439,6 +439,16 @@ html, body { overflow-x: clip; }
 .sheet.full > .x { position: absolute; float: none; margin: 0; top: calc(12px + env(safe-area-inset-top, 0px)); right: 12px; z-index: 5; }
 @keyframes pageIn { from { opacity: 0; transform: translateY(28px); } }
 .pp { flex: 1; overflow-y: auto; min-height: 0; }
+.pp-media { position: relative; }
+/* Bolinha do vídeo no cantinho da foto do produto */
+.pvbub { position: absolute; right: 14px; bottom: 34px; z-index: 3; border: 0; background: none; padding: 0; display: grid; justify-items: center; gap: 5px; cursor: pointer; animation: pvbubIn .4s .2s both; }
+.pvbub-v { position: relative; width: 84px; height: 84px; border-radius: 50%; overflow: hidden; background: #000; box-shadow: 0 0 0 3px var(--c-buyBg, #B9476F), 0 0 0 5px #fff, 0 8px 22px rgba(0,0,0,.3); }
+.pvbub-v video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.pvbub-v i { position: absolute; inset: auto 0 6px; display: grid; place-items: center; } .pvbub-v i svg { width: 18px; height: 18px; fill: #fff; filter: drop-shadow(0 1px 2px rgba(0,0,0,.5)); }
+.pvbub-t { background: var(--c-buyBg, #B9476F); color: var(--c-buyText, #fff); font-size: 11px; font-weight: 700; padding: 4px 9px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,.2); }
+@keyframes pvbubIn { from { opacity: 0; transform: scale(.7); } }
+@media (prefers-reduced-motion: reduce) { .pvbub { animation: none; } }
+
 .pcar { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
 .pcar::-webkit-scrollbar { display: none; }
 .pslide { position: relative; flex: 0 0 100%; aspect-ratio: 9/16; max-height: none; max-width: 100%; scroll-snap-align: start; background: var(--c-cardBorder); overflow: hidden; }
@@ -1461,7 +1471,7 @@ function openProduct(id) {
   const nSlides = ms.length + (artSlide ? 1 : 0);
   const label = S.store.buyText || 'EU QUERO';
   openSheet(`<div class="pp">
-    <div class="pp-media"><div class="pcar" id="pcar">${slides}</div>${nSlides > 1 ? `<div class="dots" id="dots">${Array.from({ length: nSlides }, (_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('')}</div>` : ''}</div>
+    <div class="pp-media"><div class="pcar" id="pcar">${slides}</div>${firstVid(p) && ms[0] && ms[0].type === 'img' ? `<button class="pvbub" id="pvbub" aria-label="Assistir ao vídeo do produto"><span class="pvbub-v"><video src="${MEDIA[firstVid(p).id]}" muted autoplay loop playsinline preload="metadata" aria-hidden="true"></video><i><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></i></span><span class="pvbub-t">Ver vídeo</span></button>` : ''}${nSlides > 1 ? `<div class="dots" id="dots">${Array.from({ length: nSlides }, (_, i) => `<i class="${i ? '' : 'on'}"></i>`).join('')}</div>` : ''}</div>
     <div class="pp-info">
       <div class="pcat"><span>${esc(p.cat || '')}</span>${b ? `<span class="badge ${b[1]}" style="position:static">${esc(b[0])}</span>` : ''}</div>
       <h3 class="pp-name">${(() => { const w = esc(p.name).split(' '); return w.length > 1 ? `${w.slice(0, -1).join(' ')} <em>${w[w.length - 1]}</em>` : w[0]; })()}</h3>
@@ -1484,6 +1494,7 @@ function openProduct(id) {
   const car = $('#pcar'); if ($('#dots')) car.onscroll = () => { const i = Math.round(car.scrollLeft / car.clientWidth); $('#dots').querySelectorAll('i').forEach((d, j) => d.classList.toggle('on', i === j)); };
   document.querySelectorAll('[data-full]').forEach(v => v.onclick = () => openVideo(id, v.dataset.full));
   if ($('#pvid')) $('#pvid').onclick = () => openVideo(id);
+  if ($('#pvbub')) $('#pvbub').onclick = () => openVideo(id);
   if (ext) return;
   document.querySelectorAll('[data-size]').forEach(bt => bt.onclick = () => { size = bt.dataset.size; document.querySelectorAll('[data-size]').forEach(x => x.setAttribute('aria-pressed', x === bt)); $('#perr').hidden = true; });
   if (showQty) { $('#qm').onclick = () => { qty = Math.max(1, qty - 1); $('#qv').textContent = qty; };
