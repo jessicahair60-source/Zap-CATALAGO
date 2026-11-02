@@ -10,6 +10,7 @@ const { pixPayload } = require('./lib/pix');
 const mp = require('./lib/mercadopago');
 const kiwify = require('./lib/kiwify');
 const { shareCard } = require('./lib/sharecard');
+const { readZip } = require('./lib/zipread');
 const wa = require('./lib/whatsapp');
 const mail = require('./lib/mail');
 const { createBot, TEMPLATE: WA_TEMPLATE } = require('./lib/wabot');
@@ -437,6 +438,54 @@ app.post('/api/media', auth, express.raw({ type: ['image/*', 'video/*'], limit: 
     const id = saveFile(req.store.id, req.body, mime);
     res.json({ id, url: '/u/' + id, type: mime.startsWith('video') ? 'video' : 'img' });
   } catch (e) { res.status(415).json({ error: e.message }); }
+});
+
+/* ---------- API: importar catálogo (.zip com catalogo.json, fotos e vídeos) ---------- */
+const MIME_OF = { jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp', gif: 'image/gif', mp4: 'video/mp4', mov: 'video/quicktime', webm: 'video/webm' };
+app.post('/api/import', auth, express.raw({ type: '*/*', limit: '400mb' }), (req, res) => {
+  let files; try { files = readZip(req.body); } catch (e) { return res.status(400).json({ error: e.message }); }
+  const key = [...files.keys()].find(k => /(^|\/)catalogo\.json$/i.test(k));
+  if (!key) return res.status(400).json({ error: 'Não achei o catalogo.json dentro do arquivo.' });
+  const dir = key.slice(0, key.length - 'catalogo.json'.length);
+  let cat; try { cat = JSON.parse(files.get(key)().toString('utf8')); } catch (e) { return res.status(400).json({ error: 'O catalogo.json está com erro.' }); }
+  const list = Array.isArray(cat.products) ? cat.products.slice(0, 500) : [];
+  if (!list.length) return res.status(400).json({ error: 'O catálogo não tem produtos.' });
+  const row = db.prepare('SELECT state FROM stores WHERE id = ?').get(req.store.id);
+  let state = null; try { state = JSON.parse(row.state || 'null'); } catch (e) {}
+  if (!state || !Array.isArray(state.products)) return res.status(409).json({ error: 'Abra o painel uma vez antes de importar.' });
+  state.cats = Array.isArray(state.cats) ? state.cats : [];
+  const have = new Set(state.products.map(p => String(p.name || '').trim().toLowerCase()));
+  let nextId = Math.max(0, ...state.products.map(p => +p.id || 0)) + 1, added = 0, skipped = 0, mediaCount = 0;
+  const media = ref => {
+    const get = files.get(dir + String(ref).replace(/^\.?\//, '')); if (!get) return null;
+    const mime = MIME_OF[String(ref).split('.').pop().toLowerCase()]; if (!mime) return null;
+    try { const id = saveFile(req.store.id, get(), mime); mediaCount++; return { id, type: mime.startsWith('video') ? 'video' : 'img' }; } catch (e) { return null; }
+  };
+  const fresh = [];
+  for (const p of list) {
+    const name = String(p.name || '').trim().slice(0, 120); if (!name) continue;
+    if (have.has(name.toLowerCase())) { skipped++; continue; }
+    have.add(name.toLowerCase());
+    const catName = String(p.cat || '').trim().slice(0, 60);
+    if (catName && !state.cats.includes(catName)) state.cats.push(catName);
+    const price = Number(p.price) > 0 ? Number(p.price) : 0;
+    fresh.push({ id: nextId++, name, cat: catName || state.cats[0] || '', price, old: undefined, desc: String(p.desc || '').slice(0, 2000),
+      specs: (Array.isArray(p.specs) ? p.specs : []).filter(s => Array.isArray(s) && s[1]).map(s => [String(s[0]).slice(0, 40), String(s[1]).slice(0, 80)]).slice(0, 12),
+      media: (Array.isArray(p.media) ? p.media : []).slice(0, 8).map(media).filter(Boolean),
+      sizes: Array.isArray(p.sizes) ? p.sizes.map(String).slice(0, 30) : [], optLabel: String(p.optLabel || 'Opção'),
+      kind: ['fisico', 'digital', 'servico'].includes(p.kind) ? p.kind : 'fisico', active: p.active !== false, track: false, stock: 0, zero: 'default',
+      link: '', duration: '', fromPrice: false, sales: 0, badge: p.badge || undefined });
+    added++;
+  }
+  // loja vazia: fica só com as categorias do catálogo importado, na ordem dele
+  if (!state.products.length) { const used = new Set(fresh.map(p => p.cat)); const order = Array.isArray(cat.cats) ? cat.cats.map(String) : [];
+    state.cats = [...order.filter(c => used.has(c)), ...[...used].filter(c => !order.includes(c))]; }
+  state.products = [...state.products, ...fresh];
+  const st = cat.store || {}; state.store = state.store || {};
+  if (st.phone && String(state.store.phone || '').replace(/\D/g, '').length < 12) state.store.phone = String(st.phone).replace(/\D/g, '').slice(0, 15);
+  const clean = safeLinks(state); const at = now();
+  db.prepare('UPDATE stores SET state = ?, updated_at = ? WHERE id = ?').run(JSON.stringify(clean), at, req.store.id);
+  res.json({ ok: true, added, skipped, media: mediaCount, state: clean, savedAt: at });
 });
 
 /* ---------- API: relatórios ---------- */

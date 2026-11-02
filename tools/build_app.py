@@ -260,6 +260,24 @@ function bindPanelExtras(s) {
   const load = () => loadStats(); rel.addEventListener('toggle', () => { if (rel.open) load(); }); if (rel.open) load();
   loadKpi();
 }
+// Importar catálogo: envia o .zip, o servidor cria os produtos e devolve a loja atualizada
+async function importZip(file) {
+  const msg = $('#impmsg'), bar = $('#impbar'), lab = $('#impl');
+  for (let i = 0; i < 40 && (sync.busy || sync.dirty); i++) await new Promise(r => setTimeout(r, 250));
+  lab.style.pointerEvents = 'none'; lab.textContent = 'Enviando...'; bar.hidden = false; msg.textContent = 'Enviando o arquivo. Não feche esta página.';
+  const x = new XMLHttpRequest(); x.open('POST', '/api/import'); x.setRequestHeader('Content-Type', 'application/zip');
+  x.upload.onprogress = ev => { if (ev.lengthComputable) { const pc = Math.round(ev.loaded / ev.total * 100); bar.firstChild.style.width = pc + '%'; msg.textContent = pc < 100 ? `Enviando: ${pc}%` : 'Criando os produtos...'; } };
+  x.onload = () => {
+    let j = {}; try { j = JSON.parse(x.responseText); } catch (e) {}
+    if (x.status !== 200) { msg.textContent = j.error || 'Não deu para importar. Tente de novo.'; lab.textContent = '+ Escolher arquivo .zip'; lab.style.pointerEvents = ''; bar.hidden = true; return; }
+    S.products = j.state.products.map(normP); S.cats = j.state.cats; S.store.phone = j.state.store.phone; sync.base = j.savedAt || sync.base;
+    hydrateMedia(); pui.open.add('lista'); pui.open.add('importar'); renderPainel(); renderLoja();
+    toast(`${j.added} produtos importados`);
+    const m2 = $('#impmsg'); if (m2) m2.textContent = `Pronto: ${j.added} produtos e ${j.media} fotos e vídeos importados.${j.skipped ? ` ${j.skipped} já existiam e ficaram como estavam.` : ''} Agora é só colocar os preços.`;
+  };
+  x.onerror = () => { msg.textContent = 'A internet caiu durante o envio. Tente de novo.'; lab.textContent = '+ Escolher arquivo .zip'; lab.style.pointerEvents = ''; bar.hidden = true; };
+  x.send(file);
+}
 // Números do início (visitas e cliques), guardados por 1 minuto para não buscar a cada mudança
 const kpi = { at: 0, j: null };
 async function loadKpi() {
@@ -365,6 +383,7 @@ rep("""/* Cards sem moldura */""", """.inst { display: flex; align-items: center
 .savest[data-st="ok"]::before { content: "✓ "; color: #1FA855; }
 .savest[data-st="err"] { color: #C0392B; font-weight: 700; }
 .madewith { text-align: center; margin: 18px 0 0; font-size: 12px; } .madewith a { color: var(--c-muted); text-decoration: none; }
+.impbar { height: 8px; border-radius: 8px; background: var(--p-soft); overflow: hidden; margin-top: 10px; } .impbar i { display: block; height: 100%; width: 0; background: var(--p-acc); transition: width .3s; }
 .plan { margin-top: 14px; background: var(--p-surface); border: 1px solid var(--p-line); border-radius: 18px; padding: 14px 16px; }
 .plan-pro { border-color: #1FA855; } .plan-expired { border-color: #C0392B; }
 .plan-top { display: flex; align-items: center; gap: 12px; justify-content: space-between; }
@@ -408,8 +427,13 @@ rep("""body: JSON.stringify({ state: S }) });""", """body: JSON.stringify({ stat
 rep("""    swapUrls(S, j.state); setSaveState""", """    swapUrls(S, j.state); mergeWa(j.state.products, j.state.cats); sync.base = j.savedAt || sync.base; setSaveState""")
 rep("""    <h3 class="pgroup">Produtos<small>Cadastre, organize e controle o estoque</small></h3>""",
 """    <h3 class="pgroup">Produtos<small>Cadastre, organize e controle o estoque</small></h3>
+    ${MODE === 'panel' ? sec('importar', 'Importar catálogo pronto', 'Traga de uma vez os produtos de outro catálogo', `
+      <p class="note" style="margin:0 0 10px">Envie o arquivo <b>.zip</b> do catálogo (com fotos e vídeos). Os produtos entram com nome, categoria, fotos, vídeos e ficha. Produtos com o mesmo nome não são repetidos.</p>
+      <label class="upl" for="impzip" id="impl">+ Escolher arquivo .zip</label><input id="impzip" type="file" accept=".zip,application/zip" hidden>
+      <div class="impbar" id="impbar" hidden><i></i></div><p class="note" id="impmsg" style="margin:6px 0 0"></p>`) : ''}
     ${MODE === 'panel' && BOOT.wa ? sec('whats', 'Cadastrar pelo WhatsApp', 'Mande foto e texto, o produto entra sozinho', '<div id="wabox"><p class="note">Carregando...</p></div>') : ''}""")
-rep("""  const rel = document.querySelector('details[data-sec="relatorio"]');""", """  const wsec = document.querySelector('details[data-sec="whats"]');
+rep("""  const rel = document.querySelector('details[data-sec="relatorio"]');""", """  if ($('#impzip')) $('#impzip').onchange = e => { const f = e.target.files[0]; if (f) importZip(f); e.target.value = ''; };
+  const wsec = document.querySelector('details[data-sec="whats"]');
   if (wsec) { wsec.addEventListener('toggle', () => { if (wsec.open) loadWa(); }); if (wsec.open) loadWa(); }
   const rel = document.querySelector('details[data-sec="relatorio"]');""")
 rep("""async function loadStats() {""", """// Produtos que o robô do WhatsApp cadastrou entram no painel sem recarregar a página
