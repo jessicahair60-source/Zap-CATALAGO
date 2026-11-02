@@ -784,6 +784,8 @@ body.painel #view-painel { padding-bottom: 86px; }
 
 /* Prévia ao vivo no painel */
 .is-pv .topbar, .is-pv body::before { display: none; }
+.is-embed .topbar, .is-embed .cartbar { display: none !important; }
+.is-embed { scrollbar-width: none; } .is-embed::-webkit-scrollbar { display: none; }
 .pv-tab { position: fixed; z-index: 70; right: 16px; bottom: 16px; display: none; align-items: center; gap: 8px; border: 0; border-radius: 999px; padding: 11px 16px;
   background: var(--p-fg); color: #fff; font-size: 13px; font-weight: 600; box-shadow: 0 8px 24px rgba(36,24,30,.25); }
 .pv-tab svg { flex: none; }
@@ -1032,6 +1034,9 @@ const DEFAULT = {
 
 const PV = window.name === 'vzpreview';
 if (PV) document.documentElement.classList.add('is-pv');
+// Vitrine mostrada dentro da página de vendas (zapcatalago.com): não conta visita nem clique
+const EMBED = window.name === 'zcdemo';
+if (EMBED) document.documentElement.classList.add('is-embed');
 const PV_SRC = PV || window.__BOOT__ ? '' : '<!doctype html>' + document.documentElement.outerHTML;
 const BOOT = window.__BOOT__ || { mode: 'demo' };
 const MODE = BOOT.mode; // 'store' = vitrine pública, 'panel' = painel da lojista, 'demo' = protótipo offline
@@ -1085,7 +1090,7 @@ async function runSync() {
 window.addEventListener('beforeunload', e => { if (MODE === 'panel' && (sync.dirty || sync.busy)) { e.preventDefault(); e.returnValue = ''; } });
 // Métricas da vitrine (visitas, produtos vistos, cliques no Eu quero, pedidos)
 function track(t, p) {
-  if (MODE !== 'store') return;
+  if (MODE !== 'store' || EMBED || PV) return;
   try { navigator.sendBeacon('/api/e', JSON.stringify({ s: BOOT.store.slug, t, p: p ? String(p) : '' })); } catch (e) {}
   try { if (window.fbq) { if (t === 'click') fbq('track', 'AddToCart'); if (t === 'order') fbq('track', 'Lead'); if (t === 'pview') fbq('track', 'ViewContent'); } } catch (e) {}
   try { if (window.gtag) gtag('event', { view: 'page_view_store', pview: 'view_item', click: 'add_to_cart', order: 'generate_lead' }[t] || t); } catch (e) {}
@@ -2347,7 +2352,7 @@ if (PV) {
     if (e.source !== parent || !e.data || e.data.t !== 'vzS') return;
     Object.assign(MEDIA, e.data.M || {}); S = e.data.S; applyColors(); renderLoja(); updateCartBar();
   });
-} else {
+} else if (MODE !== 'store') { // a prévia ao vivo é só do painel: na vitrine pública ela abria a loja de novo escondida e contava cada visita duas vezes
   $('#pvtab').onclick = () => pvOpen(true);
   $('#pvclose').onclick = () => pvOpen(false);
   const big = on => { $('#pv').classList.toggle('big', on); pvFit(); };
