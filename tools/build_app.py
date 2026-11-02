@@ -36,7 +36,7 @@ const EMPTY_STORE = MODE === 'store' && !S;
 if (!S || S.v !== 4) {
   S = JSON.parse(JSON.stringify(DEFAULT)); FRESH = MODE === 'panel';
   if (FRESH) { // loja nova: nome dela, sem produtos nem depoimentos de exemplo
-    Object.assign(S.store, { name: BOOT.store.name, bannerKicker: 'Bem-vinda', bannerTitle: BOOT.store.name, bio: 'Escreva aqui uma frase sobre a sua loja', phone: '', coupon: '', footer: '', layout: 'list' });
+    Object.assign(S.store, { name: BOOT.store.name, bannerKicker: 'Bem-vinda', bannerTitle: BOOT.store.name, bio: '', phone: '', coupon: '', footer: '', layout: 'list' });
     S.cats = ['Novidades']; S.products = []; S.testimonials = [];
     S.links.forEach(l => { l.value = ''; l.on = l.type === 'zap'; });
   }

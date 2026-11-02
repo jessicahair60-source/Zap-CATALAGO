@@ -298,6 +298,11 @@ html, body { overflow-x: clip; }
 .serif .price { font-weight: 700; }
 .banner::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,.28), transparent 55%); pointer-events: none; }
 .banner:has(img)::after { background: none; }
+/* Banner com imagem: mostra a arte inteira, sem cortar as laterais */
+.banner:has(picture) { aspect-ratio: auto !important; }
+.banner:has(picture) picture { position: relative; display: block; }
+.banner:has(picture) img { position: relative; display: block; height: auto; }
+@media (min-width: 760px) { .banner:has(picture) { width: min(1100px, calc(100vw - 48px)); max-width: none; margin: 18px auto 0; justify-self: center; border-radius: 22px; } }
 .banner .bdeco { z-index: 1; }
 .logo { display: block; max-height: 64px; max-width: 70%; object-fit: contain; }
 .card { transition: transform .2s ease, box-shadow .2s ease; }
@@ -1043,7 +1048,7 @@ function renderLoja() {
   $('#view-loja').innerHTML = `
     <div class="banner">${s.bannerImg || s.bannerImgM ? `<picture>${s.bannerImg && s.bannerImgM ? `<source media="(min-width: 760px)" srcset="${s.bannerImg}">` : ''}<img src="${s.bannerImgM || s.bannerImg}" alt="${esc(s.bannerTitle)}"></picture>${s.bannerInfo === true && (s.bannerKicker || s.bannerTitle) ? `<div class="bdeco"><small>${esc(s.bannerKicker)}</small><strong>${esc(s.bannerTitle)}</strong></div>` : ''}` :
       `<div class="bart" aria-hidden="true">${[1, 5, 3].map(id => prod(id) ? `<img src="${artSrc(prod(id)) || ''}" alt="">` : '').join('')}</div>${s.bannerInfo === false ? '' : `<div class="bdeco"><small>${esc(s.bannerKicker)}</small><strong>${esc(s.bannerTitle)}</strong></div>`}`}</div>
-    <aside class="side"><section class="intro">${s.logo ? `<img class="logo" src="${s.logo}" alt="${esc(s.name)}">` : ''}${!s.logo || s.showName ? `<h1 class="store-name">${esc(s.name)}</h1>` : ''}<p class="bio">${esc(s.bio)}</p></section>${perksHTML()}
+    <aside class="side"><section class="intro">${s.logo ? `<img class="logo" src="${s.logo}" alt="${esc(s.name)}">` : ''}${!s.logo || s.showName ? `<h1 class="store-name">${esc(s.name)}</h1>` : ''}${s.bio && s.bio !== 'Escreva aqui uma frase sobre a sua loja' ? `<p class="bio">${esc(s.bio)}</p>` : ''}</section>${perksHTML()}
     ${socialLinks().length && (s.linksTitle ?? 'Conecte-se com a gente') ? `<div class="links-h"><b>${esc(s.linksTitle ?? 'Conecte-se com a gente')}</b>${(s.linksSub ?? 'Toque na opção desejada') ? `<small>${esc(s.linksSub ?? 'Toque na opção desejada')}</small>` : ''}</div>` : ''}
     <nav class="links" aria-label="Redes e contato">
       ${socialLinks().map(l => `<a class="link" href="${esc(l.url)}" target="_blank" rel="noopener"><span class="ico ${l.cls}">${ICONS[l.icon]}</span>${esc(l.text)}<span class="dots" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span></a>`).join('')}
@@ -1099,7 +1104,7 @@ function renderGrid() {
         <div class="prow ${hasPrice(p) ? '' : 'noprice'}"><span class="price">${priceHTML(p)}</span>${instTxt(p) ? `<span class="inst">ou ${S.store.installments}x de ${brl(p.price / S.store.installments)}</span>` : ''}</div>
         <div class="brow"><button class="buy" data-open="${p.id}" ${out ? 'disabled' : ''}>${out ? 'Esgotado' : (p.link ? '' : ICONS.zap) + esc(S.store.buyText || 'EU QUERO')}</button>${quick}</div>
       </div></article>`;
-  }).join('') : `<div class="empty">Nada encontrado para “${esc(ui.q)}”.<br>Tente outra palavra ou categoria.</div>`;
+  }).join('') : (ui.q ? `<div class="empty">Nada encontrado para “${esc(ui.q)}”.<br>Tente outra palavra ou categoria.</div>` : `<div class="empty">Nenhum produto por aqui ainda.</div>`);
   g.querySelectorAll('[data-open]').forEach(b => b.onclick = () => openProduct(+b.dataset.open));
   g.querySelectorAll('[data-quick]').forEach(b => b.onclick = () => quickAdd(+b.dataset.quick));
   g.querySelectorAll('[data-video]').forEach(b => b.onclick = () => openVideo(+b.dataset.video));
@@ -1364,7 +1369,7 @@ function renderPainel() {
       ${s.logo ? `<p class="note" style="margin:4px 0 0"><img src="${s.logo}" alt="" style="max-height:32px;vertical-align:middle;margin-right:8px">Logo enviado. <button class="more" id="rmlogo">Remover logo</button></p>${ck('sshowname', 'Mostrar o nome da loja embaixo do logo', s.showName)}` : ''}
       ${f('sname', 'Nome da loja (embaixo do banner)', s.name)}
       <div class="field"><label>Diferenciais (com ícone, embaixo da frase; vazio = esconder)</label>${(s.perks || PERKS_DEFAULT).map((t, i) => `<input class="in" data-perk="${i}" value="${esc(t)}" style="margin-top:${i ? 6 : 0}px" aria-label="Diferencial ${i + 1}">`).join('')}</div>
-      <div class="field"><label for="sbio">Frase embaixo do nome</label><textarea class="in" id="sbio" rows="2">${esc(s.bio)}</textarea></div>
+      <div class="field"><label for="sbio">Frase embaixo do nome</label><textarea class="in" id="sbio" rows="2" placeholder="Ex.: Perucas e cabelos realistas com entrega para todo o Brasil">${esc(s.bio)}</textarea></div>
       ${f('scattitle', 'Título acima da busca ({loja} vira o nome da loja; vazio = esconder)', s.catalogTitle ?? 'Conheça nossos produtos')}`)}
     ${sec('tema', 'Cores', `${(THEMES[s.theme] || {}).label || 'Personalizado'}`, `
       <p class="note" style="margin:0 0 8px">1. Escolha um tema. Ele já vem com tudo combinando.</p>
