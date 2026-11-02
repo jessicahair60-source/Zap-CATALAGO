@@ -312,7 +312,7 @@ html, body { overflow-x: clip; }
 .promo { width: 100vw; margin: 0 0 0 calc(50% - 50vw); display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 12px; padding: 9px 16px;
   background: var(--c-buyBg, #B9476F); color: var(--c-buyText, #fff); font-size: 13px; font-weight: 600; text-align: center; }
 .promo-c { display: inline-flex; gap: 6px; font-variant-numeric: tabular-nums; }
-.promo-c span { background: rgba(255,255,255,.18); border-radius: 6px; padding: 2px 6px; font-size: 12px; } .promo-c b { font-size: 14px; margin-right: 1px; }
+.promo-c b { background: rgba(255,255,255,.18); border-radius: 8px; padding: 3px 10px; font-size: 16px; font-weight: 800; letter-spacing: .04em; }
 .kits { display: grid; gap: 10px; margin: 14px 0 4px; }
 .kit { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; font: inherit; color: var(--c-text); cursor: pointer; padding: 14px; border-radius: 16px;
   background: var(--c-cardBg, #fff); border: 1.5px dashed var(--c-buyBg, #B9476F); }
@@ -1301,7 +1301,8 @@ const promoOn = () => promoMs() > 0;
 function promoLeft() {
   const ms = Math.max(0, promoMs()); const d = Math.floor(ms / 864e5), h = Math.floor(ms / 36e5) % 24, m = Math.floor(ms / 6e4) % 60, sec = Math.floor(ms / 1e3) % 60;
   const two = n => String(n).padStart(2, '0');
-  return `${d ? `<span><b>${d}</b>d</span>` : ''}${d || h ? `<span><b>${two(h)}</b>h</span>` : ''}<span><b>${two(m)}</b>m</span><span><b>${two(sec)}</b>s</span>`;
+  // relógio que todo mundo entende: 29:59, 1:05:30 ou "2 dias 03:15:00"
+  return `<b>${d ? `${d} ${d === 1 ? 'dia' : 'dias'} ` : ''}${d || h ? `${d ? two(h) : h}:` : ''}${two(m)}:${two(sec)}</b>`;
 }
 function promoHTML() {
   if (!promoOn()) return '';
