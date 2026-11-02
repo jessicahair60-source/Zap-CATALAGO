@@ -28,7 +28,7 @@
   .sbar b { font-weight: 700; letter-spacing: -.01em; }
   .sbar span { display: flex; gap: 5px; align-items: center; } .sbar svg { height: 11px; width: auto; fill: currentColor; }
   .sbar .isl { position: absolute; left: 50%; top: 9px; width: 88px; height: 25px; margin-left: -44px; border-radius: 20px; background: #0D080A; }
-  .phone.sm .sbar { height: 36px; font-size: 12.5px; padding: 5px 20px 0 26px; } .phone.sm .sbar .isl { width: 76px; height: 22px; margin-left: -38px; top: 8px; }
+  .phone.sm .sbar { height: 34px; font-size: 11.5px; padding: 5px 15px 0 22px; } .phone.sm .sbar svg { height: 9px; } .phone.sm .sbar span { gap: 3px; } .phone.sm .sbar .isl { width: 62px; height: 20px; margin-left: -31px; top: 8px; }
   .sview { flex: 1; position: relative; overflow: hidden; }
   .home { position: absolute; left: 50%; bottom: 7px; width: 110px; height: 4px; margin-left: -55px; border-radius: 3px; background: rgba(30,20,24,.55); z-index: 2; pointer-events: none; }
   .phone figcaption { position: absolute; left: 50%; bottom: -44px; transform: translateX(-50%); white-space: nowrap; background: #fff; border: 1px solid var(--line); color: var(--fg); font-size: 12.5px; font-weight: 700; padding: 6px 12px; border-radius: 99px; box-shadow: 0 8px 20px -10px rgba(80,20,50,.35); }
@@ -37,6 +37,22 @@
   .demo-top .bar i { width: 10px; height: 10px; border-radius: 50%; background: #E9D7DE; }
   .demo-top .bar span { margin-left: 8px; }
   .demo-top img { display: block; width: 100%; height: auto; }
+  .duo { display: grid; gap: 22px; margin-top: 28px; }
+  .duo-c { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: 20px; padding: 24px 20px 20px; }
+  .duo-n { position: absolute; top: -14px; left: 20px; width: 30px; height: 30px; border-radius: 50%; background: var(--acc); color: #fff; display: grid; place-items: center; font: 800 15px var(--f-display); }
+  .duo-c h3 { font-size: 21px; margin: 2px 0 6px; } .duo-c p { margin: 0; color: var(--muted); font-size: 15px; }
+  .mini { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 8px; }
+  .mini li { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 99px; padding: 8px 14px; font-size: 14px; font-weight: 600; background: #fff; }
+  .mini i { flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--acc); }
+  .mini i.ig { background: radial-gradient(circle at 30% 110%, #FDD36B 0 25%, #F0484B 45%, #BC2FA6 70%, #5B4FE0); } .mini i.tt { background: #111; } .mini i.zp { background: #25D366; }
+  .mini i.ck { background: var(--acc) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 12l4 4 8-8'/%3E%3C/svg%3E") center/14px no-repeat; }
+  .duo-res { margin: 18px 0 0; padding: 14px 18px; border-radius: 16px; background: #FBE7EF; color: var(--fg); font-size: 15.5px; } .duo-res b { color: var(--acc); }
+  .quem { display: grid; grid-auto-flow: column; grid-auto-columns: 78%; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 22px -20px 0; padding: 6px 20px 10px; scrollbar-width: none; }
+  .quem::-webkit-scrollbar { display: none; }
+  .quem-c { scroll-snap-align: center; display: grid; justify-items: center; align-content: start; text-align: center; gap: 4px; }
+  .quem-c .phone { width: 230px; margin: 0 0 10px; }
+  .quem-c b { font-size: 17px; } .quem-c span { color: var(--muted); font-size: 14px; max-width: 260px; } .quem-c a { color: var(--acc); font-weight: 700; font-size: 14px; margin-top: 4px; }
+  .shot .live-pic { position: relative; aspect-ratio: 4/5; overflow: hidden; padding: 0; margin: 12px 12px 0; border-radius: 12px 12px 0 0; background: #FCE4EC; box-shadow: 0 6px 18px -10px rgba(80,20,50,.35); }
   .shots { display: grid; gap: 14px; margin-top: 16px; }
   .shot { margin: 0; min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; }
   .shot .pic { background: #F4ECEF; padding: 12px 12px 0; }
@@ -134,6 +150,8 @@
     .shots { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     .tut { grid-template-columns: repeat(3, 1fr); }
     .plans2 { grid-template-columns: 1fr 1fr; max-width: 820px; }
+    .duo { grid-template-columns: 1fr 1fr; gap: 20px; }
+    .quem { grid-auto-flow: row; grid-template-columns: repeat(3, 1fr); grid-auto-columns: auto; overflow: visible; margin: 26px 0 0; padding: 6px 0 0; }
   }
 </style>
 </head>
@@ -147,10 +165,9 @@
   <header class="hero">
     <div>
       <img class="hero-marca" src="/static/marca.webp" alt="Zap Catálogo 2 em 1: Link Bio + Vitrine de Produtos ou Serviços" width="1100" height="384">
-      <h1>Sua vitrine digital completa, <em>pronta para vender!</em></h1>
-      <p class="lead">Você tem uma lojinha, vende produtos ou oferece serviços?</p>
-      <p class="lead">Com o Zap Catálogo, você cria sua própria vitrine online, personalizada com a identidade da sua marca, e recebe os pedidos diretamente no WhatsApp.</p>
-      <p class="lead hl">Tudo em um único link, com seu próprio subdomínio!</p>
+      <h1>Link da bio e catálogo <em>em um link só.</em></h1>
+      <p class="lead">Sua cliente toca no link do seu Instagram, vê seus produtos com fotos e vídeos, escolhe e o <strong>pedido chega prontinho no seu WhatsApp</strong>.</p>
+      <p class="lead hl">Sem mandar foto por foto. Sem repetir preço no direct. Sem perder venda.</p>
       <div class="cta"><a class="btn big" href="/assinar/mensal">QUERO CRIAR MEU CATÁLOGO</a><a class="btn big soft" href="#planos">Ver planos</a></div>
     </div>
     <figure class="phone"><div class="screen"><div class="sbar" aria-hidden="true"><b>9:41</b><i class="isl"></i><span><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".45"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5"/><rect x="23" y="4" width="2" height="4" rx="1" opacity=".45"/></svg></span></div><div class="sview"><iframe class="live" name="zcdemo" src="/jessica-hair?embed=1" title="Catálogo de exemplo da Jessica Hair"></iframe></div><i class="home" aria-hidden="true"></i></div>
@@ -164,18 +181,44 @@
     <p>É um catálogo <strong>estratégico</strong>, em que cada detalhe foi pensado para você vender mais.</p>
   </section>
 
+  <section class="blk" id="dois-em-um">
+    <p class="eyebrow">2 em 1</p>
+    <h2>Um link que faz o trabalho de dois</h2>
+    <p class="txt">Você não precisa mais de um link para as redes e outro para o catálogo. No Zap Catálogo, tudo fica junto, no mesmo endereço, com a cara da sua marca.</p>
+    <div class="duo">
+      <div class="duo-c"><span class="duo-n">1</span><h3>Link da bio</h3>
+        <p>Coloque no Instagram e no TikTok. Quem entra já encontra seus botões: Instagram, TikTok, WhatsApp, site e endereço da loja.</p>
+        <ul class="mini"><li><i class="ig"></i>Siga no Instagram</li><li><i class="tt"></i>Siga no TikTok</li><li><i class="zp"></i>Fale no WhatsApp</li></ul></div>
+      <div class="duo-c"><span class="duo-n">2</span><h3>Catálogo que vende</h3>
+        <p>Logo abaixo dos botões, seus produtos com foto, vídeo, preço e o botão "Eu quero". A cliente monta o pedido sozinha.</p>
+        <ul class="mini"><li><i class="ck"></i>Fotos e vídeos de cada produto</li><li><i class="ck"></i>Carrinho com vários itens</li><li><i class="ck"></i>Pedido pronto no WhatsApp</li></ul></div>
+    </div>
+    <p class="duo-res"><b>Resultado:</b> quem chega pelas redes sociais já vê, escolhe e pede, tudo no mesmo lugar. Menos cliques, mais pedidos.</p>
+  </section>
+
+  <section class="blk" id="para-quem">
+    <p class="eyebrow">Para quem é</p>
+    <h2>Funciona para produto, serviço e comida</h2>
+    <p class="txt">Seja qual for o seu negócio, a vitrine se adapta. Veja três exemplos funcionando:</p>
+    <div class="quem">
+      <div class="quem-c"><figure class="phone sm"><div class="screen"><div class="sbar" aria-hidden="true"><b>9:41</b><i class="isl"></i><span><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".45"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5"/><rect x="23" y="4" width="2" height="4" rx="1" opacity=".45"/></svg></span></div><div class="sview"><iframe class="live" name="zcdemo" src="/jessica-hair?embed=1" loading="lazy" title="Exemplo de loja de produtos: Jessica Hair"></iframe></div><i class="home" aria-hidden="true"></i></div></figure><b>Quem vende produtos</b><span>Roupas, cabelos, acessórios, cosméticos, revenda.</span><a href="/jessica-hair" target="_blank" rel="noopener">Abrir exemplo →</a></div>
+      <div class="quem-c"><figure class="phone sm"><div class="screen"><div class="sbar" aria-hidden="true"><b>9:41</b><i class="isl"></i><span><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".45"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5"/><rect x="23" y="4" width="2" height="4" rx="1" opacity=".45"/></svg></span></div><div class="sview"><iframe class="live" name="zcdemo" src="/exemplo/servicos" loading="lazy" title="Exemplo de serviços: Studio Beleza"></iframe></div><i class="home" aria-hidden="true"></i></div></figure><b>Quem oferece serviços</b><span>Salão, unhas, sobrancelha, estética, aulas, consultoria.</span><a href="/exemplo/servicos" target="_blank" rel="noopener">Abrir exemplo →</a></div>
+      <div class="quem-c"><figure class="phone sm"><div class="screen"><div class="sbar" aria-hidden="true"><b>9:41</b><i class="isl"></i><span><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".45"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5"/><rect x="23" y="4" width="2" height="4" rx="1" opacity=".45"/></svg></span></div><div class="sview"><iframe class="live" name="zcdemo" src="/exemplo/alimentos" loading="lazy" title="Exemplo de alimentos: Doceria"></iframe></div><i class="home" aria-hidden="true"></i></div></figure><b>Quem vende comida</b><span>Doces, bolos, salgados, marmitas, lanches e bebidas.</span><a href="/exemplo/alimentos" target="_blank" rel="noopener">Abrir exemplo →</a></div>
+    </div>
+  </section>
+
   <section class="blk">
     <p class="eyebrow">Pedido pronto no WhatsApp</p>
     <h2>Seu cliente escolhe, clica e o pedido chega!</h2>
-    <p class="txt">Chega de ficar enviando fotos e explicando os mesmos produtos toda hora!</p>
+    <p class="txt">Chega de mandar foto por foto e responder "qual o valor?" o dia inteiro.</p>
     <div class="flow">
       <div><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg></span><span><b>Escolhe</b><p>Seu cliente acessa o catálogo e escolhe o que deseja.</p></span></div>
       <div><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11V5a2 2 0 0 1 4 0v6"/><path d="M13 9a2 2 0 0 1 4 0v3a7 7 0 0 1-7 7h-.5a5 5 0 0 1-4.2-2.3L3 14a1.8 1.8 0 0 1 3-2l3 3"/></svg></span><span><b>Clica</b><p>Um toque e o pedido sai prontinho, com os produtos escolhidos.</p></span></div>
       <div><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l1.6-4.8A8.5 8.5 0 1 1 8 19.6z"/></svg></span><span><b>O pedido chega</b><p>Direto no seu WhatsApp. Simples para ele, muito mais prático para você!</p></span></div>
     </div>
     <div class="zapdemo">
-      <div><h3>Assim o pedido chega no seu WhatsApp</h3>
-        <p>A cliente só toca em “Eu quero” e a mensagem chega prontinha, com o nome de cada produto escolhido. Se o produto tiver preço na vitrine, o valor vai junto.</p></div>
+      <div><h3>E você recebe assim o seu pedido</h3>
+        <p>Organizado, com o nome de cada produto e a quantidade. Se o produto tiver preço na vitrine, o valor vai junto. É só responder e fechar a venda.</p></div>
       <div class="wa" role="img" aria-label="Exemplo de pedido recebido no WhatsApp">
         <div class="wa-top"><i>JH</i><span>Jessica Hair<small>WhatsApp</small></span></div>
         <div class="wa-body"><span class="wa-day">Hoje</span>
@@ -189,21 +232,6 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
     </div>
   </section>
 
-  <section class="blk">
-    <p class="eyebrow">Tudo incluído</p>
-    <h2>Tudo que sua vitrine precisa</h2>
-    <ul class="checks">
-      <li>Catálogo de produtos e serviços</li>
-      <li>Fotos e vídeos para mostrar cada detalhe</li>
-      <li>Categorias para organizar sua vitrine</li>
-      <li>Carrinho de pedidos integrado ao WhatsApp</li>
-      <li>Personalização de cores, banners e identidade visual</li>
-      <li>Links para suas redes sociais</li>
-      <li>Seu próprio subdomínio exclusivo</li>
-      <li>Painel para atualizar seus produtos quando quiser</li>
-      <li>Tutorial ensinando a configurar o catálogo e adicionar vídeos em poucos minutos</li>
-    </ul>
-  </section>
 
   <section class="blk" id="exemplo">
     <p class="eyebrow">Veja por dentro</p>
@@ -218,7 +246,7 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
         <figcaption><b>Escolha as cores</b><span>Temas prontos e a cor dos botões com a cara da sua marca.</span></figcaption></figure>
       <figure class="shot"><div class="pic"><img src="/static/exemplo/painel-produtos.webp" width="684" height="1130" loading="lazy" decoding="async" alt="Lista de produtos da Jessica Hair no painel, com fotos e vídeos"></div>
         <figcaption><b>Cadastre seus produtos</b><span>Foto, vídeo, tamanho e cor. Ative, edite ou duplique quando quiser.</span></figcaption></figure>
-      <figure class="shot"><div class="pic"><img src="/static/exemplo/vitrine-produtos.webp" width="460" height="944" loading="lazy" decoding="async" alt="Vitrine da Jessica Hair com categorias e botão Eu quero"></div>
+      <figure class="shot"><div class="pic live-pic"><iframe class="live" name="zcdemo" src="/jessica-hair?embed=1" loading="lazy" title="Vitrine da Jessica Hair deslizando"></iframe></div>
         <figcaption><b>Sua cliente vê assim</b><span>Categorias com foto e o botão "Eu quero" que leva o pedido ao seu WhatsApp.</span></figcaption></figure>
     </div>
   </section>
@@ -227,11 +255,10 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
     <div>
       <p class="eyebrow">Vídeos nos produtos</p>
       <h2>Mostre seus produtos em vídeo!</h2>
-      <p class="txt" style="color:var(--muted);font-size:17px;margin:14px 0 0">Fotos são importantes, mas seus clientes também querem ver os detalhes!</p>
-      <p class="txt" style="color:var(--muted);font-size:17px;margin:12px 0 0">Com o Zap Catálogo, você pode adicionar vídeos aos seus produtos e apresentar tudo de maneira mais completa.</p>
+      <p class="txt">Quem compra pela internet quer ver de perto. Quando o produto tem vídeo, aparece uma bolinha no cantinho da foto, e a cliente assiste sem sair da página.</p>
       <p style="font-size:17px;font-weight:700;margin:12px 0 0">Mostre cores, tamanhos, acabamentos e detalhes que fazem diferença na hora da escolha.</p>
     </div>
-    <figure class="phone sm"><div class="screen"><div class="sbar" aria-hidden="true"><b>9:41</b><i class="isl"></i><span><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".45"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5"/><rect x="23" y="4" width="2" height="4" rx="1" opacity=".45"/></svg></span></div><div class="sview"><iframe class="live" name="zcdemo" src="/jessica-hair?embed=1" loading="lazy" title="Catálogo de exemplo da Jessica Hair"></iframe></div><i class="home" aria-hidden="true"></i></div></figure>
+    <figure class="phone sm"><div class="screen"><div class="sbar" aria-hidden="true"><b>9:41</b><i class="isl"></i><span><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".45"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5"/><rect x="23" y="4" width="2" height="4" rx="1" opacity=".45"/></svg></span></div><div class="sview"><iframe class="live" name="zcdemo" src="/jessica-hair?embed=1&amp;abrir=video" loading="lazy" title="Produto aberto com vídeo na vitrine da Jessica Hair" data-produto="video"></iframe></div><i class="home" aria-hidden="true"></i></div></figure>
   </section>
 
   <section class="blk split">
@@ -268,6 +295,22 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
     </div>
   </section>
 
+  <section class="blk">
+    <p class="eyebrow">Tudo incluído</p>
+    <h2>Tudo o que vem no seu plano</h2>
+    <ul class="checks">
+      <li>Catálogo de produtos e serviços</li>
+      <li>Fotos e vídeos para mostrar cada detalhe</li>
+      <li>Categorias para organizar sua vitrine</li>
+      <li>Carrinho de pedidos integrado ao WhatsApp</li>
+      <li>Personalização de cores, banners e identidade visual</li>
+      <li>Link da bio com botões para suas redes</li>
+      <li>Seu próprio subdomínio exclusivo</li>
+      <li>Painel para atualizar seus produtos quando quiser</li>
+      <li>Tutorial ensinando a configurar o catálogo e adicionar vídeos em poucos minutos</li>
+    </ul>
+  </section>
+
   <section class="blk" id="planos">
     <p class="eyebrow">Planos</p>
     <h2>Escolha seu plano</h2>
@@ -289,6 +332,8 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
     <h2>Perguntas frequentes</h2>
     <div class="faq">
       <details><summary>Vocês cobram taxa por venda?</summary><p>Não. Você paga só o plano. O pagamento do seu cliente vai direto para você.</p></details>
+      <details><summary>Serve para quem vende serviço ou comida?</summary><p>Sim. Você troca o texto do botão (por exemplo, "Agendar" ou "Encomendar"), cria as categorias do seu jeito e a cliente manda o pedido pelo WhatsApp do mesmo jeito.</p></details>
+      <details><summary>Ainda preciso do Linktree?</summary><p>Não. O Zap Catálogo já é o seu link da bio: os botões das suas redes ficam no topo e os produtos logo abaixo.</p></details>
       <details><summary>Preciso de CNPJ?</summary><p>Não. Funciona para quem vende como pessoa física ou como empresa.</p></details>
       <details><summary>Como cancelo?</summary><p>Pela área do cliente da Kiwify, com o link do e-mail da compra. Sua vitrine fica no ar até o fim do período pago, e seus produtos continuam salvos se quiser voltar.</p></details>
       <details><summary>Posso usar no computador?</summary><p>Sim. A vitrine e o painel se ajustam ao celular, ao tablet e ao computador.</p></details>
@@ -297,7 +342,7 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
 
   <section class="final">
     <h2>Sua marca merece uma vitrine profissional!</h2>
-    <p>Tenha seus produtos, serviços, fotos, vídeos e pedidos organizados em um só lugar. Crie seu Zap Catálogo e compartilhe seu link com seus clientes!</p>
+    <p>Um link na bio que mostra tudo o que você vende e entrega o pedido pronto no seu WhatsApp. Monte hoje e comece a receber pedidos ainda esta semana.</p>
     <a class="btn big" href="/assinar/mensal">QUERO MEU ZAP CATÁLOGO</a>
   </section>
 
@@ -312,6 +357,7 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
   fs.forEach(function (f) {
     var on = false, mexeu = false, pausa = 75;
     function parar() { mexeu = true; }
+    var prod = f.getAttribute('data-produto'); if (prod) mexeu = true;
     f.addEventListener('load', function () {
       try { var d = f.contentWindow.document; ['touchstart', 'wheel', 'mousedown', 'keydown'].forEach(function (t) { d.addEventListener(t, parar, { passive: true }); }); } catch (e) {}
     });
