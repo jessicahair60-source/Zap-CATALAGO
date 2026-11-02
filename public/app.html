@@ -1146,7 +1146,7 @@ async function storeFile(file) {
   return { id, type };
 }
 
-function hydrateMedia() { if (MODE === 'demo') return; S.products.forEach(p => (p.media || []).forEach(m => { if (m.id !== 'demo' && !MEDIA[m.id]) MEDIA[m.id] = '/u/' + m.id; })); }
+function hydrateMedia() { if (MODE === 'demo') return; S.products.forEach(p => (p.media || []).forEach(m => { if (m.id !== 'demo' && !MEDIA[m.id]) MEDIA[m.id] = m.id.startsWith('ex-') ? '/static/exemplo/' + m.id.slice(3) : '/u/' + m.id; })); }
 hydrateMedia();
 let cart = [];
 let ui = { cat: 'Todos', q: '', sort: 'rel', coupon: '', couponOk: false };

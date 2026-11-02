@@ -9,10 +9,10 @@
   "showName": true,
   "testiTitle": "O que as clientes dizem",
   "name": "Doceria Exemplo",
-  "bannerImg": "",
+  "bannerImg": "/static/exemplo/doceria-banner.webp",
   "bannerKicker": "Encomendas abertas",
   "bannerTitle": "Doces de festa",
-  "bio": "Bolos e doces artesanais · Entrega na cidade e retirada",
+  "bio": "Doces e salgados artesanais · Entrega na cidade e retirada",
   "phone": "5537999529778",
   "couponPct": 10,
   "installments": 3,
@@ -44,7 +44,8 @@
    "Feito no dia",
    "Ingredientes selecionados",
    "Entrega na cidade"
-  ]
+  ],
+  "bannerInfo": false
  },
  "colors": {
   "bg": "#FBF3F5",
@@ -96,9 +97,10 @@
  ],
  "catImgs": {},
  "cats": [
+  "Doces",
   "Bolos",
   "Kits",
-  "Bebidas"
+  "Salgados"
  ],
  "products": [
   {
@@ -106,30 +108,26 @@
    "zero": "default",
    "media": [
     {
-     "id": "demo",
-     "type": "video"
+     "id": "ex-doceria-morango.webp",
+     "type": "img"
     }
    ],
-   "sizes": [
-    "Ninho com morango",
-    "Chocolate belga",
-    "Limão siciliano"
-   ],
-   "optLabel": "Sabor",
+   "sizes": [],
+   "optLabel": "Opção",
    "track": true,
    "link": "",
    "duration": "",
    "fromPrice": false,
    "sales": 230,
-   "stock": 24,
+   "stock": 30,
    "specs": [],
-   "price": 15,
+   "price": 12,
    "id": 101,
-   "name": "Bolo de Pote",
-   "cat": "Bolos",
+   "name": "Morango do Amor",
+   "cat": "Doces",
    "badge": "top",
    "hue": 340,
-   "desc": "Pote de 250 ml, feito no dia.",
+   "desc": "Morango fresco com casquinha crocante de açúcar vermelho. Feito no dia.",
    "rating": 5,
    "reviewsCount": 64,
    "kind": "fisico"
@@ -137,12 +135,18 @@
   {
    "active": true,
    "zero": "default",
-   "media": [],
-   "sizes": [
-    "Caixa simples",
-    "Caixa presente"
+   "media": [
+    {
+     "id": "ex-doceria-docinhos.webp",
+     "type": "img"
+    }
    ],
-   "optLabel": "Embalagem",
+   "sizes": [
+    "Brigadeiro e beijinho",
+    "Só brigadeiro",
+    "Só beijinho"
+   ],
+   "optLabel": "Sabores",
    "track": true,
    "link": "",
    "duration": "",
@@ -150,13 +154,13 @@
    "sales": 88,
    "stock": 10,
    "specs": [],
-   "price": 45,
+   "price": 85,
    "id": 102,
-   "name": "Kit 25 Brigadeiros Gourmet",
+   "name": "Kit 50 Docinhos",
    "cat": "Kits",
    "badge": "new",
    "hue": 20,
-   "desc": "Sabores sortidos em forminhas douradas.",
+   "desc": "Docinhos de festa em forminhas. Perfeito para aniversário e presente.",
    "rating": 4.9,
    "reviewsCount": 23,
    "kind": "fisico"
@@ -164,47 +168,60 @@
   {
    "active": true,
    "zero": "default",
-   "media": [],
-   "sizes": [
-    "Ninho com morango",
-    "Prestígio",
-    "Doce de leite"
+   "media": [
+    {
+     "id": "ex-doceria-bolo.webp",
+     "type": "img"
+    }
    ],
-   "optLabel": "Recheio",
-   "track": false,
+   "sizes": [
+    "Cenoura",
+    "Laranja",
+    "Fubá"
+   ],
+   "optLabel": "Massa",
+   "track": true,
    "link": "",
    "duration": "",
-   "fromPrice": true,
+   "fromPrice": false,
    "sales": 40,
-   "stock": 0,
+   "stock": 8,
    "specs": [],
-   "price": 160,
+   "price": 55,
    "id": 103,
-   "name": "Bolo de Aniversário 2 kg",
+   "name": "Bolo Caseiro com Calda",
    "cat": "Bolos",
    "hue": 300,
-   "desc": "Encomende com 3 dias de antecedência. Decoração combinada pelo WhatsApp.",
+   "desc": "Bolo fofinho coberto com calda de chocolate e granulado. Serve até 12 fatias.",
    "kind": "fisico"
   },
   {
    "active": true,
    "zero": "default",
-   "media": [],
-   "sizes": [],
-   "optLabel": "Opção",
+   "media": [
+    {
+     "id": "ex-doceria-coxinha.webp",
+     "type": "img"
+    }
+   ],
+   "sizes": [
+    "50 unidades",
+    "100 unidades"
+   ],
+   "optLabel": "Quantidade",
    "track": false,
    "link": "",
    "duration": "",
-   "fromPrice": false,
+   "fromPrice": true,
    "sales": 61,
-   "stock": 0,
+   "stock": 20,
    "specs": [],
-   "price": 14,
+   "price": 60,
    "id": 104,
-   "name": "Café Gelado Cremoso",
-   "cat": "Bebidas",
+   "name": "Coxinha de Frango",
+   "cat": "Salgados",
    "hue": 30,
-   "desc": "400 ml com chantilly e calda de caramelo.",
+   "desc": "Coxinha cremosa e sequinha. Encomende frita ou congelada para festas.",
    "kind": "fisico"
   }
  ],
