@@ -65,7 +65,7 @@
   .pass3 li { counter-increment: p; position: relative; padding: 2px 0 0 46px; min-height: 36px; color: var(--muted); font-size: 14.5px; }
   .pass3 li::before { content: counter(p); position: absolute; left: 0; top: 0; width: 34px; height: 34px; border-radius: 50%; background: var(--acc); color: #fff; display: grid; place-items: center; font: 800 16px var(--f-display); }
   .pass3 b { display: block; color: var(--fg); font-size: 16px; }
-  .vreal { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .vreal { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; }
   .ver-ex { position: absolute; left: 50%; bottom: -54px; transform: translateX(-50%); white-space: nowrap; display: inline-flex; font-weight: 700; color: var(--acc); text-decoration: underline; text-underline-offset: 3px; }
   [data-vitrine] iframe { position: absolute; left: 0; top: 0; width: 390px; border: 0; transform-origin: 0 0; pointer-events: none; opacity: 0; transition: opacity .6s; background: #FBF3F5; }
   [data-vitrine].ao-vivo iframe { opacity: 1; }
@@ -234,7 +234,7 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
       <p class="txt" style="color:var(--muted);font-size:17px;margin:12px 0 0">Com o Zap Catálogo, você pode adicionar vídeos aos seus produtos e apresentar tudo de maneira mais completa.</p>
       <p style="font-size:17px;font-weight:700;margin:12px 0 0">Mostre cores, tamanhos, acabamentos e detalhes que fazem diferença na hora da escolha.</p>
     </div>
-    <div class="vphone"><video class="vreal" src="/static/exemplo/video-ruivinha.mp4" poster="/static/exemplo/video-ruivinha.webp" muted loop playsinline preload="none" aria-label="Vídeo real do Modelo Ruivinha, da loja Jessica Hair"></video><div class="cap">▶ Vídeo real do produto</div></div>
+    <div class="vphone"><img class="vreal" src="/static/exemplo/vitrine-produtos.webp" width="460" height="944" loading="lazy" decoding="async" alt="Produtos da Jessica Hair na vitrine, cada um com a bolinha de vídeo"></div>
   </section>
 
   <section class="blk split">
@@ -339,8 +339,6 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
       requestAnimationFrame(passo);
     }
   }
-  var vid = document.querySelector('.vreal');
-  if (vid && 'IntersectionObserver' in window) new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { var p = vid.play(); if (p && p.catch) p.catch(function () {}); } else vid.pause(); }); }, { threshold: .25 }).observe(vid);
   var caixas = document.querySelectorAll('[data-vitrine]');
   if (!('IntersectionObserver' in window)) return;
   var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { io.unobserve(e.target); montar(e.target); } }); }, { rootMargin: '200px' });
