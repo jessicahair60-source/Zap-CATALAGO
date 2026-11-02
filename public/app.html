@@ -646,8 +646,8 @@ details.pcard.need { border-color: #F1A7BF; box-shadow: 0 0 0 3px rgba(224,82,12
 .m-store::before { display: none; }
 .tlink { font-size: 13px; font-weight: 600; color: var(--p-muted); text-decoration: none; padding: 6px 4px 6px 8px; }
 .m-panel .demo-tag { white-space: nowrap; font-weight: 700; letter-spacing: .06em; }
-.m-panel .demo-tag { display: inline-flex; align-items: center; gap: 7px; } .m-panel .demo-tag img { width: 24px; height: 24px; } .m-panel .demo-tag img.marca { width: auto; height: 38px; }
-@media (max-width: 480px) { .m-panel .demo-tag img.marca { height: 26px; } .m-panel .seg button, .m-panel .topbar button { white-space: nowrap; } .m-panel .seg button { padding: 7px 9px; font-size: 12.5px; } .m-panel .savest { font-size: 0; } .m-panel .savest::first-letter { font-size: 12px; } }
+.m-panel .demo-tag { display: inline-flex; align-items: center; gap: 7px; } .m-panel .demo-tag img { width: 24px; height: 24px; } .m-panel .demo-tag img.marca { width: auto; height: 40px; filter: drop-shadow(0 3px 8px rgba(185,71,111,.18)); }
+@media (max-width: 480px) { .m-panel .demo-tag img.marca { height: 30px; } .m-panel .seg button, .m-panel .topbar button { white-space: nowrap; } .m-panel .seg button { padding: 7px 9px; font-size: 12.5px; } .m-panel .savest { font-size: 0; } .m-panel .savest::first-letter { font-size: 12px; } }
 @media (max-width: 480px) { .m-panel .demo-tag span { display: none; } }
 .savest { white-space: nowrap; font-size: 11.5px; color: var(--p-muted); margin-right: 6px; }
 .savest[data-st="ok"]::before { content: "✓ "; color: #1FA855; }
@@ -2336,7 +2336,7 @@ if (PV) {
 
 $('#tab-loja').onclick = () => show('loja');
 $('#tab-painel').onclick = () => show('painel');
-if (MODE === 'panel') { $('#brandtag').innerHTML = `<img class="marca" src="/static/marca.webp" alt="${esc(BOOT.brand)}">`; $('#logout').hidden = false; }
+if (MODE === 'panel') { $('#brandtag').innerHTML = `<img class="marca" src="/static/marca-curta.webp" alt="${esc(BOOT.brand)}">`; $('#logout').hidden = false; }
 applyColors(); show(MODE === 'panel' && !PV ? 'painel' : 'loja');
 if (MODE === 'demo') idb.loadAll().then(() => { if (!$('#view-loja').hidden) renderLoja(); else renderPainel(); });
 if (MODE === 'store') track('view');
