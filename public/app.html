@@ -1284,6 +1284,7 @@ function vbubProd() {
   return S.products.find(p => String(p.id) === String(vb.pid) && ok(p)) || S.products.find(ok);
 }
 function vbubHTML() {
+  return ''; // a bolinha de vídeo fica só na página do produto, não na página inicial
   const vb = S.store.vbubble || {}; if (!vb.on) return '';
   let gone = false; try { gone = sessionStorage.getItem('vz-vbub') === '1'; } catch (e) {} if (gone && !PV) return '';
   const p = vbubProd(); if (!p) return '';
@@ -2204,7 +2205,7 @@ const PANEL_LAYOUT = [
   ['visual', 'Passo 2 · Banner, logo e cores', 'Deixe a vitrine com a cara da sua marca', ['banner', 'tema', 'layout']],
   ['visual', 'Mais ajustes', 'Cores de cada parte, depoimentos e rodapé', ['cores', 'depo', 'rodape']],
   ['produtos', 'Passo 3 · Subir produtos', 'Cadastre e organize o seu catálogo', ['prod', 'lista', 'importar', 'cats', 'estoque', 'selos', 'whats']],
-  ['produtos', 'Vender +', 'Cronômetro, vídeo e kits', ['promo', 'vbub', 'kits']],
+  ['produtos', 'Vender +', 'Cronômetro e kits', ['promo', 'kits']],
   ['conta', 'Sua conta', '', ['assinatura', 'conta']],
   ['conta', 'Ajuda', '', ['tutoriais']]];
 // partes guardadas por enquanto (voltam quando estiverem prontas)
