@@ -9,6 +9,7 @@ const { db, DATA_DIR } = require('./lib/db');
 const { pixPayload } = require('./lib/pix');
 const mp = require('./lib/mercadopago');
 const kiwify = require('./lib/kiwify');
+const { shareCard } = require('./lib/sharecard');
 const wa = require('./lib/whatsapp');
 const mail = require('./lib/mail');
 const { createBot, TEMPLATE: WA_TEMPLATE } = require('./lib/wabot');
@@ -192,9 +193,11 @@ function renderStore(res, store) {
   const st = (state && state.store) || {};
   const boot = { mode: 'store', state, store: { slug: store.slug, name: store.name, publicUrl: publicUrlOf(store) }, brand: CFG.brand, home: CFG.publicUrl };
   const title = escHtml(st.name || store.name);
-  const desc = escHtml(st.bio || `Catálogo de ${store.name}`);
-  const img = st.bannerImgM || st.bannerImg || st.logo || '';
-  const head = `<title>${title}</title><meta name="description" content="${desc}"><meta property="og:title" content="${title}"><meta property="og:description" content="${desc}">${img && img.startsWith('/u/') ? `<meta property="og:image" content="${CFG.publicUrl}${img}">` : ''}${trackingTags(st)}`;
+  const bio = st.bio && st.bio !== 'Escreva aqui uma frase sobre a sua loja' ? st.bio : '';
+  const desc = escHtml(bio || 'Veja nossos produtos e faça seu pedido pelo WhatsApp.');
+  // prévia do link no WhatsApp: imagem com "CATÁLOGO" e o nome da loja, que muda quando a loja muda
+  const og = `${CFG.publicUrl}/og/${encodeURIComponent(store.slug)}.png?v=${store.updated_at || 0}`;
+  const head = `<title>${title}</title><meta name="description" content="${desc}"><meta property="og:type" content="website"><meta property="og:site_name" content="${title}"><meta property="og:title" content="Catálogo ${title}"><meta property="og:description" content="${desc}"><meta property="og:url" content="${escHtml(publicUrlOf(store))}"><meta property="og:image" content="${og}"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">${trackingTags(st)}`;
   const html = APP_HTML().replace('<!--HEAD-->', head).replace('<!--BOOT-->', `<script>window.__BOOT__=${jsonForScript(boot)}</script>`);
   res.set('Cache-Control', 'no-cache');
   sendApp(res, html, 'https://connect.facebook.net https://www.googletagmanager.com');
@@ -676,6 +679,22 @@ app.post('/api/admin/stores/:id', adminOnly, jsonBody, (req, res) => {
     return res.json({ ok: true, tempPassword: temp });
   } else return res.status(400).json({ error: 'Ação desconhecida.' });
   res.json({ ok: true });
+});
+
+/* ---------- imagem da prévia do link (WhatsApp, Instagram, Facebook) ---------- */
+const ogCache = new Map();
+app.get('/og/:slug.png', (req, res) => {
+  const store = db.prepare('SELECT * FROM stores WHERE slug = ?').get(String(req.params.slug).toLowerCase());
+  if (!store) return res.sendStatus(404);
+  const key = `${store.id}:${store.updated_at}`;
+  let png = ogCache.get(key);
+  if (!png) {
+    try { png = shareCard({ state: publicState(store), name: store.name, uploads: UPLOADS }); }
+    catch (e) { console.error('og', e.message); return res.sendStatus(500); }
+    if (ogCache.size > 300) ogCache.delete(ogCache.keys().next().value);
+    ogCache.set(key, png);
+  }
+  res.type('image/png').set('Cache-Control', 'public, max-age=86400').send(png);
 });
 
 /* ---------- vitrine pelo endereço /nome-da-loja ---------- */
