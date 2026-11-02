@@ -21,12 +21,6 @@
   .phone { margin: 0; position: relative; }
   .screen { width: 100%; height: 100%; border-radius: 31px; overflow: hidden; background: #FBF3F5; }
   .screen { position: relative; }
-  .rola { position: absolute; left: 0; top: 0; display: block; width: 100%; height: auto; will-change: transform; }
-  .screen .rola { animation: rolaTopo 24s ease-in-out infinite; }
-  .vphone .rola { animation: rolaVideo 22s ease-in-out infinite; }
-  @keyframes rolaTopo { 0%, 10% { transform: translateY(0); } 85%, 92% { transform: translateY(-74.5%); } 100% { transform: translateY(0); } }
-  @keyframes rolaVideo { 0%, 8% { transform: translateY(-30%); } 82%, 90% { transform: translateY(-77.5%); } 100% { transform: translateY(-30%); } }
-  @media (prefers-reduced-motion: reduce) { .screen .rola { animation: none; } .vphone .rola { animation: none; transform: translateY(-30%); } }
   .phone figcaption { position: absolute; left: 50%; bottom: -14px; transform: translateX(-50%); white-space: nowrap; background: #fff; border: 1px solid var(--line); color: var(--fg); font-size: 12.5px; font-weight: 700; padding: 6px 12px; border-radius: 99px; box-shadow: 0 8px 20px -10px rgba(80,20,50,.35); }
   .demo-top { margin-top: 26px; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; box-shadow: 0 30px 60px -36px rgba(80,20,50,.45); }
   .demo-top .bar { display: flex; gap: 6px; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--line); font-size: 12px; color: var(--muted); }
@@ -67,9 +61,6 @@
   .pass3 b { display: block; color: var(--fg); font-size: 16px; }
   .vreal { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; }
   .ver-ex { position: absolute; left: 50%; bottom: -54px; transform: translateX(-50%); white-space: nowrap; display: inline-flex; font-weight: 700; color: var(--acc); text-decoration: underline; text-underline-offset: 3px; }
-  [data-vitrine] iframe { position: absolute; left: 0; top: 0; width: 390px; border: 0; transform-origin: 0 0; pointer-events: none; opacity: 0; transition: opacity .6s; background: #FBF3F5; }
-  [data-vitrine].ao-vivo iframe { opacity: 1; }
-  [data-vitrine].ao-vivo .rola { visibility: hidden; animation: none; }
   section.blk { padding: 56px 0 0; }
   .eyebrow { font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--acc); font-weight: 700; margin: 0 0 10px; }
   .blk h2 { font-size: clamp(28px, 4.5vw, 40px); max-width: 640px; }
@@ -156,7 +147,7 @@
       <p class="lead hl">Tudo em um único link, com seu próprio subdomínio!</p>
       <div class="cta"><a class="btn big" href="/cadastro">QUERO CRIAR MEU CATÁLOGO</a><a class="btn big soft" href="#planos">Ver planos</a></div>
     </div>
-    <figure class="phone"><div class="screen" data-vitrine="jessica-hair"><img class="rola" src="/static/exemplo/vitrine-rolando.webp" width="520" height="4267" alt="Vitrine da loja Jessica Hair no celular, rolando pelo banner e pelos produtos" fetchpriority="high"></div>
+    <figure class="phone"><div class="screen"><video class="vreal" src="/static/exemplo/vitrine-video.mp4" poster="/static/exemplo/vitrine-video-capa.webp" autoplay muted loop playsinline preload="auto" aria-label="Vídeo da vitrine real da Jessica Hair rolando pelos produtos"></video></div>
       <figcaption>Vitrine real: Jessica Hair</figcaption>
       <a class="ver-ex" href="/jessica-hair" target="_blank" rel="noopener">Ver o catálogo de exemplo →</a></figure>
   </header>
@@ -234,7 +225,7 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
       <p class="txt" style="color:var(--muted);font-size:17px;margin:12px 0 0">Com o Zap Catálogo, você pode adicionar vídeos aos seus produtos e apresentar tudo de maneira mais completa.</p>
       <p style="font-size:17px;font-weight:700;margin:12px 0 0">Mostre cores, tamanhos, acabamentos e detalhes que fazem diferença na hora da escolha.</p>
     </div>
-    <div class="vphone"><img class="vreal" src="/static/exemplo/vitrine-produtos.webp" width="460" height="944" loading="lazy" decoding="async" alt="Produtos da Jessica Hair na vitrine, cada um com a bolinha de vídeo"></div>
+    <div class="vphone"><video class="vreal" src="/static/exemplo/vitrine-video.mp4" poster="/static/exemplo/vitrine-video-capa.webp" muted loop playsinline preload="none" aria-label="Vídeo da vitrine real da Jessica Hair rolando pelos produtos"></video></div>
   </section>
 
   <section class="blk split">
@@ -307,42 +298,11 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
   <footer class="site"><span>© Zap Catálogo</span><span><a href="/termos">Termos de uso</a> · <a href="/privacidade">Privacidade</a> · <a href="/entrar">Entrar</a></span></footer>
 </div>
 <script>
-/* Vitrine de verdade, ao vivo, dentro dos celulares. Se não abrir, fica a imagem. */
+/* Os vídeos da vitrine só tocam quando aparecem na tela */
 (function () {
-  var parado = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function montar(box) {
-    var f = document.createElement('iframe');
-    f.name = 'zcdemo'; f.title = 'Vitrine real da Jessica Hair, ao vivo'; f.tabIndex = -1; f.setAttribute('aria-hidden', 'true');
-    function medir() { var k = box.clientWidth / 390; f.style.transform = 'scale(' + k + ')'; f.style.height = Math.ceil(box.clientHeight / k) + 'px'; }
-    medir(); window.addEventListener('resize', medir);
-    f.onload = function () {
-      var w, d; try { w = f.contentWindow; d = f.contentDocument; } catch (e) { return f.remove(); }
-      if (!d || !d.querySelector('.cats')) return f.remove();
-      setTimeout(function () { box.classList.add('ao-vivo'); rolar(w, d); }, 700);
-    };
-    f.src = '/' + box.dataset.vitrine + '?embed=1';
-    box.appendChild(f);
-    function rolar(w, d) {
-      var el = d.scrollingElement || d.documentElement, alvo = box.dataset.inicio && d.querySelector(box.dataset.inicio);
-      var ini = alvo ? Math.max(0, alvo.getBoundingClientRect().top + el.scrollTop - 8) : 0;
-      el.scrollTop = ini; if (parado) return;
-      var pos = ini, fase = 'espera', t0 = performance.now(), ult = t0;
-      function passo(t) {
-        var dt = Math.min(64, t - ult); ult = t;
-        var fim = Math.min(el.scrollHeight - w.innerHeight, ini + 3800);
-        if (fase === 'espera' && t - t0 > 1800) fase = 'desce';
-        else if (fase === 'desce') { pos += dt * 0.06; if (pos >= fim) { pos = fim; fase = 'pausa'; t0 = t; } }
-        else if (fase === 'pausa' && t - t0 > 1500) fase = 'sobe';
-        else if (fase === 'sobe') { pos -= dt * 0.9; if (pos <= ini) { pos = ini; fase = 'espera'; t0 = t; } }
-        el.scrollTop = pos; requestAnimationFrame(passo);
-      }
-      requestAnimationFrame(passo);
-    }
-  }
-  var caixas = document.querySelectorAll('[data-vitrine]');
-  if (!('IntersectionObserver' in window)) return;
-  var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { io.unobserve(e.target); montar(e.target); } }); }, { rootMargin: '200px' });
-  window.addEventListener('load', function () { caixas.forEach(function (b) { io.observe(b); }); });
+  var vs = document.querySelectorAll('video.vreal'); if (!('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function (es) { es.forEach(function (e) { var v = e.target; if (e.isIntersecting) { var p = v.play(); if (p && p.catch) p.catch(function () {}); } else v.pause(); }); }, { threshold: .05 });
+  vs.forEach(function (v) { io.observe(v); });
 })();
 </script>
 </body>
