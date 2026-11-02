@@ -155,7 +155,7 @@ rep("""  $('#sslug').oninput = e => { const v = slugify(e.target.value); s.slug 
     BOOT.store = { ...BOOT.store, ...j.store }; renderPainel(); toast('Link atualizado. O endereço antigo deixou de funcionar.'); };""")
 
 # ---------- painel: plano, relatórios, Pix, marketing, domínio, conta ----------
-rep("""    <div class="kpihead">""", """    ${MODE === 'panel' ? planCard() : ''}
+rep("""    <div class="kpihead">""", """    ${MODE === 'panel' ? sec('assinatura', 'Sua assinatura', planSub(), planCard()) : ''}
     <div class="kpihead">""")
 rep("""    <h3 class="pgroup">Vendas e contato<small>WhatsApp, links e depoimentos</small></h3>""",
 """    ${MODE === 'panel' ? `<h3 class="pgroup">Relatórios<small>Visitas, cliques e pedidos da sua vitrine</small></h3>
@@ -194,19 +194,44 @@ rep("""  document.querySelectorAll('details[data-sec]').forEach(el => el.ontoggl
   document.querySelectorAll('details[data-sec]').forEach(el => el.ontoggle""")
 rep("""function show(view) {""", """const proOk = () => MODE === 'demo' || BOOT.store.plan !== 'expired';
 const fmtDate = t => new Date(t).toLocaleDateString('pt-BR');
+// Assinatura na aba Conta: começou, termina e quantos dias faltam
+const DAYMS = 864e5;
+function planDates() {
+  const st = BOOT.store, now = Date.now();
+  if (st.plan === 'pro') return { since: st.proSince || st.createdAt, until: st.proUntil };
+  if (st.plan === 'trial') return { since: st.createdAt, until: st.trialUntil };
+  if (st.plan === 'expired') return { since: st.proSince || st.createdAt, until: st.proUntil || st.trialUntil, gone: true };
+  return { since: st.createdAt, until: null };
+}
+function planSub() {
+  const st = BOOT.store, d = planDates();
+  if (st.plan === 'expired') return 'Vencida';
+  if (!d.until) return 'Liberada';
+  const left = Math.max(0, Math.ceil((d.until - Date.now()) / DAYMS));
+  return `Faltam ${left} ${left === 1 ? 'dia' : 'dias'}`;
+}
 function planCard() {
-  const st = BOOT.store;
-  if (st.plan === 'open') return ''; // cobrança ainda não ligada: nada de assinatura no painel
-  const label = st.plan === 'pro' ? 'Assinatura ativa' : st.plan === 'trial' ? 'Teste grátis' : 'Assinatura vencida';
-  const sub = st.plan === 'pro' ? `${st.subscribed ? 'Renova' : 'Vale'} até ${fmtDate(st.proUntil)}` : st.plan === 'trial' ? `Termina em ${fmtDate(st.trialUntil)}. Assine para a vitrine continuar no ar.` : 'Sua vitrine está fora do ar para as clientes.';
-  return `<section class="plan plan-${st.plan}"><div class="plan-top"><div><b>${label}</b><small>${sub}</small></div>
-    ${st.plan === 'pro' && st.subscribed ? '<button class="tg" id="plancancel">Cancelar</button>' : `<button class="hcopy" id="planbuy" data-plan="mensal">${st.plan === 'pro' ? 'Renovar' : 'Assinar'} · ${brl(st.proPrice)}/mês</button>`}</div>
-    ${st.yearPrice && !(st.plan === 'pro' && st.subscribed) ? `<button class="hcopy" id="planyear" data-plan="anual" style="margin-top:8px;width:100%">Plano anual · ${brl(st.yearPrice)}/ano (sai ${brl(st.yearPrice / 12)} por mês)</button>` : ''}
-    ${st.plan === 'pro' && !st.subscribed && st.proUntil - Date.now() < 5 * 864e5 ? `<p class="plan-warn">Sua assinatura vence em ${Math.max(0, Math.ceil((st.proUntil - Date.now()) / 864e5))} dia(s). Renove para a vitrine não sair do ar.</p>` : ''}
+  const st = BOOT.store, d = planDates();
+  const label = st.plan === 'pro' ? 'Assinatura ativa' : st.plan === 'trial' ? 'Teste grátis' : st.plan === 'expired' ? 'Assinatura vencida' : 'Assinatura liberada';
+  const left = d.until ? Math.max(0, Math.ceil((d.until - Date.now()) / DAYMS)) : null;
+  const canPay = st.payments && st.payments !== 'off';
+  const renew = !canPay
+    ? '<button class="hcopy" disabled style="width:100%;opacity:.6">Renovar assinatura · em breve</button>'
+    : st.plan === 'pro' && st.subscribed ? '<button class="tg" id="plancancel">Cancelar renovação automática</button>'
+    : `<button class="hcopy" id="planbuy" data-plan="mensal" style="width:100%">${st.plan === 'pro' ? 'Renovar' : 'Assinar'} · ${brl(st.proPrice)}/mês</button>
+       ${st.yearPrice ? `<button class="hcopy" id="planyear" data-plan="anual" style="margin-top:8px;width:100%">Plano anual · ${brl(st.yearPrice)}/ano (sai ${brl(st.yearPrice / 12)} por mês)</button>` : ''}`;
+  return `<div class="plan-${st.plan}"><p style="margin:0 0 8px;font-weight:700">${label}</p>
+    <div class="subrows">
+      <div><small>Começou em</small><b>${d.since ? fmtDate(d.since) : '-'}</b></div>
+      <div><small>${d.gone ? 'Venceu em' : 'Termina em'}</small><b>${d.until ? fmtDate(d.until) : 'Sem data'}</b></div>
+      ${left !== null && !d.gone ? `<div class="big"><small>Faltam</small><b>${left} ${left === 1 ? 'dia' : 'dias'}</b></div>` : ''}
+    </div>
+    ${renew}
+    ${st.plan === 'pro' && !st.subscribed && left !== null && left <= 5 ? `<p class="plan-warn">Sua assinatura vence em ${left} dia(s). Renove para a vitrine não sair do ar.</p>` : ''}
     ${st.lastPayment && st.lastPayment !== 'approved' ? `<p class="plan-warn">O último pagamento não foi aprovado. Confira o cartão ${st.payments === 'kiwify' ? 'no e-mail da compra da Kiwify' : 'no Mercado Pago'} para a assinatura continuar.</p>` : ''}
     ${st.plan === 'expired' ? '<p class="plan-warn">Assine para colocar a vitrine de volta no ar. Seus produtos e configurações continuam salvos.</p>' : ''}
     ${st.payments === 'kiwify' && st.plan !== 'pro' ? '<p class="note" style="margin:6px 0 0">O pagamento é pela Kiwify. Use na compra o mesmo e-mail da sua conta: assim a loja é liberada sozinha.</p>' : ''}
-    ${st.payments === 'teste' ? '<p class="note" style="margin:6px 0 0">Modo de teste: o pagamento é simulado.</p>' : ''}</section>`;
+    ${st.payments === 'teste' ? '<p class="note" style="margin:6px 0 0">Modo de teste: o pagamento é simulado.</p>' : ''}</div>`;
 }
 async function api(method, url, body) {
   const r = await fetch(url, { method, headers: body ? { 'Content-Type': 'application/json' } : {}, body: body ? JSON.stringify(body) : undefined });

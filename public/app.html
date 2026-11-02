@@ -584,6 +584,11 @@ body.painel .stats { margin: 14px 0 6px; }
 .fs-t { display: grid; text-align: left; gap: 1px; font-weight: 600; } .fs-t small { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--p-acc); }
 .fs-t em { font-style: normal; font-weight: 400; font-size: 12.5px; color: var(--p-muted); }
 .fs-item.ok.fs-item { text-decoration: none; } .fs-item.ok .fs-t b { text-decoration: line-through; color: var(--p-muted); } .fs-t b { font-weight: 600; }
+.soon { display: inline-block; vertical-align: middle; margin-left: 6px; font-size: 10.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; background: var(--p-soft); color: var(--p-acc); padding: 3px 8px; border-radius: 999px; }
+.szbox { margin-top: 10px; border: 1px solid var(--p-line); border-radius: 12px; padding: 10px 12px; } .szbox summary { cursor: pointer; font-weight: 600; font-size: 13.5px; color: var(--p-acc); }
+#view-painel .opt-label { color: var(--p-acc); margin: 18px 0 6px; }
+.subrows { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 4px 0 10px; } .subrows div { background: var(--p-soft); border-radius: 12px; padding: 10px 12px; }
+.subrows small { display: block; font-size: 11.5px; color: var(--p-muted); } .subrows b { font-size: 15px; } .subrows .big { grid-column: 1 / -1; text-align: center; } .subrows .big b { font-size: 26px; font-family: var(--f-display); }
 .kpihead { display: flex; justify-content: space-between; align-items: baseline; margin: 18px 2px 8px; } .kpihead b { font-size: 15px; } .kpihead small { font-size: 12px; color: var(--p-muted); }
 .fs-n { width: 24px; height: 24px; flex: none; border-radius: 50%; border: 1.5px solid var(--p-acc); color: var(--p-acc); display: grid; place-items: center; font-size: 12px; font-weight: 700; }
 .fs-item.ok { color: var(--p-muted); text-decoration: line-through; } .fs-item.ok .fs-n { background: var(--p-acc); color: #fff; border-color: var(--p-acc); }
@@ -1266,7 +1271,7 @@ function renderLoja() {
       ${socialLinks().map(l => `<a class="link" href="${esc(l.url)}" target="_blank" rel="noopener"><span class="ico ${l.cls}">${ICONS[l.icon]}</span>${esc(l.text)}<span class="dots" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span></a>`).join('')}
     </nav></aside>
     <section class="main">${s.catalogTitle !== '' ? `<h2 class="cat-title">${esc((s.catalogTitle ?? 'Conheça nossos produtos').replace('{loja}', s.name))}</h2>` : ''}
-    ${kitsHTML()}
+    ${KITS_SOON ? '' : kitsHTML()}
     <label class="search">${ICONS.search}<input id="q" type="search" placeholder="Buscar no catálogo" value="${esc(ui.q)}" aria-label="Buscar produtos"></label>
     <div class="cats" role="group" aria-label="Categorias">
       ${cats.map(c => `<button class="cat" data-cat="${esc(c)}" aria-pressed="${ui.cat === c}"><span class="ring"><span>${c === 'Todos' ? `<span class="all">${ICONS.grid}</span>` : catImg(c)}</span></span><em>${esc(c)}</em></button>`).join('')}
@@ -1544,7 +1549,8 @@ async function showPix() {
 }
 
 /* ---------- Painel ---------- */
-let pui = { open: new Set(), editId: null, draft: null };
+let pui = { open: new Set(['assinatura']), editId: null, draft: null };
+const KITS_SOON = true; // montagem de kits: em breve
 const newDraft = () => normP({ name: '', price: '', old: '', cat: S.cats[0] || '', badge: '', sizes: ['P','M','G'], optLabel: 'Tamanho', stock: 10, desc: '' });
 const STORE_DOMAIN = 'vitrinezap.com.br';
 const slugify = t => norm(t || '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'minha-loja';
@@ -1597,7 +1603,7 @@ function renderPainel() {
       ${s.online === false ? `<div class="field"><label for="soffmsg">Aviso que as clientes veem</label><input class="in" id="soffmsg" value="${esc(s.offMsg ?? 'Estamos repondo o estoque. Voltamos em breve!')}"></div>` : ''}
     </section>
     ${firstSteps()}
-    ${MODE === 'panel' ? planCard() : ''}
+    ${MODE === 'panel' ? sec('assinatura', 'Sua assinatura', planSub(), planCard()) : ''}
     <div class="kpihead"><b>Relatórios</b><small>Últimos 30 dias</small></div>
     <div class="stats">
       <div class="stat"><b id="kpiv">${MODE === 'panel' ? '·' : '0'}</b><span>pessoas visitaram</span></div>
@@ -1608,27 +1614,31 @@ function renderPainel() {
     ${MODE === 'panel' && BOOT.wa ? sec('whats', 'Cadastrar pelo WhatsApp', 'Mande foto e texto, o produto entra sozinho', '<div id="wabox"><p class="note">Carregando...</p></div>') : ''}
     ${sec('prod', ed ? 'Editar item' : 'Novo produto ou serviço', ed ? esc(d.name) : 'Físico, digital ou serviço, com fotos e vídeos', `
       ${ck('pactive', 'Ativo (aparece no catálogo)', d.active)}
-      <div class="field"><label for="pkind">Tipo</label><select class="in" id="pkind">${Object.entries(KINDS).map(([k, v]) => `<option value="${k}" ${d.kind === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
       ${f('pname', 'Nome', d.name, 'placeholder="Ex.: Saia Plissada Midi"')}
+      <div class="field"><label for="pkind">Tipo</label><select class="in" id="pkind">${Object.entries(KINDS).map(([k, v]) => `<option value="${k}" ${d.kind === k ? 'selected' : ''}>${v}</option>`).join('')}</select></div>
       <div class="field"><label>Fotos e vídeos</label><div class="mlist" id="mlist"></div>
         <label class="upl" for="madd" id="maddl">+ Adicionar fotos ou vídeos</label><input id="madd" type="file" accept="image/*,video/*" multiple hidden>
         <p class="note" style="margin:2px 0 0">A primeira mídia é a capa do card, e pode ser foto ou vídeo. Use as setas para mudar a ordem. Tamanho ideal: 1080 x 1920 px, em pé (9:16).</p></div>
-      <div class="two">${f('pprice', 'Preço (R$; vazio = Consulte o valor no WhatsApp)', !d.price || d.price === '0' ? '' : String(d.price).replace('.', ','), 'inputmode="decimal" placeholder="129,90"')}${f('pold', 'Preço antigo (opcional)', d.old ? String(d.old).replace('.', ',') : '', 'inputmode="decimal" placeholder="159,90"')}</div>
+      <div class="two">${f('pprice', 'Valor (R$) <span style="font-weight:400;color:var(--p-muted)">· sem preço, deixe 0,00</span>', !d.price || d.price === '0' ? '0,00' : String(d.price).replace('.', ','), 'inputmode="decimal" placeholder="0,00"')}${f('pold', 'Preço antigo (opcional)', d.old ? String(d.old).replace('.', ',') : '', 'inputmode="decimal" placeholder="159,90"')}</div>
+      ${ck('pfrom', 'Mostrar "a partir de" antes do preço', d.fromPrice)}
       <div class="two"><div class="field"><label for="pcat">Categoria</label><select class="in" id="pcat">${S.cats.map(c => `<option ${d.cat === c ? 'selected' : ''}>${esc(c)}</option>`).join('')}</select></div>
         <div class="field"><label for="pbadge">Selo</label><select class="in" id="pbadge"><option value="">Nenhum</option>${Object.keys(BADGES).map(k => `<option value="${k}" ${d.badge === k ? 'selected' : ''}>${esc(s.badgeNames[k])}</option>`).join('')}</select></div></div>
-      ${ck('pfrom', 'Mostrar "a partir de" antes do preço', d.fromPrice)}
+      <div class="opt-label">Informações do produto</div>
+      <div class="field"><label for="pdesc">Descrição</label><textarea class="in" id="pdesc" rows="3" placeholder="O que é, o que inclui, medidas, prazo...">${esc(d.desc)}</textarea></div>
       <div class="field"><label for="pspecs">Ficha do produto (uma por linha, no formato Nome: valor)</label><textarea class="in" id="pspecs" rows="4" placeholder="Tamanho: 80 cm&#10;Cor: Ruivo&#10;Telas: 6&#10;Peso: Aprox. 250 g">${esc((d.specs || []).map(x => `${x[0]}: ${x[1]}`).join('\n'))}</textarea>
         <p class="note" style="margin:2px 0 0">Os valores aparecem embaixo do nome no card (80 CM · RUIVO) e a ficha completa aparece na página do produto.</p></div>
       <div class="two">${f('prating', 'Nota média (0 a 5; vazio = esconder)', d.rating ? String(d.rating).replace('.', ',') : '', 'inputmode="decimal" placeholder="4,9"')}${f('prcount', 'Número de avaliações', d.reviewsCount || '', 'inputmode="numeric" placeholder="32"')}</div>
-      <div class="two">${f('poptl', 'Nome das opções (Tamanho, Cor, Sabor, Turma...)', d.optLabel)}${f('psizes', 'Opções (separe por vírgula; vazio = sem opções)', d.sizes.join(', '))}</div>
       ${d.kind === 'servico' ? f('pdur', 'Duração do serviço (ex.: 1h30)', d.duration) : ''}
       ${d.kind !== 'fisico' ? f('plink', 'Link de pagamento externo (opcional: Hotmart, Kiwify, Mercado Pago...)', d.link, 'type="url" placeholder="https://"') + '<p class="note" style="margin:2px 0 0">Com link, o botão leva a cliente direto para o pagamento. Sem link, o pedido vai pelo WhatsApp.</p>' : ''}
+      <div ${d.kind === 'fisico' || (d.sizes || []).length ? '' : 'hidden'}><div class="opt-label">Variações <span style="font-weight:400">· tamanho, cor, modelo</span></div>
+      <div class="two">${f('poptl', 'Nome das opções (Tamanho, Cor, Sabor, Turma...)', d.optLabel)}${f('psizes', 'Opções (separe por vírgula; vazio = sem opções)', d.sizes.join(', '))}</div>
+      </div>
+      <div class="opt-label">Estoque</div>
       ${ck('ptrack', d.kind === 'fisico' ? 'Controlar estoque' : 'Limitar vagas ou unidades', d.track)}
       <div class="two" ${d.track ? '' : 'hidden'}>${f('pstock', d.kind === 'fisico' ? 'Estoque' : 'Vagas disponíveis', d.stock, 'inputmode="numeric"')}
         <div class="field"><label for="pzero">Quando zerar</label>${zeroSel('pzero', d.zero || 'default', true)}</div></div>
-      <div class="field"><label for="pdesc">Descrição</label><textarea class="in" id="pdesc" rows="3" placeholder="O que é, o que inclui, medidas, prazo...">${esc(d.desc)}</textarea></div>
       <p class="err" id="perr2" hidden></p>
-      <button class="pbtn" id="padd">${ed ? 'Salvar alterações' : 'Publicar na vitrine'}</button>
+      <button class="pbtn" id="padd">${ed ? 'Salvar alterações' : 'PUBLICAR PRODUTO'}</button>
       ${ed ? '<button class="pbtn ghost" style="margin-top:8px" id="pcancel">Cancelar edição</button>' : ''}`)}
     ${sec('lista', 'Seus produtos e serviços', `${S.products.length} itens · ${active} ativos`, `
       <div class="plist">${S.products.map(p => `<div class="pli ${visible(p) ? '' : 'off-item'}"><div class="mini">${img(p)}</div>
@@ -1668,6 +1678,7 @@ function renderPainel() {
           <input id="sbanner" type="file" accept="image/*" hidden></div>
       </div>
       <p class="note" style="margin:8px 0 0">JPG ou PNG até 2 MB. Deixe textos e rostos no centro da imagem. Se enviar só um, ele vale para os dois tamanhos.</p>
+      <details class="szbox"><summary>Ver tamanhos ideais das imagens</summary>${MEDIDAS_HTML}</details>
       <div class="two">${f('skick', 'Chamada pequena', s.bannerKicker)}${f('stitle', 'Título do banner', s.bannerTitle)}</div>
       ${ck('sbinfo', 'Mostrar a chamada e o título no banner', s.bannerInfo === undefined ? !(s.bannerImg || s.bannerImgM) : s.bannerInfo)}
       <div class="field"><label>Logo da loja</label><div class="radios">
@@ -1730,7 +1741,8 @@ function renderPainel() {
         <div class="field"><label for="spdu">&nbsp;</label><select class="in" id="spdu">${[['1', 'minutos'], ['60', 'horas'], ['1440', 'dias']].map(([v, l]) => { const d = (s.promo || {}).dur || 0; const cur = !d ? '1' : d % 1440 === 0 ? '1440' : d % 60 === 0 ? '60' : '1'; return `<option value="${v}" ${v === cur ? 'selected' : ''}>${l}</option>`; }).join('')}</select></div></div>
       ${ck('sploop', 'Recomeçar sozinho quando acabar (fica sempre contando)', (s.promo || {}).loop !== false)}
       <p class="note" style="margin:6px 0 0">${promoOn() ? `Agora faltam ${Math.ceil(promoMs() / 6e4)} min. ` : ''}A contagem começa quando você escolhe o tempo.${(s.promo || {}).loop === false ? ' Quando acabar, a faixa some sozinha.' : ''}</p>`)}
-    ${sec('kits', 'Montagem de kits', `${(S.kits || []).filter(k => k.on !== false).length} kits ativos`, `
+    ${KITS_SOON ? sec('kits', 'Montagem de kits <span class="soon">Em breve</span>', 'Kits com preço especial', '<p class="note" style="margin:0">Em breve você vai poder montar kits para a cliente escolher os itens na vitrine.</p>') : ''}
+    ${KITS_SOON ? '' : sec('kits', 'Montagem de kits', `${(S.kits || []).filter(k => k.on !== false).length} kits ativos`, `
       <p class="note" style="margin:0 0 8px">A cliente escolhe os itens do kit na vitrine e o kit entra no pedido com a lista do que ela escolheu.</p>
       ${(S.kits || []).map((k, i) => `<div class="kitcfg">
         <div class="two">${f('kn' + i, 'Nome do kit', k.name, `data-kf="${i}:name" placeholder="Ex.: Kit 3 perucas"`)}${f('kq' + i, 'Quantos itens', k.n, `data-kf="${i}:n" inputmode="numeric"`)}</div>
@@ -1773,6 +1785,7 @@ function renderPainel() {
       <p class="err" id="domerr" hidden></p>
       <ol class="steps"><li>Compre o domínio (Registro.br, Hostinger, GoDaddy...).</li><li>No painel de onde comprou, crie um registro <b>CNAME</b> com nome <b>www</b> apontando para <b>${esc(new URL(BOOT.home).hostname)}</b>.</li><li>Salve o domínio aqui. A mudança pode levar algumas horas para valer.</li></ol>`)}` : ''}
     <h3 class="pgroup">Ajuda<small>Tamanhos ideais e exemplos prontos</small></h3>
+    ${sec('tutoriais', 'Tutoriais <span class="soon">Em breve</span>', 'Vídeos curtos ensinando cada passo', '<p class="note" style="margin:0">Em breve você vai encontrar aqui os vídeos ensinando a montar e divulgar a sua vitrine.</p>')}
     ${sec('medidas', 'Tamanhos ideais das imagens', 'Banner, fotos, categorias, logo e vídeo', MEDIDAS_HTML)}
     ${sec('modelo', 'Exemplos prontos por segmento', 'Veja a vitrine pronta para outros tipos de negócio', `
       <p class="note" style="margin:0 0 8px">Troca o nome, os textos, as categorias e os produtos pelo exemplo escolhido. Cores e links continuam iguais.</p>
@@ -1919,7 +1932,7 @@ function renderPainel() {
     syncDraft();
     const price = num(d.price), old = num(d.old), err = $('#perr2');
     if (!d.name.trim()) { err.textContent = 'Dê um nome ao produto.'; err.hidden = false; return; }
-    if (String(d.price).trim() && String(d.price).trim() !== '0' && !(price > 0)) { err.textContent = 'Preço inválido. Use por exemplo 129,90, ou deixe vazio para "Consulte o valor".'; err.hidden = false; return; }
+    if (!/^[\s0.,]*$/.test(String(d.price)) && !(price > 0)) { err.textContent = 'Preço inválido. Use por exemplo 129,90, ou deixe 0,00 para "Consulte o valor".'; err.hidden = false; return; }
     if (d.link && !/^https?:\/\//.test(d.link)) { err.textContent = 'O link de pagamento precisa começar com https://'; err.hidden = false; return; }
     const data = { name: d.name.trim(), price: price > 0 ? price : 0, specs: d.specs || [], old: price > 0 && old > price ? old : undefined, cat: d.cat, badge: d.badge || undefined, sizes: d.sizes, optLabel: d.optLabel,
       kind: d.kind, track: d.track, fromPrice: d.fromPrice, duration: d.duration || '', link: d.kind === 'fisico' ? '' : d.link || '',
@@ -1970,19 +1983,44 @@ function renderMedia() {
 const expired = () => MODE === 'panel' && BOOT.store.plan === 'expired';
 const proOk = () => MODE === 'demo' || BOOT.store.plan !== 'expired';
 const fmtDate = t => new Date(t).toLocaleDateString('pt-BR');
+// Assinatura na aba Conta: começou, termina e quantos dias faltam
+const DAYMS = 864e5;
+function planDates() {
+  const st = BOOT.store, now = Date.now();
+  if (st.plan === 'pro') return { since: st.proSince || st.createdAt, until: st.proUntil };
+  if (st.plan === 'trial') return { since: st.createdAt, until: st.trialUntil };
+  if (st.plan === 'expired') return { since: st.proSince || st.createdAt, until: st.proUntil || st.trialUntil, gone: true };
+  return { since: st.createdAt, until: null };
+}
+function planSub() {
+  const st = BOOT.store, d = planDates();
+  if (st.plan === 'expired') return 'Vencida';
+  if (!d.until) return 'Liberada';
+  const left = Math.max(0, Math.ceil((d.until - Date.now()) / DAYMS));
+  return `Faltam ${left} ${left === 1 ? 'dia' : 'dias'}`;
+}
 function planCard() {
-  const st = BOOT.store;
-  if (st.plan === 'open') return ''; // cobrança ainda não ligada: nada de assinatura no painel
-  const label = st.plan === 'pro' ? 'Assinatura ativa' : st.plan === 'trial' ? 'Teste grátis' : 'Assinatura vencida';
-  const sub = st.plan === 'pro' ? `${st.subscribed ? 'Renova' : 'Vale'} até ${fmtDate(st.proUntil)}` : st.plan === 'trial' ? `Termina em ${fmtDate(st.trialUntil)}. Assine para a vitrine continuar no ar.` : 'Sua vitrine está fora do ar para as clientes.';
-  return `<section class="plan plan-${st.plan}"><div class="plan-top"><div><b>${label}</b><small>${sub}</small></div>
-    ${st.plan === 'pro' && st.subscribed ? '<button class="tg" id="plancancel">Cancelar</button>' : `<button class="hcopy" id="planbuy" data-plan="mensal">${st.plan === 'pro' ? 'Renovar' : 'Assinar'} · ${brl(st.proPrice)}/mês</button>`}</div>
-    ${st.yearPrice && !(st.plan === 'pro' && st.subscribed) ? `<button class="hcopy" id="planyear" data-plan="anual" style="margin-top:8px;width:100%">Plano anual · ${brl(st.yearPrice)}/ano (sai ${brl(st.yearPrice / 12)} por mês)</button>` : ''}
-    ${st.plan === 'pro' && !st.subscribed && st.proUntil - Date.now() < 5 * 864e5 ? `<p class="plan-warn">Sua assinatura vence em ${Math.max(0, Math.ceil((st.proUntil - Date.now()) / 864e5))} dia(s). Renove para a vitrine não sair do ar.</p>` : ''}
+  const st = BOOT.store, d = planDates();
+  const label = st.plan === 'pro' ? 'Assinatura ativa' : st.plan === 'trial' ? 'Teste grátis' : st.plan === 'expired' ? 'Assinatura vencida' : 'Assinatura liberada';
+  const left = d.until ? Math.max(0, Math.ceil((d.until - Date.now()) / DAYMS)) : null;
+  const canPay = st.payments && st.payments !== 'off';
+  const renew = !canPay
+    ? '<button class="hcopy" disabled style="width:100%;opacity:.6">Renovar assinatura · em breve</button>'
+    : st.plan === 'pro' && st.subscribed ? '<button class="tg" id="plancancel">Cancelar renovação automática</button>'
+    : `<button class="hcopy" id="planbuy" data-plan="mensal" style="width:100%">${st.plan === 'pro' ? 'Renovar' : 'Assinar'} · ${brl(st.proPrice)}/mês</button>
+       ${st.yearPrice ? `<button class="hcopy" id="planyear" data-plan="anual" style="margin-top:8px;width:100%">Plano anual · ${brl(st.yearPrice)}/ano (sai ${brl(st.yearPrice / 12)} por mês)</button>` : ''}`;
+  return `<div class="plan-${st.plan}"><p style="margin:0 0 8px;font-weight:700">${label}</p>
+    <div class="subrows">
+      <div><small>Começou em</small><b>${d.since ? fmtDate(d.since) : '-'}</b></div>
+      <div><small>${d.gone ? 'Venceu em' : 'Termina em'}</small><b>${d.until ? fmtDate(d.until) : 'Sem data'}</b></div>
+      ${left !== null && !d.gone ? `<div class="big"><small>Faltam</small><b>${left} ${left === 1 ? 'dia' : 'dias'}</b></div>` : ''}
+    </div>
+    ${renew}
+    ${st.plan === 'pro' && !st.subscribed && left !== null && left <= 5 ? `<p class="plan-warn">Sua assinatura vence em ${left} dia(s). Renove para a vitrine não sair do ar.</p>` : ''}
     ${st.lastPayment && st.lastPayment !== 'approved' ? `<p class="plan-warn">O último pagamento não foi aprovado. Confira o cartão ${st.payments === 'kiwify' ? 'no e-mail da compra da Kiwify' : 'no Mercado Pago'} para a assinatura continuar.</p>` : ''}
     ${st.plan === 'expired' ? '<p class="plan-warn">Assine para colocar a vitrine de volta no ar. Seus produtos e configurações continuam salvos.</p>' : ''}
     ${st.payments === 'kiwify' && st.plan !== 'pro' ? '<p class="note" style="margin:6px 0 0">O pagamento é pela Kiwify. Use na compra o mesmo e-mail da sua conta: assim a loja é liberada sozinha.</p>' : ''}
-    ${st.payments === 'teste' ? '<p class="note" style="margin:6px 0 0">Modo de teste: o pagamento é simulado.</p>' : ''}</section>`;
+    ${st.payments === 'teste' ? '<p class="note" style="margin:6px 0 0">Modo de teste: o pagamento é simulado.</p>' : ''}</div>`;
 }
 async function api(method, url, body) {
   const r = await fetch(url, { method, headers: body ? { 'Content-Type': 'application/json' } : {}, body: body ? JSON.stringify(body) : undefined });
@@ -2090,19 +2128,20 @@ function show(view) {
 /* Organização: cada aba tem o principal em cima e os ajustes finos embaixo */
 const PANEL_LAYOUT = [
   ['inicio', 'Relatório completo', 'Visitas, cliques e pedidos de cada dia', ['relatorio']],
-  ['loja', 'Passo 1 · Informações da loja', 'Nome, WhatsApp, links e como o pedido chega', ['info', 'pedido', 'links', 'pix']],
+  ['loja', 'Passo 1 · Informações da loja', 'Nome, WhatsApp, links e como o pedido chega', ['info', 'pedido', 'links']],
   ['visual', 'Passo 2 · Banner, logo e cores', 'Deixe a vitrine com a cara da sua marca', ['banner', 'tema', 'layout']],
   ['visual', 'Mais ajustes', 'Cores de cada parte, depoimentos e rodapé', ['cores', 'depo', 'rodape']],
-  ['produtos', 'Passo 3 · Subir produtos', 'Cadastre e organize o seu catálogo', ['prod', 'lista', 'cats', 'whats']],
-  ['produtos', 'Para vender mais', 'Estoque, selos, cronômetro e kits', ['vbub', 'estoque', 'selos', 'promo', 'kits']],
-  ['conta', 'Sua conta', '', ['conta']],
-  ['conta', 'Divulgação', 'Anúncios e endereço próprio', ['marketing', 'dominio']],
-  ['conta', 'Ajuda', 'Tamanhos ideais e exemplos prontos', ['medidas', 'modelo']]];
+  ['produtos', 'Passo 3 · Subir produtos', 'Cadastre e organize o seu catálogo', ['prod', 'lista', 'cats', 'estoque', 'selos', 'whats']],
+  ['produtos', 'Vender +', 'Cronômetro, vídeo e kits', ['promo', 'vbub', 'kits']],
+  ['conta', 'Sua conta', '', ['assinatura', 'conta']],
+  ['conta', 'Ajuda', '', ['tutoriais']]];
+// partes guardadas por enquanto (voltam quando estiverem prontas)
+const PANEL_HIDE = ['pix', 'marketing', 'dominio', 'medidas', 'modelo'];
 function applySimple() {
   const box = $('#view-painel');
   const firstH = box.querySelector(':scope > h3.pgroup'); if (!firstH) return;
   const tail = [...box.querySelectorAll(':scope > .legal')];
-  const secs = {}; box.querySelectorAll(':scope > details[data-sec]').forEach(d => { secs[d.dataset.sec] = d; d.remove(); });
+  const secs = {}; box.querySelectorAll(':scope > details[data-sec]').forEach(d => { if (!PANEL_HIDE.includes(d.dataset.sec)) secs[d.dataset.sec] = d; d.remove(); });
   box.querySelectorAll(':scope > h3.pgroup, :scope > .moreopts').forEach(h => h.remove());
   PANEL_LAYOUT.forEach(([tab, title, sub, ids]) => {
     const list = ids.map(id => secs[id]).filter(Boolean); if (!list.length) return;

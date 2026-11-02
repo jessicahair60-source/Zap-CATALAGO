@@ -63,7 +63,8 @@ const isPro = store => planOf(store) !== 'expired';
 
 function storeInfo(store) {
   return {
-    id: store.id, slug: store.slug, name: store.name, plan: planOf(store), proUntil: store.pro_until, trialUntil: store.trial_until,
+    id: store.id, slug: store.slug, name: store.name, plan: planOf(store), proUntil: store.pro_until, trialUntil: store.trial_until, createdAt: store.created_at,
+    proSince: store.pro_since || (db.prepare("SELECT MAX(created_at) AS t FROM payments WHERE store_id = ? AND status = 'approved'").get(store.id) || {}).t || null,
     subscribed: !!store.mp_preapproval, customDomain: store.custom_domain, blocked: !!store.blocked, blockedReason: store.blocked_reason,
     lastPayment: (db.prepare('SELECT status FROM payments WHERE store_id = ? ORDER BY created_at DESC, id DESC LIMIT 1').get(store.id) || {}).status || '',
     publicUrl: publicUrlOf(store), proPrice: CFG.proPrice, yearPrice: kiwify.checkoutUrl('anual') ? CFG.yearPrice : 0, brand: CFG.brand, autoRelease: !kiwify.links() || kiwify.enabled(), support: CFG.support,
