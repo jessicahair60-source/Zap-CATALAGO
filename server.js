@@ -240,6 +240,12 @@ app.use((req, res, next) => {
 const page = name => (req, res) => res.sendFile(path.join(PUB, name));
 app.get('/', page('index.html'));
 app.get('/termos', page('termos.html'));
+// Botões "Quero..." da página de vendas: vão direto para o pagamento da Kiwify (sem link configurado, caem no cadastro)
+app.get('/assinar/:plano', (req, res) => {
+  const plan = req.params.plano === 'anual' ? 'anual' : 'mensal';
+  const url = kiwify.checkoutUrl(plan);
+  res.redirect(302, url || `/cadastro?plano=${plan}`);
+});
 app.get('/privacidade', page('privacidade.html'));
 app.get(['/esqueci', '/nova-senha'], page('entrar.html'));
 app.get(['/entrar', '/cadastro'], (req, res) => currentUser(req) ? res.redirect('/painel') : res.sendFile(path.join(PUB, 'entrar.html')));
