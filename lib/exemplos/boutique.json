@@ -1,0 +1,326 @@
+{
+ "v": 4,
+ "store": {
+  "theme": "custom",
+  "titleFont": "cormorant",
+  "radius": "soft",
+  "anim": true,
+  "logo": "",
+  "showName": true,
+  "testiTitle": "O que as clientes dizem",
+  "name": "Boutique da Maria",
+  "bannerImg": "/static/exemplo/boutique-banner.webp",
+  "bannerKicker": "Promoção",
+  "bannerTitle": "Leve 3, pague 2",
+  "bio": "Moda feminina e bolsas · Leve 3 peças e pague 2",
+  "phone": "5537999529778",
+  "couponPct": 10,
+  "installments": 3,
+  "buyText": "Eu quero",
+  "payments": "Pix, Cartão",
+  "delivery": true,
+  "pickup": true,
+  "greeting": "Oi! Eu quero:\n{nome_dos_produtos}",
+  "layout": "grid",
+  "showStock": true,
+  "lowStock": 5,
+  "zeroStock": "soldout",
+  "igRing": true,
+  "igVideo": false,
+  "badgeNames": {
+   "new": "Lançamento",
+   "top": "Mais vendido",
+   "promo": "Promoção"
+  },
+  "catalogTitle": "Conheça nossos produtos",
+  "groupCats": false,
+  "p5": true,
+  "p4": true,
+  "p3": true,
+  "p2": true,
+  "bannerImgM": "",
+  "online": true,
+  "perks": [
+   "Envio para todo o Brasil",
+   "Troca fácil",
+   "Parcele em até 3x"
+  ],
+  "bannerInfo": false,
+  "ratio": "45"
+ },
+ "colors": {
+  "bg": "#FBF4F3",
+  "text": "#4A2A30",
+  "title": "#3A1620",
+  "muted": "#957C80",
+  "bannerBg": "#E9C9C6",
+  "bannerText": "#5A1626",
+  "linkBg": "#FFFFFF",
+  "linkText": "#3A1620",
+  "linkBorder": "#F0DCDD",
+  "searchBg": "#FFFFFF",
+  "catRing": "#7A1E36",
+  "catText": "#4A2A30",
+  "cardBg": "#FFFFFF",
+  "cardBorder": "#F1E2E3",
+  "name": "#3A1620",
+  "price": "#7A1E36",
+  "videoRing": "#7A1E36",
+  "star": "#D9A441",
+  "buyBg": "#7A1E36",
+  "buyText": "#FFFFFF",
+  "cartBg": "#3A1620",
+  "cartText": "#FFFFFF",
+  "bNew": "#FFFFFF",
+  "bTop": "#FFFFFF",
+  "bPromo": "#FFFFFF",
+  "badgeText": "#3A1620"
+ },
+ "links": [
+  {
+   "type": "ig",
+   "on": true,
+   "text": "Siga no Instagram",
+   "value": "boutiquedamaria"
+  },
+  {
+   "type": "tt",
+   "on": true,
+   "text": "Siga no TikTok",
+   "value": "boutiquedamaria"
+  },
+  {
+   "type": "zap",
+   "on": true,
+   "text": "Fale com a gente no WhatsApp",
+   "value": ""
+  }
+ ],
+ "catImgs": {},
+ "cats": [
+  "Conjuntos",
+  "Bolsas"
+ ],
+ "products": [
+  {
+   "active": true,
+   "zero": "default",
+   "media": [
+    {
+     "id": "ex-boutique-conj1.webp",
+     "type": "img"
+    }
+   ],
+   "sizes": [
+    "P",
+    "M",
+    "G"
+   ],
+   "optLabel": "Tamanho",
+   "track": true,
+   "link": "",
+   "duration": "",
+   "fromPrice": false,
+   "sales": 180,
+   "stock": 6,
+   "specs": [],
+   "price": 129.9,
+   "id": 501,
+   "name": "Conjunto Cropped Ombro Só + Short",
+   "cat": "Conjuntos",
+   "hue": 340,
+   "desc": "Cropped canelado de um ombro só com short alfaiataria e cinto.",
+   "rating": 4.9,
+   "reviewsCount": 64,
+   "kind": "fisico",
+   "badge": "top",
+   "reviews": 64
+  },
+  {
+   "active": true,
+   "zero": "default",
+   "media": [
+    {
+     "id": "ex-boutique-conj2.webp",
+     "type": "img"
+    }
+   ],
+   "sizes": [
+    "P",
+    "M",
+    "G"
+   ],
+   "optLabel": "Tamanho",
+   "track": true,
+   "link": "",
+   "duration": "",
+   "fromPrice": false,
+   "sales": 72,
+   "stock": 6,
+   "specs": [],
+   "price": 149.9,
+   "id": 502,
+   "name": "Conjunto Camisa Branca + Short Caramelo",
+   "cat": "Conjuntos",
+   "hue": 340,
+   "desc": "Camisa de algodão com short de linho e cinto. Elegante para o dia a dia.",
+   "rating": 5.0,
+   "reviewsCount": 64,
+   "kind": "fisico",
+   "badge": "new",
+   "reviews": 21
+  },
+  {
+   "active": true,
+   "zero": "default",
+   "media": [
+    {
+     "id": "ex-boutique-conj3.webp",
+     "type": "img"
+    }
+   ],
+   "sizes": [
+    "P",
+    "M",
+    "G"
+   ],
+   "optLabel": "Tamanho",
+   "track": true,
+   "link": "",
+   "duration": "",
+   "fromPrice": false,
+   "sales": 95,
+   "stock": 6,
+   "specs": [],
+   "price": 139.9,
+   "id": 503,
+   "name": "Conjunto Preto Ombro a Ombro",
+   "cat": "Conjuntos",
+   "hue": 340,
+   "desc": "Blusa ombro a ombro franzida com short alfaiataria e cinto.",
+   "rating": 4.8,
+   "reviewsCount": 64,
+   "kind": "fisico",
+   "reviews": 33
+  },
+  {
+   "active": true,
+   "zero": "default",
+   "media": [
+    {
+     "id": "ex-boutique-bolsa1.webp",
+     "type": "img"
+    }
+   ],
+   "sizes": [],
+   "optLabel": "Opção",
+   "track": true,
+   "link": "",
+   "duration": "",
+   "fromPrice": false,
+   "sales": 60,
+   "stock": 6,
+   "specs": [],
+   "price": 189.9,
+   "id": 504,
+   "name": "Bolsa Sacola Caramelo",
+   "cat": "Bolsas",
+   "hue": 340,
+   "desc": "Bolsa grande de couro sintético, cabe tudo. Lenço de seda de brinde.",
+   "rating": 4.9,
+   "reviewsCount": 64,
+   "kind": "fisico",
+   "old": 229.9,
+   "badge": "promo",
+   "reviews": 18
+  },
+  {
+   "active": true,
+   "zero": "default",
+   "media": [
+    {
+     "id": "ex-boutique-bolsa2.webp",
+     "type": "img"
+    }
+   ],
+   "sizes": [],
+   "optLabel": "Opção",
+   "track": true,
+   "link": "",
+   "duration": "",
+   "fromPrice": false,
+   "sales": 88,
+   "stock": 6,
+   "specs": [],
+   "price": 159.9,
+   "id": 505,
+   "name": "Bolsa Transversal Caramelo",
+   "cat": "Bolsas",
+   "hue": 340,
+   "desc": "Bolsa pequena com alça regulável e ferragens douradas.",
+   "rating": 4.9,
+   "reviewsCount": 64,
+   "kind": "fisico",
+   "reviews": 27
+  },
+  {
+   "active": true,
+   "zero": "default",
+   "media": [
+    {
+     "id": "ex-boutique-bolsa3.webp",
+     "type": "img"
+    }
+   ],
+   "sizes": [],
+   "optLabel": "Opção",
+   "track": true,
+   "link": "",
+   "duration": "",
+   "fromPrice": false,
+   "sales": 41,
+   "stock": 6,
+   "specs": [],
+   "price": 199.9,
+   "id": 506,
+   "name": "Bolsa Preta com Lenço",
+   "cat": "Bolsas",
+   "hue": 340,
+   "desc": "Bolsa estruturada de alça de mão, acompanha lenço estampado.",
+   "rating": 5.0,
+   "reviewsCount": 64,
+   "kind": "fisico",
+   "reviews": 12
+  },
+  {
+   "active": true,
+   "zero": "default",
+   "media": [
+    {
+     "id": "ex-boutique-bolsa4.webp",
+     "type": "img"
+    }
+   ],
+   "sizes": [],
+   "optLabel": "Opção",
+   "track": true,
+   "link": "",
+   "duration": "",
+   "fromPrice": false,
+   "sales": 120,
+   "stock": 6,
+   "specs": [],
+   "price": 119.9,
+   "id": 507,
+   "name": "Bolsa Baguete Preta",
+   "cat": "Bolsas",
+   "hue": 340,
+   "desc": "Bolsa de ombro com aba curvada. Combina com tudo.",
+   "rating": 4.8,
+   "reviewsCount": 64,
+   "kind": "fisico",
+   "reviews": 40
+  }
+ ],
+ "testimonials": []
+}
