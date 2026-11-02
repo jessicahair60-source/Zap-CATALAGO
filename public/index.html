@@ -18,16 +18,23 @@
   .cta { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
   .cta small { color: var(--muted); font-size: 13px; width: 100%; }
   .phone { justify-self: center; width: 280px; aspect-ratio: 9/18.5; border-radius: 40px; background: #2A1A22; padding: 10px; box-shadow: 0 30px 60px -30px rgba(80,20,50,.5); }
-  .screen { width: 100%; height: 100%; border-radius: 31px; overflow: hidden; background: var(--bg); display: grid; grid-template-rows: 30% auto 1fr; }
-  .sb { background: linear-gradient(135deg, #E8B4C6, #B9476F); display: grid; align-content: end; padding: 14px; color: #fff; }
-  .sb small { font-size: 9px; letter-spacing: .14em; text-transform: uppercase; opacity: .85; } .sb b { font-family: var(--f-display); font-size: 22px; }
-  .sl { padding: 10px 12px 4px; display: grid; gap: 6px; }
-  .sl i { display: block; height: 22px; border-radius: 99px; background: #fff; border: 1px solid var(--line); }
-  .sp { padding: 6px 12px; display: grid; gap: 10px; }
-  .sp div { display: grid; grid-template-columns: 54px 1fr; gap: 10px; align-items: center; }
-  .sp span { aspect-ratio: 9/14; border-radius: 10px; }
-  .sp p { margin: 0; display: grid; gap: 5px; } .sp p i { display: block; height: 7px; border-radius: 4px; background: #E9D7DE; } .sp p i:first-child { width: 80%; background: #CFAFBC; }
-  .sp p em { display: block; width: 62px; height: 18px; border-radius: 6px; background: var(--acc); }
+  .phone { margin: 0; position: relative; }
+  .screen { width: 100%; height: 100%; border-radius: 31px; overflow: hidden; background: #FBF3F5; }
+  .screen img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+  .phone figcaption { position: absolute; left: 50%; bottom: -14px; transform: translateX(-50%); white-space: nowrap; background: #fff; border: 1px solid var(--line); color: var(--fg); font-size: 12.5px; font-weight: 700; padding: 6px 12px; border-radius: 99px; box-shadow: 0 8px 20px -10px rgba(80,20,50,.35); }
+  .demo-top { margin-top: 26px; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; box-shadow: 0 30px 60px -36px rgba(80,20,50,.45); }
+  .demo-top .bar { display: flex; gap: 6px; align-items: center; padding: 10px 14px; border-bottom: 1px solid var(--line); font-size: 12px; color: var(--muted); }
+  .demo-top .bar i { width: 10px; height: 10px; border-radius: 50%; background: #E9D7DE; }
+  .demo-top .bar span { margin-left: 8px; }
+  .demo-top img { display: block; width: 100%; height: auto; }
+  .shots { display: grid; gap: 14px; margin-top: 16px; }
+  .shot { margin: 0; min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; }
+  .shot .pic { background: #F4ECEF; padding: 12px 12px 0; }
+  .shot img { display: block; width: 100%; max-width: 100%; height: auto; aspect-ratio: 4/5; object-fit: cover; object-position: left top; border-radius: 12px 12px 0 0; box-shadow: 0 6px 18px -10px rgba(80,20,50,.35); }
+  .shot figcaption { padding: 14px 16px 16px; }
+  .shot b { display: block; font-size: 16px; } .shot span { display: block; color: var(--muted); font-size: 14px; margin-top: 3px; }
+  @media (max-width: 559px) { .demo-top { display: none; } }
+  .demo-note { color: var(--muted); font-size: 13.5px; margin: 12px 0 0; }
   section.blk { padding: 56px 0 0; }
   .eyebrow { font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--acc); font-weight: 700; margin: 0 0 10px; }
   .blk h2 { font-size: clamp(28px, 4.5vw, 40px); max-width: 640px; }
@@ -67,7 +74,7 @@
   .checks li { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px 14px 48px; position: relative; font-weight: 500; }
   .checks li::before { content: ""; position: absolute; left: 16px; top: 50%; width: 20px; height: 20px; margin-top: -10px; border-radius: 50%; background: var(--acc) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5 9-10'/%3E%3C/svg%3E") center / 12px no-repeat; }
   .split { display: grid; gap: 34px; align-items: center; }
-  .vphone { justify-self: center; width: 230px; aspect-ratio: 9/16; border-radius: 30px; background: linear-gradient(165deg, #F3C9D6, #B9476F 70%, #6E2343); position: relative; box-shadow: 0 30px 60px -30px rgba(80,20,50,.5); overflow: hidden; }
+  .vphone { justify-self: center; width: 230px; aspect-ratio: 9/16; border-radius: 30px; background: #6E2343 url("/static/exemplo/video-produto.webp") center top / cover no-repeat; position: relative; box-shadow: 0 30px 60px -30px rgba(80,20,50,.5); overflow: hidden; }
   .vphone .play { position: absolute; left: 50%; top: 45%; width: 62px; height: 62px; margin: -31px 0 0 -31px; border-radius: 50%; background: rgba(255,255,255,.92); display: grid; place-items: center; }
   .vphone .play::after { content: ""; border-left: 18px solid var(--acc); border-top: 11px solid transparent; border-bottom: 11px solid transparent; margin-left: 5px; }
   .vphone .cap { position: absolute; left: 12px; right: 12px; bottom: 14px; background: rgba(42,26,34,.7); color: #fff; font-size: 12.5px; font-weight: 700; border-radius: 99px; padding: 8px 12px; text-align: center; }
@@ -80,6 +87,7 @@
   .plan.best { border: 2px solid var(--acc); position: relative; }
   .plan.best::after { content: "Mais vantajoso"; position: absolute; top: -12px; right: 20px; background: var(--acc); color: #fff; font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 99px; }
   .plan .btn { width: 100%; }
+  @media (min-width: 560px) and (max-width: 759px) { .shots { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (min-width: 760px) {
     .hero { grid-template-columns: 1.15fr .85fr; padding-top: 50px; }
     .feats { grid-template-columns: repeat(3, 1fr); }
@@ -88,6 +96,7 @@
     .flow { grid-template-columns: repeat(3, 1fr); } .flow div { grid-template-columns: 1fr; align-items: start; }
     .checks { grid-template-columns: repeat(3, 1fr); } .checks li { display: flex; align-items: center; }
     .split { grid-template-columns: 1.1fr .9fr; }
+    .shots { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     .tut { grid-template-columns: repeat(3, 1fr); }
     .plans2 { grid-template-columns: 1fr 1fr; max-width: 820px; }
   }
@@ -109,15 +118,8 @@
       <p class="lead hl">Tudo em um único link, com seu próprio subdomínio!</p>
       <div class="cta"><a class="btn big" href="/cadastro">QUERO CRIAR MEU CATÁLOGO</a><a class="btn big soft" href="#planos">Ver planos</a></div>
     </div>
-    <div class="phone" aria-hidden="true"><div class="screen">
-      <div class="sb"><small>Nova coleção</small><b>Sua loja</b></div>
-      <div class="sl"><i></i><i></i></div>
-      <div class="sp">
-        <div><span style="background:linear-gradient(160deg,#F3C9D6,#C9718F)"></span><p><i></i><i></i><em></em></p></div>
-        <div><span style="background:linear-gradient(160deg,#F6DCC4,#C98A5E)"></span><p><i></i><i></i><em></em></p></div>
-        <div><span style="background:linear-gradient(160deg,#DCD3F0,#8A74C2)"></span><p><i></i><i></i><em></em></p></div>
-      </div>
-    </div></div>
+    <figure class="phone"><div class="screen"><img src="/static/exemplo/vitrine-celular.webp" width="560" height="1156" alt="Vitrine da loja Jessica Hair aberta no celular, com o banner da loja" fetchpriority="high"></div>
+      <figcaption>Vitrine real: Jessica Hair</figcaption></figure>
   </header>
 
   <section class="blk">
@@ -147,6 +149,24 @@
     </ul>
   </section>
 
+  <section class="blk" id="exemplo">
+    <p class="eyebrow">👀 Veja por dentro</p>
+    <h2>Assim fica o seu painel, com a sua marca</h2>
+    <p class="txt">Este é um exemplo real: a loja <strong>Jessica Hair</strong> montada no Zap Catálogo. Você escolhe o banner, a logo e as cores, sobe seus produtos com fotos e vídeos, e a prévia mostra na hora como a sua vitrine está ficando.</p>
+    <div class="demo-top"><div class="bar"><i></i><i></i><i></i><span>Painel da lojista · prévia ao vivo</span></div>
+      <img src="/static/exemplo/painel-computador.webp" width="1400" height="798" loading="lazy" decoding="async" alt="Painel do Zap Catálogo no computador, com o banner da Jessica Hair e a prévia da vitrine ao lado"></div>
+    <div class="shots">
+      <figure class="shot"><div class="pic"><img src="/static/exemplo/painel-banner.webp" width="684" height="855" loading="lazy" decoding="async" alt="Parte do painel onde a lojista envia o banner do celular e do computador"></div>
+        <figcaption><b>Coloque o seu banner</b><span>Envie a arte da sua loja, uma para o celular e outra para o computador.</span></figcaption></figure>
+      <figure class="shot"><div class="pic"><img src="/static/exemplo/painel-cores.webp" width="684" height="1300" loading="lazy" decoding="async" alt="Escolha de tema e cor dos botões no painel"></div>
+        <figcaption><b>Escolha as cores</b><span>Temas prontos e a cor dos botões com a cara da sua marca.</span></figcaption></figure>
+      <figure class="shot"><div class="pic"><img src="/static/exemplo/painel-produtos.webp" width="684" height="1130" loading="lazy" decoding="async" alt="Lista de produtos da Jessica Hair no painel, com fotos e vídeos"></div>
+        <figcaption><b>Cadastre seus produtos</b><span>Foto, vídeo, tamanho e cor. Ative, edite ou duplique quando quiser.</span></figcaption></figure>
+      <figure class="shot"><div class="pic"><img src="/static/exemplo/vitrine-produtos.webp" width="460" height="944" loading="lazy" decoding="async" alt="Vitrine da Jessica Hair com categorias e botão Eu quero"></div>
+        <figcaption><b>Sua cliente vê assim</b><span>Categorias com foto e o botão "Eu quero" que leva o pedido ao seu WhatsApp.</span></figcaption></figure>
+    </div>
+  </section>
+
   <section class="blk split">
     <div>
       <p class="eyebrow">🎥 Vídeos nos produtos</p>
@@ -155,7 +175,7 @@
       <p class="txt" style="color:var(--muted);font-size:17px;margin:12px 0 0">Com o Zap Catálogo, você pode adicionar vídeos aos seus produtos e apresentar tudo de maneira mais completa.</p>
       <p style="font-size:17px;font-weight:700;margin:12px 0 0">Mostre cores, tamanhos, acabamentos e detalhes que fazem diferença na hora da escolha.</p>
     </div>
-    <div class="vphone" aria-hidden="true"><div class="bar"><i></i></div><div class="play"></div><div class="cap">Assista ao vídeo dos detalhes</div></div>
+    <div class="vphone" role="img" aria-label="Produto da loja Jessica Hair com vídeo"><div class="bar"><i></i></div><div class="play"></div><div class="cap">Veja o vídeo do modelo</div></div>
   </section>
 
   <section class="blk">
