@@ -1,18 +1,18 @@
 {
  "v": 4,
  "store": {
-  "theme": "nude",
+  "theme": "custom",
   "titleFont": "cormorant",
   "radius": "soft",
   "anim": true,
   "logo": "",
   "showName": true,
   "testiTitle": "O que as clientes dizem",
-  "name": "Studio Beleza Exemplo",
-  "bannerImg": "",
+  "name": "Studio Bella",
+  "bannerImg": "/static/exemplo/salao-banner.webp",
   "bannerKicker": "Agenda aberta",
   "bannerTitle": "Novembro",
-  "bio": "Cabelo, unhas e sobrancelha · Agende pelo WhatsApp",
+  "bio": "Cabelo, unhas e beleza para toda a família · Agende pelo WhatsApp",
   "phone": "5537999529778",
   "couponPct": 10,
   "installments": 3,
@@ -44,30 +44,32 @@
    "Profissionais experientes",
    "Produtos de qualidade",
    "Horário marcado"
-  ]
+  ],
+  "bannerInfo": false,
+  "ratio": "45"
  },
  "colors": {
-  "bg": "#F6EFE9",
-  "text": "#4B3F38",
-  "title": "#2E2520",
-  "muted": "#8C7B70",
-  "bannerBg": "#C8A992",
+  "bg": "#FBF5F3",
+  "text": "#4A2A33",
+  "title": "#3A1622",
+  "muted": "#937A80",
+  "bannerBg": "#6E1A33",
   "bannerText": "#FFFFFF",
-  "linkBg": "#FFFDFB",
-  "linkText": "#2E2520",
-  "linkBorder": "#E6D8CC",
-  "searchBg": "#FFFDFB",
-  "catRing": "#B08968",
-  "catText": "#4B3F38",
-  "cardBg": "#FFFDFB",
-  "cardBorder": "#EADDD2",
-  "name": "#2E2520",
-  "price": "#2E2520",
-  "videoRing": "#B08968",
+  "linkBg": "#FFFFFF",
+  "linkText": "#3A1622",
+  "linkBorder": "#EEDDE1",
+  "searchBg": "#FFFFFF",
+  "catRing": "#B8893A",
+  "catText": "#4A2A33",
+  "cardBg": "#FFFFFF",
+  "cardBorder": "#F0E2E5",
+  "name": "#3A1622",
+  "price": "#7A1E3A",
+  "videoRing": "#B8893A",
   "star": "#D9A441",
-  "buyBg": "#2E2520",
-  "buyText": "#F6EFE9",
-  "cartBg": "#2E2520",
+  "buyBg": "#7A1E3A",
+  "buyText": "#FFFFFF",
+  "cartBg": "#3A1622",
   "cartText": "#FFFFFF",
   "bNew": "#7D8F69",
   "bTop": "#B08968",
@@ -96,10 +98,10 @@
  ],
  "catImgs": {},
  "cats": [
-  "Cabelo",
   "Unhas",
-  "Sobrancelha",
-  "Pacotes"
+  "Cabelo",
+  "Infantil",
+  "Produtos"
  ],
  "products": [
   {
@@ -107,8 +109,40 @@
    "zero": "default",
    "media": [
     {
-     "id": "demo",
-     "type": "video"
+     "id": "ex-salao-unhas.webp",
+     "type": "img"
+    }
+   ],
+   "sizes": [
+    "Unha lisa",
+    "Com decoração"
+   ],
+   "optLabel": "Opção",
+   "track": false,
+   "link": "",
+   "duration": "2h",
+   "fromPrice": false,
+   "sales": 150,
+   "stock": 0,
+   "specs": [],
+   "price": 150,
+   "id": 301,
+   "kind": "servico",
+   "name": "Alongamento de Unhas em Gel",
+   "cat": "Unhas",
+   "badge": "top",
+   "hue": 330,
+   "desc": "Alongamento em gel com formato amendoado ou quadrado. Manutenção a cada 21 dias.",
+   "rating": 4.9,
+   "reviewsCount": 47
+  },
+  {
+   "active": true,
+   "zero": "default",
+   "media": [
+    {
+     "id": "ex-salao-corte.webp",
+     "type": "img"
     }
    ],
    "sizes": [
@@ -121,45 +155,26 @@
    "link": "",
    "duration": "1h",
    "fromPrice": true,
-   "sales": 150,
-   "stock": 0,
-   "specs": [],
-   "price": 80,
-   "id": 301,
-   "kind": "servico",
-   "name": "Escova Modeladora",
-   "cat": "Cabelo",
-   "badge": "top",
-   "hue": 330,
-   "desc": "Lavagem, hidratação rápida e escova com acabamento.",
-   "rating": 4.9,
-   "reviewsCount": 47
-  },
-  {
-   "active": true,
-   "zero": "default",
-   "media": [],
-   "sizes": [],
-   "optLabel": "Opção",
-   "track": false,
-   "link": "",
-   "duration": "1h30",
-   "fromPrice": false,
    "sales": 210,
    "stock": 0,
    "specs": [],
-   "price": 70,
+   "price": 60,
    "id": 302,
    "kind": "servico",
-   "name": "Manicure e Pedicure",
-   "cat": "Unhas",
+   "name": "Corte Feminino",
+   "cat": "Cabelo",
    "hue": 0,
-   "desc": "Esmaltação comum. Pergunte pelas cores da estação."
+   "desc": "Corte com lavagem e finalização. Leve uma foto de referência que a gente faz."
   },
   {
    "active": true,
    "zero": "default",
-   "media": [],
+   "media": [
+    {
+     "id": "ex-salao-infantil.webp",
+     "type": "img"
+    }
+   ],
    "sizes": [],
    "optLabel": "Opção",
    "track": false,
@@ -169,37 +184,42 @@
    "sales": 95,
    "stock": 0,
    "specs": [],
-   "price": 55,
+   "price": 45,
    "id": 303,
    "kind": "servico",
-   "name": "Design de Sobrancelha com Henna",
-   "cat": "Sobrancelha",
+   "name": "Penteado Cabelo Maluco Infantil",
+   "cat": "Infantil",
    "badge": "new",
    "hue": 25,
-   "desc": "Mapeamento do rosto e henna de longa duração.",
+   "desc": "Penteado divertido com acessórios coloridos para o Dia do Cabelo Maluco na escola.",
    "rating": 5,
    "reviewsCount": 31
   },
   {
    "active": true,
    "zero": "default",
-   "media": [],
+   "media": [
+    {
+     "id": "ex-salao-shampoo.webp",
+     "type": "img"
+    }
+   ],
    "sizes": [],
    "optLabel": "Opção",
    "track": true,
    "link": "",
-   "duration": "Dia todo",
-   "fromPrice": true,
+   "duration": "",
+   "fromPrice": false,
    "sales": 12,
-   "stock": 2,
+   "stock": 12,
    "specs": [],
-   "price": 890,
+   "price": 49.9,
    "id": 304,
-   "kind": "servico",
-   "name": "Dia da Noiva",
-   "cat": "Pacotes",
+   "kind": "fisico",
+   "name": "Shampoo Hidratante 300 ml",
+   "cat": "Produtos",
    "hue": 300,
-   "desc": "Cabelo, maquiagem, unhas e espumante. Vagas limitadas por mês."
+   "desc": "Limpa sem ressecar e deixa o cabelo macio. Retire no salão ou receba em casa."
   }
  ],
  "testimonials": []

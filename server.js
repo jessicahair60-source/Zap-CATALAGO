@@ -756,7 +756,7 @@ app.get('/og/:slug.png', (req, res) => {
 
 /* ---------- vitrine pelo endereço /nome-da-loja ---------- */
 // Vitrines de exemplo da página de vendas (serviço e alimento): vêm de arquivos, não são lojas de verdade
-const EXEMPLOS = { servicos: 'Studio Beleza Exemplo', alimentos: 'Doceria Exemplo', mentorias: 'Mentoria Exemplo' };
+const EXEMPLOS = { servicos: 'Studio Bella', alimentos: 'Doceria Encanto', mentorias: 'Mentora Jéssica Ferreira' };
 app.get('/exemplo/:tipo', (req, res) => {
   const tipo = String(req.params.tipo);
   if (!EXEMPLOS[tipo]) return res.status(404).send(simplePage('Exemplo não encontrado', 'Confira o endereço digitado.'));
