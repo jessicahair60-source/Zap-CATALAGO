@@ -1102,11 +1102,11 @@ function renderLoja() {
   const cats = ['Todos', ...S.cats];
   $('#view-loja').innerHTML = `
     ${promoHTML()}
-    ${lpos() === 'bar' ? `<header class="ltop">${s.logo ? `<img class="logo" src="${s.logo}" alt="${esc(s.name)}">` : `<span class="ltop-name">${esc(s.name)}</span>`}</header>` : ''}
+    ${lpos() === 'bar' ? `<header class="ltop">${hasImg() ? `<img class="logo" src="${s.logo}" alt="${esc(s.name)}">` : ltext('ltop-name')}</header>` : ''}
     <div class="banner">${lpos() === 'over' ? `<img class="blogo" src="${s.logo}" alt="${esc(s.name)}">` : ''}${s.bannerImg || s.bannerImgM ? `<picture>${s.bannerImg && s.bannerImgM ? `<source media="(min-width: 760px)" srcset="${s.bannerImg}">` : ''}<img src="${s.bannerImgM || s.bannerImg}" alt="${esc(s.bannerTitle)}"></picture>${s.bannerInfo === true && (s.bannerKicker || s.bannerTitle) ? `<div class="bdeco"><small>${esc(s.bannerKicker)}</small><strong>${esc(s.bannerTitle)}</strong></div>` : ''}` :
       `<div class="bart" aria-hidden="true">${[1, 5, 3].map(id => prod(id) ? `<img src="${artSrc(prod(id)) || ''}" alt="">` : '').join('')}</div>${s.bannerInfo === false ? '' : `<div class="bdeco"><small>${esc(s.bannerKicker)}</small><strong>${esc(s.bannerTitle)}</strong></div>`}`}</div>
     ${lpos() === 'badge' ? `<div class="lbadge"><img src="${s.logo}" alt="${esc(s.name)}"></div>` : ''}
-    <aside class="side"><section class="intro">${lpos() === 'below' && s.logo ? `<img class="logo" src="${s.logo}" alt="${esc(s.name)}">` : ''}${lpos() !== 'bar' && (!s.logo || s.showName) ? `<h1 class="store-name">${esc(s.name)}</h1>` : ''}${s.bio && s.bio !== 'Escreva aqui uma frase sobre a sua loja' ? `<p class="bio">${esc(s.bio)}</p>` : ''}</section>${perksHTML()}
+    <aside class="side"><section class="intro">${lpos() === 'below' ? (hasImg() ? `<img class="logo" src="${s.logo}" alt="${esc(s.name)}">` : `<h1 class="store-name" style="font-family:${lfont()}">${esc(s.name)}</h1>`) : ''}${s.bio && s.bio !== 'Escreva aqui uma frase sobre a sua loja' ? `<p class="bio">${esc(s.bio)}</p>` : ''}</section>${perksHTML()}
     ${socialLinks().length && (s.linksTitle ?? 'Conecte-se com a gente') ? `<div class="links-h"><b>${esc(s.linksTitle ?? 'Conecte-se com a gente')}</b>${(s.linksSub ?? 'Toque na opção desejada') ? `<small>${esc(s.linksSub ?? 'Toque na opção desejada')}</small>` : ''}</div>` : ''}
     <nav class="links" aria-label="Redes e contato">
       ${socialLinks().map(l => `<a class="link" href="${esc(l.url)}" target="_blank" rel="noopener"><span class="ico ${l.cls}">${ICONS[l.icon]}</span>${esc(l.text)}<span class="dots" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></span></a>`).join('')}
@@ -1170,7 +1170,12 @@ function renderGrid() {
 }
 
 /* Onde a logo fica: por cima do banner, redonda na borda, numa faixa acima ou embaixo do banner */
-const lpos = () => { const p = S.store.logoPos || 'bar'; return !S.store.logo && (p === 'over' || p === 'badge') ? 'bar' : p; };
+// Logo: foto enviada ou escrita (o próprio nome da loja, na letra escolhida)
+const lkind = () => S.store.logoKind || (S.store.logo ? 'img' : 'text');
+const hasImg = () => lkind() === 'img' && !!S.store.logo;
+const lfont = () => (TITLE_FONTS[S.store.logoFont] || TITLE_FONTS[S.store.titleFont] || TITLE_FONTS.bricolage)[1].replace(/"/g, "'");
+const ltext = cls => `<span class="${cls}" style="font-family:${lfont()}">${esc(S.store.name)}</span>`;
+const lpos = () => { const p = S.store.logoPos || 'bar'; return !hasImg() && (p === 'over' || p === 'badge') ? 'bar' : p; };
 /* Cronômetro de promoção */
 // Duração em minutos a partir de "start"; com "loop" recomeça sozinho. Lojas antigas usam "end" (dia e hora).
 function promoMs() {
@@ -1475,7 +1480,7 @@ function renderPainel() {
       <p class="note">Cada produto pode ter uma regra própria, no cadastro dele.</p>`)}
     ${sec('selos', 'Selos dos produtos', 'Nomes dos selos', `<div class="two">${Object.keys(BADGES).map(k => f('bn' + k, `Selo ${k === 'new' ? '1' : k === 'top' ? '2' : '3'}`, s.badgeNames[k], `data-bn="${k}"`)).join('')}</div>`)}
     <h3 class="pgroup">Aparência<small>Banner, cores e jeito da vitrine</small></h3>
-    ${sec('banner', 'Banner e texto do topo', 'Imagem, chamada, nome e frase', `
+    ${sec('banner', 'Banner, logo e texto do topo', 'Imagem, logo, chamada e frase', `
       <div class="bups">
         <div class="bup"><div class="bprev r169">${s.bannerImgM || s.bannerImg ? `<img src="${s.bannerImgM || s.bannerImg}" alt="">` : '<span>16:9</span>'}</div>
           <div class="binfo"><b>Celular</b><code>1080 x 608 px</code></div>
@@ -1489,12 +1494,16 @@ function renderPainel() {
       <p class="note" style="margin:8px 0 0">JPG ou PNG até 2 MB. Deixe textos e rostos no centro da imagem. Se enviar só um, ele vale para os dois tamanhos.</p>
       <div class="two">${f('skick', 'Chamada pequena', s.bannerKicker)}${f('stitle', 'Título do banner', s.bannerTitle)}</div>
       ${ck('sbinfo', 'Mostrar a chamada e o título no banner', s.bannerInfo === undefined ? !(s.bannerImg || s.bannerImgM) : s.bannerInfo)}
-      <div class="field"><label>Logo <span style="font-weight:400;color:var(--p-muted)">· 600 x 200 px, PNG com fundo transparente</span></label><div><label class="tg" for="slogo" style="cursor:pointer;padding:8px 12px;display:inline-block">${s.logo ? 'Trocar logo' : 'Enviar logo'}</label></div><input id="slogo" type="file" accept="image/*" hidden></div>
-      <div class="field"><label>Onde fica ${s.logo ? 'a logo' : 'o nome da loja'}</label><div class="radios">${[['bar', 'Em cima do banner'], ...(s.logo ? [['over', 'Por cima da imagem'], ['badge', 'Redonda na borda']] : []), ['below', 'Embaixo do banner']].map(([k, l]) => `<button class="opt" data-lpos="${k}" aria-pressed="${lpos() === k}">${l}</button>`).join('')}</div></div>
-      ${s.logo ? `<p class="note" style="margin:4px 0 0"><img src="${s.logo}" alt="" style="max-height:32px;vertical-align:middle;margin-right:8px">Logo enviado. <button class="more" id="rmlogo">Remover logo</button></p>${ck('sshowname', 'Mostrar o nome da loja', s.showName)}` : ''}
-      ${f('sname', 'Nome da loja (embaixo do banner)', s.name)}
+      <div class="field"><label>Logo da loja</label><div class="radios">
+        <button class="opt" data-lkind="text" aria-pressed="${lkind() === 'text'}">Escrever a logo</button><button class="opt" data-lkind="img" aria-pressed="${lkind() === 'img'}">Enviar foto da logo</button></div></div>
+      ${lkind() === 'img' ? `
+        <div class="field"><div><label class="tg" for="slogo" style="cursor:pointer;padding:8px 12px;display:inline-block">${s.logo ? 'Trocar foto da logo' : 'Escolher foto da logo'}</label></div><input id="slogo" type="file" accept="image/*" hidden>
+        <p class="note" style="margin:6px 0 0">${s.logo ? `<img src="${s.logo}" alt="" style="max-height:32px;vertical-align:middle;margin-right:8px">Logo enviada. <button class="more" id="rmlogo">Remover</button>` : 'PNG com fundo transparente, 600 x 200 px.'}</p></div>
+        ${f('sname', 'Nome da loja <span style="font-weight:400;color:var(--p-muted)">· não aparece na vitrine, só no título da página</span>', s.name)}` : `
+        <div class="two">${f('sname', 'Escreva a logo', s.name, 'placeholder="Ex.: Jessica Hair"')}<div class="field"><label for="slfont">Letra da logo</label><select class="in" id="slfont">${Object.entries(TITLE_FONTS).map(([k, v]) => `<option value="${k}" ${(s.logoFont || s.titleFont) === k ? 'selected' : ''}>${v[0]}</option>`).join('')}</select></div></div>`}
+      <div class="field"><label>Onde fica a logo</label><div class="radios">${[['bar', 'Em cima do banner'], ...(hasImg() ? [['over', 'Por cima da imagem'], ['badge', 'Redonda na borda']] : []), ['below', 'Embaixo do banner']].map(([k, l]) => `<button class="opt" data-lpos="${k}" aria-pressed="${lpos() === k}">${l}</button>`).join('')}</div></div>
       <div class="field"><label>Diferenciais (com ícone, embaixo da frase; vazio = esconder)</label>${(s.perks || PERKS_DEFAULT).map((t, i) => `<input class="in" data-perk="${i}" value="${esc(t)}" style="margin-top:${i ? 6 : 0}px" aria-label="Diferencial ${i + 1}">`).join('')}</div>
-      <div class="field"><label for="sbio">Frase embaixo do nome</label><textarea class="in" id="sbio" rows="2" placeholder="Ex.: Perucas e cabelos realistas com entrega para todo o Brasil">${esc(s.bio)}</textarea></div>
+      <div class="field"><label for="sbio">Frase embaixo do banner</label><textarea class="in" id="sbio" rows="2" placeholder="Ex.: Perucas e cabelos realistas com entrega para todo o Brasil">${esc(s.bio)}</textarea></div>
       ${f('scattitle', 'Título acima da busca ({loja} vira o nome da loja; vazio = esconder)', s.catalogTitle ?? 'Conheça nossos produtos')}`)}
     ${sec('tema', 'Cores', `${(THEMES[s.theme] || {}).label || 'Personalizado'}`, `
       <p class="note" style="margin:0 0 8px">1. Escolha um tema. Ele já vem com tudo combinando.</p>
@@ -1626,7 +1635,7 @@ function renderPainel() {
     S.testimonials.splice(+b.dataset.tdel, 1); save(); renderPainel(); toast('Depoimento excluído'); });
   $('#addtesti').onclick = () => { S.testimonials.push({ name: 'Nome da cliente', stars: 5, photo: '', text: 'Escreva aqui o depoimento.' }); pui.open.add('depo'); save(); renderPainel(); };
   $('#sanim').onchange = e => { s.anim = e.target.checked; applyColors(); save(); };
-  $('#slogo').onchange = e => readImg(e.target, u => { s.logo = u; save(); renderPainel(); toast('Logo atualizado'); }, 600, true);
+  if ($('#slogo')) $('#slogo').onchange = e => readImg(e.target, u => { s.logo = u; s.logoKind = 'img'; save(); renderPainel(); toast('Logo atualizado'); }, 600, true);
   if ($('#rmlogo')) $('#rmlogo').onclick = () => { s.logo = ''; save(); renderPainel(); };
   // cronômetro
   const pr = () => (s.promo = s.promo || { on: false, text: 'Promoção termina em', dur: 10, loop: true, start: Date.now() });
@@ -1644,7 +1653,8 @@ function renderPainel() {
   document.querySelectorAll('[data-kon]').forEach(el => el.onchange = () => { S.kits[+el.dataset.kon].on = el.checked; save(); renderPainel(); });
   document.querySelectorAll('[data-kdelc]').forEach(b => b.onclick = () => { if (b.dataset.sure) { S.kits.splice(+b.dataset.kdelc, 1); save(); renderPainel(); } else { b.dataset.sure = 1; b.textContent = 'Toque de novo para tirar'; } });
   document.querySelectorAll('[data-lpos]').forEach(b => b.onclick = () => { s.logoPos = b.dataset.lpos; save(); renderPainel(); });
-  if ($('#sshowname')) $('#sshowname').onchange = e => { s.showName = e.target.checked; save(); };
+  document.querySelectorAll('[data-lkind]').forEach(b => b.onclick = () => { s.logoKind = b.dataset.lkind; save(); renderPainel(); });
+  if ($('#slfont')) $('#slfont').onchange = e => { s.logoFont = e.target.value; save(); };
   $('#sbanner').onchange = e => readImg(e.target, u => { s.bannerImg = u; save(); renderPainel(); toast('Banner do computador atualizado'); }, 1920);
   $('#sbannerm').onchange = e => readImg(e.target, u => { s.bannerImgM = u; save(); renderPainel(); toast('Banner do celular atualizado'); }, 1080);
   if ($('#rmbannerm')) $('#rmbannerm').onclick = () => { s.bannerImgM = ''; save(); renderPainel(); };
