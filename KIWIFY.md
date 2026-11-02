@@ -6,6 +6,16 @@ A lojista toca em **Assinar** no painel, paga no checkout da Kiwify e a loja del
 
 Com a Kiwify ligada, loja sem assinatura paga sai do ar (como era com o Mercado Pago). Antes de colocar o token, entre em `/admin` e toque em **Liberar 30 dias** na sua loja e nas lojas que você quer manter no ar.
 
+## Começar só com os links (sem webhook)
+
+Dá para começar só com os links de pagamento: coloque `KIWIFY_CHECKOUT_URL` (mensal) e `KIWIFY_CHECKOUT_ANUAL` (anual) no Dokploy, sem o `KIWIFY_TOKEN`.
+
+- Quem cria a conta e ainda não pagou vê, ao entrar no painel, a tela para escolher o plano.
+- Depois que ela pagar, a liberação é feita por você: em `/admin`, toque em **Liberar 30 dias** (mensal) ou **Liberar 1 ano** (anual).
+- Coloque `SUPPORT_WHATSAPP` (seu número, só dígitos) para aparecer o botão "Avisar no WhatsApp" depois do pagamento.
+
+Quando colocar o `KIWIFY_TOKEN` e criar o webhook (passos abaixo), a liberação passa a ser automática.
+
 ## 1. Criar o produto
 
 1. Na Kiwify, abra **Produtos > Criar produto**.

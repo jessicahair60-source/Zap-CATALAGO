@@ -569,6 +569,22 @@ body.painel .stats { margin: 14px 0 6px; }
 .plan-list { margin: 10px 0 0; padding: 0; list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; font-size: 12px; color: var(--p-muted); }
 .plan-list li::before { content: "✓ "; color: var(--p-acc); font-weight: 700; }
 .plan-warn { margin: 10px 0 0; font-size: 12.5px; background: #FFF4E5; color: #8A4B00; border-radius: 10px; padding: 8px 10px; }
+.pw { position: fixed; inset: 0; z-index: 90; background: rgba(42,26,34,.55); display: grid; place-items: center; padding: 16px; overflow-y: auto; }
+.pw-box { background: #FBF3F5; color: #2A1A22; border-radius: 24px; padding: 24px 20px; width: 100%; max-width: 620px; box-shadow: 0 30px 80px -20px rgba(0,0,0,.4); }
+.pw-box h2 { margin: 0; font-size: 22px; line-height: 1.2; text-align: center; }
+.pw-lead { text-align: center; color: #7A6670; margin: 8px 0 18px; font-size: 14.5px; }
+.pw-plans { display: grid; gap: 12px; }
+.pw-plan { position: relative; background: #fff; border: 1px solid #EEDDE4; border-radius: 18px; padding: 16px; display: grid; gap: 6px; }
+.pw-plan.best { border: 2px solid #B9476F; }
+.pw-badge { position: absolute; top: -11px; right: 14px; background: #B9476F; color: #fff; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 99px; }
+.pw-plan b { font-size: 15px; } .pw-price { font-size: 26px; font-weight: 800; } .pw-price small { font-size: 13px; font-weight: 500; color: #7A6670; margin-left: 2px; }
+.pw-plan p { margin: 0; font-size: 13px; color: #7A6670; }
+.pw-go { margin-top: 6px; border: 0; border-radius: 12px; padding: 13px; background: #B9476F; color: #fff; font-family: inherit; font-size: 14.5px; font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: .02em; }
+.pw-go:disabled { opacity: .6; }
+.pw-note { font-size: 12.5px; color: #7A6670; text-align: center; margin: 14px 0 0; } .pw-note a { color: #B9476F; font-weight: 700; }
+.pw-foot { display: flex; justify-content: center; gap: 18px; margin-top: 12px; flex-wrap: wrap; }
+.pw-link { background: none; border: 0; color: #2A1A22; font-family: inherit; font-size: 13.5px; font-weight: 600; text-decoration: underline; cursor: pointer; padding: 6px; }
+@media (min-width: 640px) { .pw-plans { grid-template-columns: 1fr 1fr; } }
 .pronote { margin: 0 0 6px; font-size: 12.5px; background: var(--p-soft); border-radius: 10px; padding: 8px 10px; }
 .steps { margin: 12px 0 0; padding-left: 18px; font-size: 12.5px; color: var(--p-muted); display: grid; gap: 4px; }
 .kpis { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -1995,6 +2011,30 @@ if (MODE === 'panel' && !PV) {
   const rp1 = renderPainel; renderPainel = function () { rp1.apply(this, arguments); addInstall(); };
   addInstall();
 }
+// Ainda não pagou: abre a tela para escolher o plano (pode fechar e montar a vitrine antes)
+function payWall() {
+  const st = BOOT.store; if (MODE !== 'panel' || PV || st.plan !== 'expired' || $('#paywall')) return;
+  let closed = false; try { closed = sessionStorage.getItem('vz-pw') === '1'; } catch (e) {}
+  if (closed && !/plano=/.test(location.search)) return;
+  const d = document.createElement('div'); d.id = 'paywall'; d.className = 'pw';
+  const year = st.yearPrice ? `<div class="pw-plan best"><span class="pw-badge">Mais vantajoso</span><b>Plano anual</b><div class="pw-price">${brl(st.yearPrice)}<small>/ano</small></div>
+    <p>Equivale a ${brl(st.yearPrice / 12)} por mês. Economize ${brl(st.proPrice * 12 - st.yearPrice)}.</p><button class="pw-go" data-plan="anual">Quero o plano anual</button></div>` : '';
+  const sup = st.support ? ` <a href="https://wa.me/${st.support}?text=${encodeURIComponent('Olá! Já paguei meu plano do ' + BOOT.brand + '. Meu e-mail: ' + (BOOT.user.email || ''))}" target="_blank" rel="noopener">Avisar no WhatsApp</a>` : '';
+  d.innerHTML = `<div class="pw-box" role="dialog" aria-modal="true" aria-labelledby="pwt">
+    <h2 id="pwt">Falta só um passo para sua vitrine ir ao ar 💗</h2>
+    <p class="pw-lead">Escolha seu plano. Todas as funcionalidades estão incluídas nos dois.</p>
+    <div class="pw-plans">${year}<div class="pw-plan"><b>Plano mensal</b><div class="pw-price">${brl(st.proPrice)}<small>/mês</small></div>
+      <p>Seu catálogo completo, com todas as funcionalidades.</p><button class="pw-go" data-plan="mensal">Quero o plano mensal</button></div></div>
+    <p class="pw-note">Pagamento seguro pela Kiwify. Use o e-mail <b>${esc(BOOT.user.email || '')}</b> na compra. ${st.autoRelease ? 'Sua vitrine é liberada assim que o pagamento for aprovado.' : 'Depois de pagar, sua vitrine é liberada assim que confirmarmos o pagamento.' + sup}</p>
+    <div class="pw-foot"><button class="pw-link" id="pwpaid">Já paguei</button><button class="pw-link" id="pwlater">Montar minha vitrine primeiro</button></div></div>`;
+  document.body.appendChild(d);
+  d.querySelectorAll('.pw-go').forEach(b => b.onclick = async () => { b.disabled = true;
+    try { const j = await api('POST', '/api/billing/checkout', { plan: b.dataset.plan }); if (j.url) { location.href = j.url; return; } if (j.store) { BOOT.store = { ...BOOT.store, ...j.store }; d.remove(); renderPainel(); toast('Assinatura ativada'); } }
+    catch (e) { toast(e.message); b.disabled = false; } });
+  $('#pwpaid').onclick = () => location.reload();
+  $('#pwlater').onclick = () => { try { sessionStorage.setItem('vz-pw', '1'); } catch (e) {} d.remove(); };
+}
+if (!/plano=/.test(location.search)) payWall();
 if (MODE === 'panel' && /assinatura=ok/.test(location.search)) { toast('Pagamento recebido. Assim que o Mercado Pago confirmar, o Pro é ativado.'); history.replaceState(null, '', '/painel'); }
 </script>
 

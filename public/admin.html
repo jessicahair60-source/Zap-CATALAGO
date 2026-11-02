@@ -93,6 +93,7 @@ function render() {
     <div class="acts">
       <a href="${esc(s.url)}" target="_blank" rel="noopener">Ver vitrine</a>
       <button data-a="givePro" data-id="${s.id}">Liberar 30 dias</button>
+      <button data-a="giveYear" data-id="${s.id}">Liberar 1 ano</button>
       ${s.plan !== 'expired' ? `<button data-a="expire" data-id="${s.id}">Encerrar acesso</button>` : ''}
       <button data-a="resetLink" data-id="${s.id}">Link de senha nova</button>
       ${s.blocked ? `<button data-a="unblock" data-id="${s.id}">Desbloquear</button>` : `<button class="danger" data-a="block" data-id="${s.id}">Bloquear</button>`}
@@ -107,6 +108,7 @@ async function act(id, action) {
   if (action === 'block') { const reason = prompt(`Bloquear ${s.name}? A vitrine sai do ar para as clientes. Motivo (opcional):`); if (reason === null) return; body.reason = reason; }
   if (action === 'expire' && !confirm(`Encerrar o acesso de ${s.name} agora? A vitrine sai do ar até ela assinar.`)) return;
   if (action === 'givePro') body.days = 30;
+  if (action === 'giveYear') { body.action = 'givePro'; body.days = 366; }
   const r = await fetch(`/api/admin/stores/${id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
   const j = await r.json().catch(() => ({}));
   if (!r.ok) return toast(j.error || 'Não deu certo.');

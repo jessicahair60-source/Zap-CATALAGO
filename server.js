@@ -21,7 +21,7 @@ const CFG = {
   yearPrice: parseFloat(process.env.PLAN_PRICE_YEAR || '299.99'),
   adminHost: (process.env.ADMIN_HOST || '').toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, ''),
   admins: (process.env.ADMIN_EMAILS || '').toLowerCase().split(',').map(s => s.trim()).filter(Boolean),
-  fakePayments: !mp.enabled() && !kiwify.enabled() && process.env.NODE_ENV !== 'production',
+  fakePayments: !mp.enabled() && !kiwify.enabled() && !kiwify.links() && process.env.NODE_ENV !== 'production',
   support: String(process.env.SUPPORT_WHATSAPP || '').replace(/\D/g, '')
 };
 const UPLOADS = path.join(DATA_DIR, 'uploads');
@@ -55,7 +55,7 @@ function uniqueSlug(base) {
 // Não tem teste grátis: com a cobrança ligada, a loja nova só entra no ar depois de pagar.
 function planOf(store) {
   if (store.pro_until && store.pro_until > now()) return 'pro';
-  if (!mp.enabled() && !kiwify.enabled() && !CFG.fakePayments) return 'open';
+  if (!mp.enabled() && !kiwify.enabled() && !kiwify.links() && !CFG.fakePayments) return 'open';
   return 'expired';
 }
 const isPro = store => planOf(store) !== 'expired';
@@ -65,7 +65,8 @@ function storeInfo(store) {
     id: store.id, slug: store.slug, name: store.name, plan: planOf(store), proUntil: store.pro_until, trialUntil: store.trial_until,
     subscribed: !!store.mp_preapproval, customDomain: store.custom_domain, blocked: !!store.blocked, blockedReason: store.blocked_reason,
     lastPayment: (db.prepare('SELECT status FROM payments WHERE store_id = ? ORDER BY created_at DESC, id DESC LIMIT 1').get(store.id) || {}).status || '',
-    publicUrl: publicUrlOf(store), proPrice: CFG.proPrice, yearPrice: kiwify.enabled() && kiwify.checkoutUrl('anual') ? CFG.yearPrice : 0, brand: CFG.brand, payments: kiwify.enabled() ? 'kiwify' : mp.enabled() ? 'mercadopago' : CFG.fakePayments ? 'teste' : 'off', savedAt: store.updated_at
+    publicUrl: publicUrlOf(store), proPrice: CFG.proPrice, yearPrice: kiwify.checkoutUrl('anual') ? CFG.yearPrice : 0, brand: CFG.brand, autoRelease: !kiwify.links() || kiwify.enabled(), support: CFG.support,
+    payments: kiwify.enabled() || kiwify.links() ? 'kiwify' : mp.enabled() ? 'mercadopago' : CFG.fakePayments ? 'teste' : 'off', savedAt: store.updated_at
   };
 }
 function publicUrlOf(store) {
@@ -478,7 +479,7 @@ app.get('/api/pix', async (req, res) => {
 app.post('/api/billing/checkout', auth, jsonBody, async (req, res) => {
   const s = req.store;
   try {
-    if (kiwify.enabled()) {
+    if (kiwify.enabled() || kiwify.links()) {
       const plan = req.body && req.body.plan === 'anual' ? 'anual' : 'mensal';
       if (!kiwify.checkoutUrl(plan)) return res.status(503).json({ error: 'O link de pagamento ainda não foi configurado na plataforma.' });
       return res.json({ url: kiwify.checkout({ email: req.user.email, name: req.user.name, plan }) });
