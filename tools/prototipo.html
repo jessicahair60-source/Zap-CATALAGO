@@ -327,7 +327,7 @@ html, body { overflow-x: clip; }
 .promo { width: 100vw; margin: 0 0 0 calc(50% - 50vw); display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 12px; padding: 9px 16px;
   background: var(--c-buyBg, #B9476F); color: var(--c-buyText, #fff); font-size: 13px; font-weight: 600; text-align: center; }
 .promo-c { display: inline-flex; gap: 6px; font-variant-numeric: tabular-nums; }
-.promo-c b { background: rgba(255,255,255,.18); border-radius: 8px; padding: 3px 10px; font-size: 16px; font-weight: 800; letter-spacing: .04em; }
+.promo-c b { color: inherit; font-size: 16px; font-weight: 800; letter-spacing: .04em; }
 .kits { display: grid; gap: 10px; margin: 14px 0 4px; }
 .kit { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; font: inherit; color: var(--c-text); cursor: pointer; padding: 14px; border-radius: 16px;
   background: var(--c-cardBg, #fff); border: 1.5px dashed var(--c-buyBg, #B9476F); }
@@ -1094,10 +1094,10 @@ const visible = p => p.active && !(soldOut(p) && zeroMode(p) === 'hide');
 const soldOut = p => p.track && p.stock <= 0;
 const maxQty = p => p.track ? p.stock : 99;
 const hasPrice = p => p.price > 0;
-const priceHTML = p => !hasPrice(p) ? '<span class="ask">Consulte o valor no WhatsApp</span>' : `${p.fromPrice ? '<small class="from">a partir de</small>' : ''}${brl(p.price)}${p.old ? `<span class="old">${brl(p.old)}</span>` : ''}`;
+const priceHTML = p => !hasPrice(p) ? '' : `${p.fromPrice ? '<small class="from">a partir de</small>' : ''}${brl(p.price)}${p.old ? `<span class="old">${brl(p.old)}</span>` : ''}`;
 const kindTxt = p => p.kind === 'digital' ? 'Produto digital' : p.kind === 'servico' ? ['Serviço', p.duration].filter(Boolean).join(' · ') : '';
-const instTxt = p => S.store.installments > 1 && hasPrice(p) ? `ou ${S.store.installments}x de ${brl(p.price / S.store.installments)} sem juros` : '';
-const stockTxt = p => !p.track || !S.store.showStock || soldOut(p) ? '' : p.kind !== 'fisico' ? (p.stock <= S.store.lowStock ? `<b>Restam ${p.stock} vagas</b>` : `${p.stock} vagas`) : p.stock <= S.store.lowStock ? `<b>Restam só ${p.stock}</b>` : `${p.stock} em estoque`;
+const instTxt = p => false && S.store.installments > 1 && hasPrice(p) ? `ou ${S.store.installments}x de ${brl(p.price / S.store.installments)} sem juros` : '';
+const stockTxt = p => true || !p.track || !S.store.showStock || soldOut(p) ? '' : p.kind !== 'fisico' ? (p.stock <= S.store.lowStock ? `<b>Restam ${p.stock} vagas</b>` : `${p.stock} vagas`) : p.stock <= S.store.lowStock ? `<b>Restam só ${p.stock}</b>` : `${p.stock} em estoque`;
 const stars = (r, cls = '') => `<span class="stars ${cls}" style="--r:${Math.max(0, Math.min(5, r))}" aria-label="Nota ${String(r).replace('.', ',')} de 5">★★★★★</span>`;
 const fmtR = r => r.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 const badgeOf = p => p.badge && BADGES[p.badge] ? [S.store.badgeNames[p.badge], BADGES[p.badge]] : null;
@@ -1260,7 +1260,7 @@ function promoLeft() {
   const ms = Math.max(0, promoMs()); const d = Math.floor(ms / 864e5), h = Math.floor(ms / 36e5) % 24, m = Math.floor(ms / 6e4) % 60, sec = Math.floor(ms / 1e3) % 60;
   const two = n => String(n).padStart(2, '0');
   // relógio que todo mundo entende: 29:59, 1:05:30 ou "2 dias 03:15:00"
-  return `<b>${d ? `${d} ${d === 1 ? 'dia' : 'dias'} ` : ''}${d || h ? `${d ? two(h) : h}:` : ''}${two(m)}:${two(sec)}</b>`;
+  return `<b>${d ? `${d} ${d === 1 ? 'dia' : 'dias'} ` : ''}${two(h)}:${two(m)}:${two(sec)}</b>`;
 }
 function promoHTML() {
   if (!promoOn()) return '';
@@ -1309,7 +1309,7 @@ function openVideo(id, mid) {
   const pl = $('#player');
   pl.innerHTML = `<button class="x" id="closeVid" aria-label="Fechar vídeo">×</button>
     <video src="${MEDIA[v.id]}" controls autoplay playsinline></video>
-    <div class="pbar"><div>${esc(p.name)}<small>${hasPrice(p) ? (p.fromPrice ? 'a partir de ' : '') + brl(p.price) : 'Consulte o valor'}</small></div>
+    <div class="pbar"><div>${esc(p.name)}<small>${hasPrice(p) ? (p.fromPrice ? 'a partir de ' : '') + brl(p.price) : ''}</small></div>
       ${soldOut(p) ? '' : `<button class="buy" id="vidBuy">${ICONS.zap}${esc(S.store.buyText || 'EU QUERO')}</button>`}</div>`;
   pl.hidden = false;
   const close = () => { pl.querySelector('video').pause(); pl.hidden = true; pl.innerHTML = ''; };
@@ -1543,10 +1543,8 @@ function renderPainel() {
         <input id="cimg${i}" data-cimg="${esc(c)}" type="file" accept="image/*" hidden></div>`).join('')}</div>
       <p class="note">Toque na bolinha para trocar a foto da categoria.</p>
       <div class="coupon"><input class="in" id="newcat" placeholder="Nova categoria"><button class="tg" id="addcat">Adicionar</button></div>`)}
-    ${sec('estoque', 'Estoque', s.showStock ? 'Contador visível para as clientes' : 'Contador escondido', `
-      ${ck('sshowstock', 'Mostrar o contador de estoque para as clientes', s.showStock)}
-      <div class="two">${f('slow', 'Avisar "Restam só X" a partir de', s.lowStock, 'inputmode="numeric"')}
-        <div class="field"><label for="szero">Quando o estoque zerar</label>${zeroSel('szero', s.zeroStock, false)}</div></div>
+    ${sec('estoque', 'Estoque', 'O que acontece quando o estoque zera', `
+      <div class="field"><label for="szero">Quando o estoque zerar</label>${zeroSel('szero', s.zeroStock, false)}</div>
       <p class="note">Cada produto pode ter uma regra própria, no cadastro dele.</p>`)}
     ${sec('selos', 'Selos dos produtos', 'Nomes dos selos', `<div class="two">${Object.keys(BADGES).map(k => f('bn' + k, `Selo ${k === 'new' ? '1' : k === 'top' ? '2' : '3'}`, s.badgeNames[k], `data-bn="${k}"`)).join('')}</div>`)}
     <h3 class="pgroup">Aparência<small>Banner, cores e jeito da vitrine</small></h3>
@@ -1609,7 +1607,7 @@ function renderPainel() {
       ${ck('ssort', 'Mostrar a contagem de itens e o filtro de ordenar (Mais vendidos, Menor preço...)', !!s.showSort)}
       ${ck('sgroup', 'Separar os produtos por categoria, com título (ex.: CACHEADOS 👇)', s.groupCats === true)}
       ${f('semoji', 'Depois do título da categoria: "seta" = seta animada, ou um emoji (vazio = nada)', (s.secEmoji ?? 'seta') === '👇' ? 'seta' : s.secEmoji ?? 'seta')}
-      <div class="two">${f('sbuy', 'Texto do botão de compra', s.buyText)}${f('sinst', 'Parcelas sem juros (1 = esconder)', s.installments, 'inputmode="numeric"')}</div>`)}
+      <div class="two">${f('sbuy', 'Texto do botão de compra', s.buyText)}</div>`)}
     <h3 class="pgroup">Vendas e contato<small>WhatsApp, links e depoimentos</small></h3>
     ${sec('vbub', 'Bolinha de vídeo na vitrine', (s.vbubble || {}).on ? 'Ligada: aparece no canto da vitrine' : 'Vídeo flutuante "Assistir vídeo dos detalhes"', (() => { const vids = S.products.filter(p => firstVid(p)); const vb = s.vbubble || {}; const cur = vbubProd(); return vids.length ? `
       ${ck('svbon', 'Mostrar a bolinha flutuante com vídeo', !!vb.on)}
@@ -1681,8 +1679,8 @@ function renderPainel() {
     if ($('#svbon')) { $('#svbon').onchange = e => { vbs('on')(e.target.checked); save(); }; $('#svbp').onchange = e => { vbs('pid')(e.target.value); save(); }; $('#svbt').oninput = e => { vbs('text')(e.target.value); save(); }; } }
   bind('sname','name'); if ($('#slogotxt')) bind('slogotxt','logoText'); bind('sbio','bio'); bind('sphone','phone'); bind('skick','bannerKicker'); if ($('#sbinfo')) $('#sbinfo').onchange = e => { s.bannerInfo = e.target.checked; save(); }; bind('stitle','bannerTitle');
   bind('sgreet','greeting'); bind('spay','payments'); bind('sdel','delivery'); bind('spick','pickup'); bind('scoupon','coupon');
-  bind('scpct','couponPct', v => Math.min(100, Math.max(0, parseInt(v) || 0))); bind('sinst','installments', v => Math.max(1, parseInt(v) || 1));
-  bind('sbuy','buyText'); bind('sgroup','groupCats'); bind('ssort','showSort', v => { document.body.classList.toggle('showsort', v); return v; }); bind('semoji','secEmoji'); document.querySelectorAll('[data-perk]').forEach(el => el.oninput = () => { s.perks = [...(s.perks || PERKS_DEFAULT)]; s.perks[+el.dataset.perk] = el.value; save(); }); if ($('#slt')) { bind('slt','linksTitle'); bind('sls','linksSub'); } bind('scattitle','catalogTitle'); bind('sfoot','footer'); bind('sshowstock','showStock'); bind('slow','lowStock', v => Math.max(0, parseInt(v) || 0)); bind('szero','zeroStock');
+  bind('scpct','couponPct', v => Math.min(100, Math.max(0, parseInt(v) || 0)));
+  bind('sbuy','buyText'); bind('sgroup','groupCats'); bind('ssort','showSort', v => { document.body.classList.toggle('showsort', v); return v; }); bind('semoji','secEmoji'); document.querySelectorAll('[data-perk]').forEach(el => el.oninput = () => { s.perks = [...(s.perks || PERKS_DEFAULT)]; s.perks[+el.dataset.perk] = el.value; save(); }); if ($('#slt')) { bind('slt','linksTitle'); bind('sls','linksSub'); } bind('scattitle','catalogTitle'); bind('sfoot','footer'); bind('szero','zeroStock');
   $('#sigring').onchange = e => { s.igRing = e.target.checked; save(); applyColors(); };
   $('#sigvid').onchange = e => { s.igVideo = e.target.checked; save(); applyColors(); };
   document.querySelectorAll('[data-bn]').forEach(el => el.oninput = () => { s.badgeNames[el.dataset.bn] = el.value; save(); });
