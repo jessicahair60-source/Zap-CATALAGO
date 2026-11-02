@@ -1,0 +1,194 @@
+{
+ "v": 4,
+ "store": {
+  "theme": "preto",
+  "titleFont": "playfair",
+  "radius": "square",
+  "anim": true,
+  "logo": "",
+  "showName": true,
+  "testiTitle": "O que as alunas dizem",
+  "name": "Mentoria Exemplo",
+  "bannerImg": "/static/exemplo/mentoria-banner.webp",
+  "bannerKicker": "Turma aberta",
+  "bannerTitle": "Mentoria com Propósito",
+  "bio": "Mentoria e materiais para empreendedoras venderem todos os dias",
+  "phone": "5537999529778",
+  "couponPct": 10,
+  "installments": 3,
+  "buyText": "Eu quero",
+  "payments": "Pix, Cartão",
+  "delivery": false,
+  "pickup": false,
+  "greeting": "Olá! Tenho interesse em:\n{nome_dos_produtos}",
+  "layout": "grid",
+  "showStock": true,
+  "lowStock": 5,
+  "zeroStock": "soldout",
+  "igRing": false,
+  "igVideo": false,
+  "badgeNames": {
+   "new": "Lançamento",
+   "top": "Mais vendido",
+   "promo": "Promoção"
+  },
+  "catalogTitle": "Conheça nossos produtos",
+  "groupCats": false,
+  "p5": true,
+  "p4": true,
+  "p3": true,
+  "p2": true,
+  "bannerImgM": "",
+  "online": true,
+  "perks": [
+   "Acesso imediato",
+   "Suporte no WhatsApp",
+   "Conteúdo prático"
+  ],
+  "bannerInfo": false
+ },
+ "colors": {
+  "bg": "#1A1210",
+  "text": "#EDE3D6",
+  "title": "#F7EFE3",
+  "muted": "#A89685",
+  "bannerBg": "#2A1B16",
+  "bannerText": "#D9B46A",
+  "linkBg": "#241915",
+  "linkText": "#F7EFE3",
+  "linkBorder": "#4A3628",
+  "searchBg": "#241915",
+  "catRing": "#D9B46A",
+  "catText": "#EDE3D6",
+  "cardBg": "#221714",
+  "cardBorder": "#3E2D24",
+  "name": "#F7EFE3",
+  "price": "#D9B46A",
+  "videoRing": "#D9B46A",
+  "star": "#D9A441",
+  "buyBg": "#D9B46A",
+  "buyText": "#1A1210",
+  "cartBg": "#D9B46A",
+  "cartText": "#1A1210",
+  "bNew": "#D9B46A",
+  "bTop": "#F7EFE3",
+  "bPromo": "#B8860B",
+  "badgeText": "#1A1210"
+ },
+ "links": [
+  {
+   "type": "ig",
+   "on": true,
+   "text": "Siga no Instagram",
+   "value": "mentoriaexemplo"
+  },
+  {
+   "type": "zap",
+   "on": true,
+   "text": "Fale comigo no WhatsApp",
+   "value": ""
+  }
+ ],
+ "catImgs": {},
+ "cats": [
+  "Mentorias",
+  "E-books",
+  "Materiais"
+ ],
+ "products": [
+  {
+   "active": true,
+   "zero": "default",
+   "media": [
+    {
+     "id": "ex-mentoria-mentoria.webp",
+     "type": "img"
+    }
+   ],
+   "sizes": [
+    "Online",
+    "Presencial"
+   ],
+   "optLabel": "Formato",
+   "track": true,
+   "link": "",
+   "duration": "3 meses",
+   "fromPrice": false,
+   "sales": 48,
+   "stock": 5,
+   "specs": [],
+   "price": 997,
+   "id": 401,
+   "name": "Mentoria com Propósito",
+   "cat": "Mentorias",
+   "hue": 340,
+   "desc": "Acompanhamento individual com estratégia, posicionamento e plano de vendas para o seu negócio. Poucas vagas por mês.",
+   "rating": 5.0,
+   "reviewsCount": 64,
+   "kind": "servico",
+   "badge": "top",
+   "reviews": 31
+  },
+  {
+   "active": true,
+   "zero": "default",
+   "media": [
+    {
+     "id": "ex-mentoria-ebook.webp",
+     "type": "img"
+    }
+   ],
+   "sizes": [],
+   "optLabel": "Opção",
+   "track": false,
+   "link": "",
+   "duration": "",
+   "fromPrice": false,
+   "sales": 320,
+   "stock": 0,
+   "specs": [],
+   "price": 37,
+   "id": 402,
+   "name": "E-book Como Vender Todos os Dias",
+   "cat": "E-books",
+   "hue": 340,
+   "desc": "Passo a passo para atrair clientes, gerar pedidos e vender com constância. Acesso liberado logo após o pagamento.",
+   "rating": 4.9,
+   "reviewsCount": 64,
+   "kind": "digital",
+   "old": 67,
+   "badge": "new",
+   "reviews": 112
+  },
+  {
+   "active": true,
+   "zero": "default",
+   "media": [
+    {
+     "id": "ex-mentoria-fornecedores.webp",
+     "type": "img"
+    }
+   ],
+   "sizes": [],
+   "optLabel": "Opção",
+   "track": false,
+   "link": "",
+   "duration": "",
+   "fromPrice": false,
+   "sales": 410,
+   "stock": 0,
+   "specs": [],
+   "price": 27,
+   "id": 403,
+   "name": "Lista de Fornecedores",
+   "cat": "Materiais",
+   "hue": 340,
+   "desc": "Fornecedores de cabelos, beleza, moda e acessórios com preço de revenda e envio para todo o Brasil.",
+   "rating": 4.9,
+   "reviewsCount": 64,
+   "kind": "digital",
+   "reviews": 150
+  }
+ ],
+ "testimonials": []
+}

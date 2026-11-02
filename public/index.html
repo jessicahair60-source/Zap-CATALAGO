@@ -50,7 +50,7 @@
   .quem { display: grid; grid-auto-flow: column; grid-auto-columns: 78%; gap: 16px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 22px -20px 0; padding: 6px 20px 10px; scrollbar-width: none; }
   .quem::-webkit-scrollbar { display: none; }
   .quem-c { scroll-snap-align: center; display: grid; justify-items: center; align-content: start; text-align: center; gap: 4px; }
-  .quem-c .phone { width: 230px; margin: 0 0 10px; }
+  .quem-c .phone { width: min(230px, 100%); margin: 0 0 10px; }
   .quem-c b { font-size: 17px; } .quem-c span { color: var(--muted); font-size: 14px; max-width: 260px; } .quem-c a { color: var(--acc); font-weight: 700; font-size: 14px; margin-top: 4px; }
   .shot .live-pic { position: relative; aspect-ratio: 4/5; overflow: hidden; padding: 0; margin: 12px 12px 0; border-radius: 12px 12px 0 0; background: #FCE4EC; box-shadow: 0 6px 18px -10px rgba(80,20,50,.35); }
   .shots { display: grid; gap: 14px; margin-top: 16px; }
@@ -151,7 +151,7 @@
     .tut { grid-template-columns: repeat(3, 1fr); }
     .plans2 { grid-template-columns: 1fr 1fr; max-width: 820px; }
     .duo { grid-template-columns: 1fr 1fr; gap: 20px; }
-    .quem { grid-auto-flow: row; grid-template-columns: repeat(3, 1fr); grid-auto-columns: auto; overflow: visible; margin: 26px 0 0; padding: 6px 0 0; }
+    .quem { grid-auto-flow: row; grid-template-columns: repeat(4, 1fr); grid-auto-columns: auto; overflow: visible; margin: 26px 0 0; padding: 6px 0 0; }
   }
 </style>
 </head>
@@ -198,12 +198,13 @@
 
   <section class="blk" id="para-quem">
     <p class="eyebrow">Para quem é</p>
-    <h2>Funciona para produto, serviço e comida</h2>
-    <p class="txt">Seja qual for o seu negócio, a vitrine se adapta. Veja três exemplos funcionando:</p>
+    <h2>Funciona para produto, serviço, comida e mentoria</h2>
+    <p class="txt">Seja qual for o seu negócio, a vitrine se adapta. Veja quatro exemplos funcionando:</p>
     <div class="quem">
       <div class="quem-c"><figure class="phone sm"><div class="screen"><div class="sbar" aria-hidden="true"><b>9:41</b><i class="isl"></i><span><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".45"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5"/><rect x="23" y="4" width="2" height="4" rx="1" opacity=".45"/></svg></span></div><div class="sview"><iframe class="live" name="zcdemo" src="/jessica-hair?embed=1" loading="lazy" title="Exemplo de loja de produtos: Jessica Hair"></iframe></div><i class="home" aria-hidden="true"></i></div></figure><b>Quem vende produtos</b><span>Roupas, cabelos, acessórios, cosméticos, revenda.</span><a href="/jessica-hair" target="_blank" rel="noopener">Abrir exemplo →</a></div>
       <div class="quem-c"><figure class="phone sm"><div class="screen"><div class="sbar" aria-hidden="true"><b>9:41</b><i class="isl"></i><span><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".45"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5"/><rect x="23" y="4" width="2" height="4" rx="1" opacity=".45"/></svg></span></div><div class="sview"><iframe class="live" name="zcdemo" src="/exemplo/servicos" loading="lazy" title="Exemplo de serviços: Studio Beleza"></iframe></div><i class="home" aria-hidden="true"></i></div></figure><b>Quem oferece serviços</b><span>Salão, unhas, sobrancelha, estética, aulas, consultoria.</span><a href="/exemplo/servicos" target="_blank" rel="noopener">Abrir exemplo →</a></div>
       <div class="quem-c"><figure class="phone sm"><div class="screen"><div class="sbar" aria-hidden="true"><b>9:41</b><i class="isl"></i><span><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".45"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5"/><rect x="23" y="4" width="2" height="4" rx="1" opacity=".45"/></svg></span></div><div class="sview"><iframe class="live" name="zcdemo" src="/exemplo/alimentos" loading="lazy" title="Exemplo de alimentos: Doceria"></iframe></div><i class="home" aria-hidden="true"></i></div></figure><b>Quem vende comida</b><span>Doces, bolos, salgados, marmitas, lanches e bebidas.</span><a href="/exemplo/alimentos" target="_blank" rel="noopener">Abrir exemplo →</a></div>
+      <div class="quem-c"><figure class="phone sm"><div class="screen"><div class="sbar" aria-hidden="true"><b>9:41</b><i class="isl"></i><span><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".45"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5"/><rect x="23" y="4" width="2" height="4" rx="1" opacity=".45"/></svg></span></div><div class="sview"><iframe class="live" name="zcdemo" src="/exemplo/mentorias" loading="lazy" title="Exemplo de mentoria e infoprodutos"></iframe></div><i class="home" aria-hidden="true"></i></div></figure><b>Quem vende mentoria</b><span>Mentorias, cursos, e-books, consultorias e materiais digitais.</span><a href="/exemplo/mentorias" target="_blank" rel="noopener">Abrir exemplo →</a></div>
     </div>
   </section>
 
@@ -333,7 +334,7 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
     <div class="faq">
       <details><summary>É fácil de configurar?</summary><p>Sim, é bem fácil, e você monta tudo pelo celular em 3 passos: coloca seu banner, escolhe as cores e cadastra seus produtos. Logo depois do pagamento você já cria sua conta e começa. E ainda tem tutoriais rápidos que mostram cada passo.</p></details>
       <details><summary>Posso cancelar quando quiser?</summary><p>Sim. Não tem fidelidade nem multa, e você cancela quando quiser. Sua vitrine fica no ar até o fim do período que você já pagou.</p></details>
-      <details><summary>Serve para qualquer tipo de loja?</summary><p>Sim! Serve para quem vende produto, serviço ou comida: roupas, cabelos, cosméticos, salão, unhas, doces, marmitas e muito mais. Você escolhe o texto do botão, por exemplo "Eu quero", "Agendar" ou "Encomendar".</p></details>
+      <details><summary>Serve para qualquer tipo de loja?</summary><p>Sim! Serve para quem vende produto, serviço, comida ou mentoria: roupas, cabelos, cosméticos, salão, unhas, doces, marmitas, cursos, e-books e muito mais. Você escolhe o texto do botão, por exemplo "Eu quero", "Agendar" ou "Encomendar".</p></details>
       <details><summary>Cobra taxa por venda?</summary><p>Não! Você paga só o plano, sem taxa sobre as suas vendas. O pagamento da sua cliente vai direto para você.</p></details>
       <details><summary>Preciso de CNPJ?</summary><p>Não precisa. Funciona tanto para quem vende como pessoa física quanto para empresa.</p></details>
       <details><summary>Ainda preciso do Linktree?</summary><p>Não. O Zap Catálogo já é o seu link da bio: os botões das suas redes ficam no topo e os produtos logo abaixo.</p></details>
