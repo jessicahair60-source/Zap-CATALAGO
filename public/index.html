@@ -310,7 +310,7 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
   function fit(f) { var w = f.parentNode.clientWidth, h = f.parentNode.clientHeight, k = w / 340; f.style.transform = 'scale(' + k + ')'; f.style.height = (h / k) + 'px'; }
   function fitAll() { fs.forEach(fit); } fitAll(); addEventListener('resize', fitAll);
   fs.forEach(function (f) {
-    var on = false, mexeu = false, pausa = 0;
+    var on = false, mexeu = false, pausa = 75;
     function parar() { mexeu = true; }
     f.addEventListener('load', function () {
       try { var d = f.contentWindow.document; ['touchstart', 'wheel', 'mousedown', 'keydown'].forEach(function (t) { d.addEventListener(t, parar, { passive: true }); }); } catch (e) {}
