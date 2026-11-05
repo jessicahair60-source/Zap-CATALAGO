@@ -224,6 +224,24 @@
     .fixo .wa-mini svg { width: 26px; height: 26px; fill: #fff; }
     footer.site { margin-top: 40px; }
   }
+
+  /* exemplos reais em destaque, girando */
+  .vitrines { margin: 40px -20px 0; padding: 48px 20px 40px; background: linear-gradient(180deg, #FFE4EE 0%, #FFF0F6 60%, var(--bg) 100%); border-radius: 32px; }
+  .ex-tabs { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin: 24px 0 4px; }
+  .ex-tabs button { border: 1px solid var(--line); background: #fff; color: var(--fg); font: 700 14px var(--f-body); padding: 9px 16px; border-radius: 99px; cursor: pointer; transition: background .2s, color .2s; }
+  .ex-tabs button.on { background: var(--acc); border-color: var(--acc); color: #fff; box-shadow: 0 8px 18px -10px rgba(232,8,122,.8); }
+  .quem { position: relative; }
+  .quem-c { transition: transform .45s ease, opacity .45s ease; opacity: .7; transform: scale(.93); }
+  .quem-c.on { opacity: 1; transform: none; }
+  .dots { display: flex; gap: 6px; justify-content: center; margin-top: 16px; }
+  .dots i { width: 8px; height: 8px; border-radius: 99px; background: #F3C6D8; transition: width .3s, background .3s; }
+  .dots i.on { width: 24px; background: var(--acc); }
+  @media (prefers-reduced-motion: reduce) { .quem-c { transition: none; } }
+  @media (min-width: 760px) { .vitrines { margin: 48px 0 0; padding: 56px 32px 44px; } }
+  @media (max-width: 759px) {
+    .ex-tabs { gap: 6px; } .ex-tabs button { font-size: 13px; padding: 8px 12px; }
+    .quem { grid-auto-columns: 64%; padding: 6px 18% 10px; margin: 18px -20px 0; }
+  }
 </style>
 </head>
 <body>
@@ -246,6 +264,22 @@
     <figure class="phone"><div class="screen"><div class="sbar" aria-hidden="true"><b>9:41</b><i class="isl"></i><span><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".45"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5"/><rect x="23" y="4" width="2" height="4" rx="1" opacity=".45"/></svg></span></div><div class="sview"><iframe class="live" name="zcdemo" src="/jessica-hair?embed=1" title="Catálogo de exemplo da Jessica Hair"></iframe></div><i class="home" aria-hidden="true"></i></div>
       <figcaption>Vitrine real: Jessica Hair</figcaption></figure>
   </header>
+
+  <!-- 2. Exemplos reais, girando -->
+  <section class="blk centro vitrines" id="exemplos">
+    <p class="eyebrow">Exemplos reais</p>
+    <h2>Olha como seu negócio pode ficar com o Zap Catálogo!</h2>
+    <p class="txt">Cada negócio tem seu estilo. Com o Zap Catálogo, você cria uma vitrine com a identidade da sua marca.</p>
+    <div class="ex-tabs" role="tablist" aria-label="Tipos de negócio"><button type="button" class="on">Produtos</button><button type="button">Serviços</button><button type="button">Comida</button><button type="button">Mentoria</button></div>
+    <div class="quem">
+      <div class="quem-c on"><figure class="phone sm"><div class="screen"><div class="sbar" aria-hidden="true"><b>9:41</b><i class="isl"></i><span><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".45"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5"/><rect x="23" y="4" width="2" height="4" rx="1" opacity=".45"/></svg></span></div><div class="sview"><iframe class="live" name="zcdemo" src="/exemplo/boutique" loading="lazy" title="Exemplo de loja de produtos: Boutique da Maria"></iframe></div><i class="home" aria-hidden="true"></i></div></figure><b>Quem vende produtos</b><span>Roupas, bolsas, cabelos, acessórios, cosméticos, revenda.</span><a href="/exemplo/boutique" target="_blank" rel="noopener">Abrir exemplo →</a></div>
+      <div class="quem-c"><figure class="phone sm"><div class="screen"><div class="sbar" aria-hidden="true"><b>9:41</b><i class="isl"></i><span><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".45"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5"/><rect x="23" y="4" width="2" height="4" rx="1" opacity=".45"/></svg></span></div><div class="sview"><iframe class="live" name="zcdemo" src="/exemplo/servicos" loading="lazy" title="Exemplo de serviços: Studio Bella"></iframe></div><i class="home" aria-hidden="true"></i></div></figure><b>Quem oferece serviços</b><span>Salão, unhas, sobrancelha, estética, aulas, consultoria.</span><a href="/exemplo/servicos" target="_blank" rel="noopener">Abrir exemplo →</a></div>
+      <div class="quem-c"><figure class="phone sm"><div class="screen"><div class="sbar" aria-hidden="true"><b>9:41</b><i class="isl"></i><span><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".45"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5"/><rect x="23" y="4" width="2" height="4" rx="1" opacity=".45"/></svg></span></div><div class="sview"><iframe class="live" name="zcdemo" src="/exemplo/alimentos" loading="lazy" title="Exemplo de alimentos: Doceria Encanto"></iframe></div><i class="home" aria-hidden="true"></i></div></figure><b>Quem vende comida</b><span>Doces, bolos, salgados, marmitas, lanches e bebidas.</span><a href="/exemplo/alimentos" target="_blank" rel="noopener">Abrir exemplo →</a></div>
+      <div class="quem-c"><figure class="phone sm"><div class="screen"><div class="sbar" aria-hidden="true"><b>9:41</b><i class="isl"></i><span><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".45"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5"/><rect x="23" y="4" width="2" height="4" rx="1" opacity=".45"/></svg></span></div><div class="sview"><iframe class="live" name="zcdemo" src="/exemplo/mentorias" loading="lazy" title="Exemplo de mentoria: Mentora Jéssica Ferreira"></iframe></div><i class="home" aria-hidden="true"></i></div></figure><b>Quem vende mentoria</b><span>Mentorias, cursos, e-books, consultorias e materiais digitais.</span><a href="/exemplo/mentorias" target="_blank" rel="noopener">Abrir exemplo →</a></div>
+    </div>
+    <div class="dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></div>
+    <div class="cta-row"><a class="btn big" href="/assinar/mensal">QUERO CRIAR MEU CATÁLOGO</a></div>
+  </section>
 
   <!-- 2. Problema e solução -->
   <section class="blk centro">
@@ -279,21 +313,6 @@
 Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
       </div>
     </div>
-    <div class="cta-row"><a class="btn big" href="/assinar/mensal">QUERO CRIAR MEU CATÁLOGO</a></div>
-  </section>
-
-  <!-- 4. Exemplos reais -->
-  <section class="blk centro" id="exemplos">
-    <p class="eyebrow">Na prática</p>
-    <h2>Olha como seu negócio pode ficar com o Zap Catálogo!</h2>
-    <p class="txt">Cada negócio tem seu estilo. Com o Zap Catálogo, você cria uma vitrine com a identidade da sua marca.</p>
-    <div class="quem">
-      <div class="quem-c"><figure class="phone sm"><div class="screen"><div class="sbar" aria-hidden="true"><b>9:41</b><i class="isl"></i><span><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".45"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5"/><rect x="23" y="4" width="2" height="4" rx="1" opacity=".45"/></svg></span></div><div class="sview"><iframe class="live" name="zcdemo" src="/exemplo/boutique" loading="lazy" title="Exemplo de loja de produtos: Boutique da Maria"></iframe></div><i class="home" aria-hidden="true"></i></div></figure><b>Quem vende produtos</b><span>Roupas, bolsas, cabelos, acessórios, cosméticos, revenda.</span><a href="/exemplo/boutique" target="_blank" rel="noopener">Abrir exemplo →</a></div>
-      <div class="quem-c"><figure class="phone sm"><div class="screen"><div class="sbar" aria-hidden="true"><b>9:41</b><i class="isl"></i><span><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".45"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5"/><rect x="23" y="4" width="2" height="4" rx="1" opacity=".45"/></svg></span></div><div class="sview"><iframe class="live" name="zcdemo" src="/exemplo/servicos" loading="lazy" title="Exemplo de serviços: Studio Bella"></iframe></div><i class="home" aria-hidden="true"></i></div></figure><b>Quem oferece serviços</b><span>Salão, unhas, sobrancelha, estética, aulas, consultoria.</span><a href="/exemplo/servicos" target="_blank" rel="noopener">Abrir exemplo →</a></div>
-      <div class="quem-c"><figure class="phone sm"><div class="screen"><div class="sbar" aria-hidden="true"><b>9:41</b><i class="isl"></i><span><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".45"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5"/><rect x="23" y="4" width="2" height="4" rx="1" opacity=".45"/></svg></span></div><div class="sview"><iframe class="live" name="zcdemo" src="/exemplo/alimentos" loading="lazy" title="Exemplo de alimentos: Doceria Encanto"></iframe></div><i class="home" aria-hidden="true"></i></div></figure><b>Quem vende comida</b><span>Doces, bolos, salgados, marmitas, lanches e bebidas.</span><a href="/exemplo/alimentos" target="_blank" rel="noopener">Abrir exemplo →</a></div>
-      <div class="quem-c"><figure class="phone sm"><div class="screen"><div class="sbar" aria-hidden="true"><b>9:41</b><i class="isl"></i><span><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".45"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5"/><rect x="23" y="4" width="2" height="4" rx="1" opacity=".45"/></svg></span></div><div class="sview"><iframe class="live" name="zcdemo" src="/exemplo/mentorias" loading="lazy" title="Exemplo de mentoria: Mentora Jéssica Ferreira"></iframe></div><i class="home" aria-hidden="true"></i></div></figure><b>Quem vende mentoria</b><span>Mentorias, cursos, e-books, consultorias e materiais digitais.</span><a href="/exemplo/mentorias" target="_blank" rel="noopener">Abrir exemplo →</a></div>
-    </div>
-    <p class="arraste">Arraste para o lado para ver os 4 exemplos →</p>
     <div class="cta-row"><a class="btn big" href="/assinar/mensal">QUERO CRIAR MEU CATÁLOGO</a></div>
   </section>
 
@@ -367,6 +386,24 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
       } catch (e) {}
     }, 33);
   });
+})();
+</script>
+<script>
+/* Exemplos: giram sozinhos, com abas e bolinhas; param quando a pessoa mexe */
+(function () {
+  var q = document.querySelector('#exemplos .quem'); if (!q) return;
+  var cards = [].slice.call(q.children), tabs = [].slice.call(document.querySelectorAll('#exemplos .ex-tabs button')), dots = [].slice.call(document.querySelectorAll('#exemplos .dots i'));
+  var i = 0, pausaAte = 0, visivel = false, auto = false;
+  function marcar(n) { i = n; [cards, tabs, dots].forEach(function (l) { l.forEach(function (e, k) { e.classList.toggle('on', k === n); }); }); tabs.forEach(function (t, k) { t.setAttribute('aria-selected', k === n ? 'true' : 'false'); }); }
+  function ir(n) { marcar(n); if (q.scrollWidth > q.clientWidth + 4) { auto = true; q.scrollTo({ left: cards[n].offsetLeft - (q.clientWidth - cards[n].offsetWidth) / 2, behavior: 'smooth' }); setTimeout(function () { auto = false; }, 700); } }
+  function mexeu() { pausaAte = Date.now() + 12000; }
+  tabs.forEach(function (t, k) { t.addEventListener('click', function () { mexeu(); ir(k); }); });
+  var tm; q.addEventListener('scroll', function () { if (auto) return; clearTimeout(tm); tm = setTimeout(function () {
+    var c = q.scrollLeft + q.clientWidth / 2, best = 0, d = 1e9; cards.forEach(function (e, k) { var x = Math.abs(e.offsetLeft + e.offsetWidth / 2 - c); if (x < d) { d = x; best = k; } }); marcar(best); }, 80); }, { passive: true });
+  ['touchstart', 'pointerdown', 'wheel'].forEach(function (t) { q.addEventListener(t, mexeu, { passive: true }); });
+  if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { visivel = es[0].isIntersecting; }, { threshold: .3 }).observe(q); else visivel = true;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  setInterval(function () { if (!visivel || document.hidden || Date.now() < pausaAte) return; ir((i + 1) % cards.length); }, 4000);
 })();
 </script>
 <script>
