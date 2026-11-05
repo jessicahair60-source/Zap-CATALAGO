@@ -173,9 +173,6 @@
   .fixo .btn { width: 100%; min-height: 48px; }
   @media (max-width: 759px) {
     body.tem-fixo { padding-bottom: 76px; }
-    .wa-float { bottom: calc(80px + env(safe-area-inset-bottom)); }
-    .wa-float span { display: none; }
-    .wa-float i { width: 50px; height: 50px; } .wa-float svg { width: 27px; height: 27px; }
   }
   @media (min-width: 760px) {
     .fixo { display: none; }
@@ -184,6 +181,48 @@
     .shots { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 900px; margin-left: auto; margin-right: auto; }
     .compra { grid-template-columns: .95fr 1.05fr; gap: 36px; }
     .final { padding: 52px 40px; }
+  }
+
+  /* ===== ajustes para celular ===== */
+  .arraste { display: none; }
+  @media (max-width: 759px) {
+    section.blk { padding-top: 54px; }
+    .nav .btn:not(.ghost) { display: none; }
+    .nav .btn.ghost { padding: 9px 4px; font-size: 14px; }
+    .hero { padding-top: 18px; gap: 34px; }
+    .hero .lead { font-size: 16.5px; }
+    .ok3 { margin: 18px 0 22px; }
+    .hero .phone { width: 252px; margin-bottom: 56px; }
+    .phone figcaption { bottom: -40px; }
+    .blk > p.txt, .centro > p.txt { font-size: 16px; }
+    .antesdepois { margin-top: 22px; }
+    .ad { padding: 18px; }
+    /* benefícios mais compactos: ícone ao lado do texto */
+    .bens { gap: 10px; margin-top: 22px; }
+    .ben { display: grid; grid-template-columns: 40px 1fr; column-gap: 14px; padding: 16px; }
+    .ben .ico { grid-row: span 2; }
+    .ben b { margin: 1px 0 2px; font-size: 16px; }
+    .zapdemo { padding: 18px; gap: 18px; }
+    /* 3 passos em carrossel, como os exemplos */
+    .shots { grid-auto-flow: column; grid-auto-columns: 80%; grid-template-columns: none; overflow-x: auto; scroll-snap-type: x mandatory; margin: 22px -20px 0; padding: 4px 20px 10px; scrollbar-width: none; }
+    .shots::-webkit-scrollbar { display: none; }
+    .shot { scroll-snap-align: center; }
+    .shot img { aspect-ratio: 1 / 1; }
+    .arraste { display: block; margin: 6px 0 0; text-align: center; font-size: 13px; font-weight: 600; color: var(--muted); }
+    .quem { grid-auto-columns: 66%; }
+    .cta-row { margin-top: 24px; }
+    .cta-row .btn { width: 100%; }
+    .plano { padding: 22px 18px; }
+    .plano .valor { font-size: 40px; }
+    .final { margin-top: 56px; padding: 34px 20px; }
+    .final .btn { width: 100%; }
+    /* WhatsApp de dúvidas entra no botão fixo, sem cobrir o conteúdo */
+    .wa-float { display: none; }
+    .fixo { display: flex; gap: 10px; align-items: center; }
+    .fixo .btn { flex: 1; }
+    .fixo .wa-mini { flex: none; width: 48px; height: 48px; border-radius: 14px; background: #25D366; display: grid; place-items: center; }
+    .fixo .wa-mini svg { width: 26px; height: 26px; fill: #fff; }
+    footer.site { margin-top: 40px; }
   }
 </style>
 </head>
@@ -254,6 +293,7 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
       <div class="quem-c"><figure class="phone sm"><div class="screen"><div class="sbar" aria-hidden="true"><b>9:41</b><i class="isl"></i><span><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".45"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5"/><rect x="23" y="4" width="2" height="4" rx="1" opacity=".45"/></svg></span></div><div class="sview"><iframe class="live" name="zcdemo" src="/exemplo/alimentos" loading="lazy" title="Exemplo de alimentos: Doceria Encanto"></iframe></div><i class="home" aria-hidden="true"></i></div></figure><b>Quem vende comida</b><span>Doces, bolos, salgados, marmitas, lanches e bebidas.</span><a href="/exemplo/alimentos" target="_blank" rel="noopener">Abrir exemplo →</a></div>
       <div class="quem-c"><figure class="phone sm"><div class="screen"><div class="sbar" aria-hidden="true"><b>9:41</b><i class="isl"></i><span><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".45"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5"/><rect x="23" y="4" width="2" height="4" rx="1" opacity=".45"/></svg></span></div><div class="sview"><iframe class="live" name="zcdemo" src="/exemplo/mentorias" loading="lazy" title="Exemplo de mentoria: Mentora Jéssica Ferreira"></iframe></div><i class="home" aria-hidden="true"></i></div></figure><b>Quem vende mentoria</b><span>Mentorias, cursos, e-books, consultorias e materiais digitais.</span><a href="/exemplo/mentorias" target="_blank" rel="noopener">Abrir exemplo →</a></div>
     </div>
+    <p class="arraste">Arraste para o lado para ver os 4 exemplos →</p>
     <div class="cta-row"><a class="btn big" href="/assinar/mensal">QUERO CRIAR MEU CATÁLOGO</a></div>
   </section>
 
@@ -269,6 +309,7 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
       <figure class="shot"><div class="pic"><img src="/static/exemplo/painel-3-passos.webp" width="600" height="965" loading="lazy" decoding="async" alt="Painel: vitrine no ar com o link para copiar e compartilhar"></div>
         <figcaption><span class="n">3</span><b>Compartilhe</b><span>Divulgue seu link e receba os pedidos pelo WhatsApp.</span></figcaption></figure>
     </div>
+    <p class="arraste">Arraste para ver os 3 passos →</p>
     <p class="comp"><b>Não precisa saber programar.</b> Você recebe acesso ao painel e um tutorial para aprender a usar.</p>
   </section>
 
@@ -301,7 +342,7 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
 
   <footer class="site"><span>© Zap Catálogo</span><span><a href="/termos">Termos de uso</a> · <a href="/privacidade">Privacidade</a> · <a href="/entrar">Entrar</a></span></footer>
 </div>
-<div class="fixo" id="fixo" aria-hidden="true"><a class="btn" href="/assinar/mensal" tabindex="-1">QUERO CRIAR MEU CATÁLOGO</a></div>
+<div class="fixo" id="fixo" aria-hidden="true"><a class="btn" href="/assinar/mensal" tabindex="-1">QUERO CRIAR MEU CATÁLOGO</a><a class="wa-mini" href="https://wa.me/5537999764780?text=Ol%C3%A1!%20Tenho%20uma%20d%C3%BAvida%20sobre%20o%20Zap%20Cat%C3%A1logo." target="_blank" rel="noopener" tabindex="-1" aria-label="Tirar dúvidas no WhatsApp"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.3-.6-.4zM12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4C2.7 15.6 2.2 13.8 2.2 12 2.2 6.6 6.6 2.2 12 2.2c2.6 0 5.1 1 6.9 2.9 1.8 1.8 2.9 4.3 2.9 6.9 0 5.4-4.4 9.8-9.8 9.8zm8.4-18.2C18.2 1.3 15.2 0 12 0 5.4 0 0 5.4 0 12c0 2.1.6 4.2 1.6 6L0 24l6.2-1.6c1.8 1 3.8 1.5 5.8 1.5 6.6 0 12-5.4 12-12 0-3.2-1.2-6.2-3.6-8.4z"/></svg></a></div>
 <script>
 /* Catálogo de exemplo de verdade dentro dos celulares: ajusta ao tamanho e desce sozinho até a cliente mexer */
 (function () {
@@ -336,7 +377,7 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
   document.body.classList.add('tem-fixo');
   new IntersectionObserver(function (es) {
     var on = !es[0].isIntersecting && es[0].boundingClientRect.top < 0;
-    fixo.classList.toggle('on', on); fixo.setAttribute('aria-hidden', on ? 'false' : 'true'); fixo.querySelector('a').tabIndex = on ? 0 : -1;
+    fixo.classList.toggle('on', on); fixo.setAttribute('aria-hidden', on ? 'false' : 'true'); fixo.querySelectorAll('a').forEach(function (a) { a.tabIndex = on ? 0 : -1; });
   }).observe(alvo);
 })();
 </script>
