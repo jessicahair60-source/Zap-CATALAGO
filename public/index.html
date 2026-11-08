@@ -530,11 +530,6 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
   fetch('/api/oferta', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (o) {
     if (!o || !o.ativa) return;
     var desvio = o.agora - Date.now();
-    var dia = function (t) { return new Date(t).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' }); };
-    if (dia(o.fim) !== dia(o.agora)) {
-      document.getElementById('of-tit').textContent = 'OFERTA ESPECIAL POR TEMPO LIMITADO!';
-      document.getElementById('of-txt').textContent = 'Aproveite as condições especiais desta oferta para ter seu próprio catálogo online e começar a organizar suas vendas.';
-    }
     if (o.precoNormal > o.preco) document.getElementById('of-de').textContent = brl(o.precoNormal);
     document.getElementById('of-por').textContent = brl(o.preco);
     document.getElementById('of-per').textContent = o.periodo || '';
