@@ -335,6 +335,16 @@
     .oferta { margin-top: 56px; padding: 36px 18px; }
     .oferta .btn { width: 100%; }
   }
+
+  /* trio de vitrines no topo */
+  .trio { position: relative; margin: 0 auto 10px; width: 100%; max-width: 520px; aspect-ratio: 1 / 1.3; }
+  .trio img { position: absolute; top: 0; height: auto; display: block;
+    aspect-ratio: 520 / 1220; object-fit: cover; object-position: top; border-radius: 15% / 6.4%; box-shadow: 0 30px 50px -24px rgba(120,20,60,.45); }
+  .trio .t-meio { width: 54%; left: 23%; z-index: 3; }
+  .trio .t-esq { width: 42%; left: 1%; top: 8%; z-index: 1; transform: rotate(-7deg); opacity: .96; }
+  .trio .t-dir { width: 42%; right: 1%; top: 8%; z-index: 2; transform: rotate(7deg); opacity: .96; }
+  .trio figcaption { position: absolute; left: 50%; bottom: -14px; transform: translateX(-50%); z-index: 4; white-space: nowrap; background: #fff; border: 1px solid var(--line); color: var(--fg); font-size: 12.5px; font-weight: 700; padding: 7px 13px; border-radius: 99px; box-shadow: 0 8px 20px -10px rgba(80,20,50,.35); }
+  @media (min-width: 760px) { .trio { max-width: 540px; } }
 </style>
 </head>
 <body>
@@ -354,8 +364,12 @@
       <a class="btn big" id="cta-topo" href="/assinar/mensal">QUERO CRIAR MEU CATÁLOGO</a>
       <p class="preco-mini"><b>R$ 47,00/mês</b> • Acesso após a confirmação do pagamento</p>
     </div>
-    <figure class="phone"><div class="screen"><div class="sbar" aria-hidden="true"><b>9:41</b><i class="isl"></i><span><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".45"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5"/><rect x="23" y="4" width="2" height="4" rx="1" opacity=".45"/></svg></span></div><div class="sview"><iframe class="live" name="zcdemo" src="/jessica-hair?embed=1" title="Catálogo de exemplo da Jessica Hair"></iframe></div><i class="home" aria-hidden="true"></i></div>
-      <figcaption>Vitrine real: Jessica Hair</figcaption></figure>
+    <figure class="trio" aria-label="Exemplos de vitrines feitas no Zap Catálogo">
+      <img class="t-esq" src="/static/exemplo/mockup-acessorios.webp" width="520" height="1220" alt="Vitrine Acessórios da Lu: bijuterias e semijoias, com botões das redes e produtos com Eu quero" fetchpriority="high">
+      <img class="t-dir" src="/static/exemplo/mockup-doceria.webp" width="520" height="1425" alt="Vitrine Doceria Encanto: doces e salgados com pedido pelo WhatsApp">
+      <img class="t-meio" src="/static/exemplo/mockup-boutique.webp" width="520" height="1220" alt="Vitrine Boutique da Maria: moda feminina com categorias e produtos" fetchpriority="high">
+      <figcaption>Vitrines feitas no Zap Catálogo</figcaption>
+    </figure>
   </header>
 
   <!-- 2. O que é: painel x catálogo -->
