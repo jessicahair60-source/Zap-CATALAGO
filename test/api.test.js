@@ -175,3 +175,19 @@ test('páginas públicas da plataforma', async () => {
   let r = await c('GET', '/painel'); assert.strictEqual(r.status, 302);
   r = await c('GET', '/nao-existe'); assert.strictEqual(r.status, 404);
 });
+
+test('oferta da página de vendas: desligada sem configuração, liga com prazo fixo e some quando acaba', async () => {
+  const c = client();
+  let r = await c('GET', '/api/oferta'); assert.deepStrictEqual(r.json, { ativa: false });
+  r = await c('GET', '/assinar/oferta'); assert.strictEqual(r.headers.get('location'), '/assinar/mensal');
+  const fim = Date.now() + 3600e3;
+  Object.assign(process.env, { OFERTA_PRECO: '37,00', OFERTA_FIM: new Date(fim).toISOString(), OFERTA_CHECKOUT_URL: 'https://pay.kiwify.com.br/oferta' });
+  try {
+    r = await c('GET', '/api/oferta'); assert.strictEqual(r.json.ativa, true); assert.strictEqual(r.json.preco, 37); assert.strictEqual(r.json.fim, fim);
+    const r2 = await client()('GET', '/api/oferta'); assert.strictEqual(r2.json.fim, r.json.fim);
+    r = await c('GET', '/assinar/oferta'); assert.strictEqual(r.headers.get('location'), 'https://pay.kiwify.com.br/oferta');
+    process.env.OFERTA_FIM = new Date(Date.now() - 1000).toISOString();
+    r = await c('GET', '/api/oferta'); assert.strictEqual(r.json.ativa, false);
+    r = await c('GET', '/assinar/oferta'); assert.strictEqual(r.headers.get('location'), '/assinar/mensal');
+  } finally { for (const k of ['OFERTA_PRECO', 'OFERTA_FIM', 'OFERTA_CHECKOUT_URL']) delete process.env[k]; }
+});

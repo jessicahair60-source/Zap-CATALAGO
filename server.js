@@ -240,6 +240,21 @@ app.use((req, res, next) => {
 const page = name => (req, res) => res.sendFile(path.join(PUB, name));
 app.get('/', page('index.html'));
 app.get('/termos', page('termos.html'));
+// Oferta por tempo limitado da página de vendas. Só aparece com preço, data de fim e link de checkout configurados,
+// e some sozinha quando o prazo acaba. O prazo é o mesmo para todo mundo (não reinicia por visita nem por sessão).
+// O preço aqui só é mostrado na página: o valor cobrado é o do link OFERTA_CHECKOUT_URL criado na Kiwify.
+function oferta() {
+  const preco = parseFloat(String(process.env.OFERTA_PRECO || '').replace(',', '.'));
+  const fim = Date.parse(process.env.OFERTA_FIM || '');
+  const url = process.env.OFERTA_CHECKOUT_URL || '';
+  if (!(preco > 0) || !Number.isFinite(fim) || !/^https:\/\//.test(url) || Date.now() >= fim) return null;
+  return { preco, fim, url, periodo: process.env.OFERTA_PERIODO || '/mês' };
+}
+app.get('/api/oferta', (req, res) => {
+  const o = oferta();
+  res.set('Cache-Control', 'no-store').json(o ? { ativa: true, preco: o.preco, precoNormal: CFG.proPrice, periodo: o.periodo, fim: o.fim, agora: Date.now() } : { ativa: false });
+});
+app.get('/assinar/oferta', (req, res) => { const o = oferta(); res.redirect(302, o ? o.url : '/assinar/mensal'); });
 // Botões "Quero..." da página de vendas: vão direto para o pagamento da Kiwify (sem link configurado, caem no cadastro)
 app.get('/assinar/:plano', (req, res) => {
   const plan = req.params.plano === 'anual' ? 'anual' : 'mensal';

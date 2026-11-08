@@ -67,3 +67,16 @@ KIWIFY_CHECKOUT_ANUAL=https://pay.kiwify.com.br/seu-link-anual
 ```
 
 Com isso, o painel mostra os dois planos e os botões da página de vendas abrem o checkout certo depois que a pessoa cria a conta.
+
+## Oferta por tempo limitado na página de vendas (opcional)
+
+A seção "Oferta especial" com cronômetro só aparece quando estas variáveis estão preenchidas no Environment do Dokploy:
+
+- `OFERTA_PRECO`: o valor promocional mostrado na página, por exemplo `37,00`.
+- `OFERTA_FIM`: data e hora em que a oferta acaba, com fuso. Exemplo: `2026-11-30T23:59:00-03:00`.
+- `OFERTA_CHECKOUT_URL`: o link de checkout da Kiwify criado **com esse mesmo preço promocional**.
+- `OFERTA_PERIODO` (opcional): o texto ao lado do preço. O padrão é `/mês`. Exemplo: `no primeiro mês`.
+
+O cronômetro conta até `OFERTA_FIM` usando o relógio do servidor, então é o mesmo para todas as visitantes e não reinicia ao atualizar a página. Quando o prazo acaba, a seção some sozinha e o botão `/assinar/oferta` passa a levar ao plano mensal normal. Se a oferta acaba no mesmo dia, o título é "Oferta especial somente hoje!". Se acaba em outro dia, o título vira "Oferta especial por tempo limitado!".
+
+O preço da assinatura normal (`PLAN_PRICE`) e os links `KIWIFY_CHECKOUT_URL` e `KIWIFY_CHECKOUT_ANUAL` não mudam.
