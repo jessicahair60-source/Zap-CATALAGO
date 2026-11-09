@@ -75,6 +75,7 @@ A seção "Oferta especial" com cronômetro só aparece quando estas variáveis 
 - `OFERTA_PRECO`: o valor promocional mostrado na página, por exemplo `37,00`.
 - `OFERTA_FIM`: data e hora em que a oferta acaba, com fuso. Exemplo: `2026-11-30T23:59:00-03:00`.
 - `OFERTA_CHECKOUT_URL`: o link de checkout da Kiwify criado **com esse mesmo preço promocional**.
+- `OFERTA_PRECO_DE` (opcional): o preço riscado da oferta ("De R$ ..."). O padrão é `150,00`.
 - `OFERTA_PERIODO` (opcional): o texto ao lado do preço. O padrão é `/mês`. Exemplo: `no primeiro mês`.
 
 O cronômetro conta até `OFERTA_FIM` usando o relógio do servidor, então é o mesmo para todas as visitantes e não reinicia ao atualizar a página. Quando o prazo acaba, a seção some sozinha e o botão `/assinar/oferta` passa a levar ao plano mensal normal. O título da seção é sempre "Oferta especial somente hoje!", então coloque em `OFERTA_FIM` o fim do próprio dia (por exemplo `2026-11-30T23:59:00-03:00`) para o texto ficar verdadeiro.

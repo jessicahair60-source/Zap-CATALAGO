@@ -114,6 +114,8 @@
   .ok3 li::before, .incl li::before { content: ""; flex: none; width: 22px; height: 22px; border-radius: 50%; background: var(--acc) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5 9-10'/%3E%3C/svg%3E") center / 12px no-repeat; }
   .preco-mini { margin: 12px 0 0; font-size: 13.5px; color: var(--muted); }
   .preco-mini b { color: var(--fg); }
+  .preco-mini s, .plano .de s { text-decoration-thickness: 1.5px; }
+  .plano .de { margin: 10px 0 -4px; font-size: 15px; color: var(--muted); }
   @media (max-width: 559px) { .hero .btn.big { width: 100%; } }
   .phone figcaption { bottom: -42px; }
 
@@ -362,7 +364,7 @@
       <p class="lead">Com o Zap Catálogo, você cria seu próprio catálogo online, com a sua marca, e recebe pedidos diretamente no WhatsApp.</p>
       <ul class="ok3"><li>Seu próprio painel para cadastrar e editar tudo</li><li>Catálogo com a sua marca em um único link</li><li>Pedidos direto no seu WhatsApp</li></ul>
       <a class="btn big" id="cta-topo" href="/assinar/mensal">QUERO CRIAR MEU CATÁLOGO</a>
-      <p class="preco-mini"><b>R$ 47,00/mês</b> • Acesso após a confirmação do pagamento</p>
+      <p class="preco-mini">De <s>R$ 150,00</s> por <b>R$ 47,00/mês</b> • Acesso após a confirmação do pagamento</p>
     </div>
     <figure class="trio" aria-label="Exemplos de vitrines feitas no Zap Catálogo">
       <img class="t-esq" src="/static/exemplo/mockup-acessorios.webp" width="520" height="1220" alt="Vitrine Acessórios da Lu: bijuterias e semijoias, com botões das redes e produtos com Eu quero" fetchpriority="high">
@@ -464,6 +466,7 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
     <div class="compra so-plano">
       <div class="plano">
         <span class="nome">ZAP CATÁLOGO</span>
+        <div class="de">De <s>R$ 150,00</s> por</div>
         <div class="valor">R$ 47,00<small>/mês</small></div>
         <p class="intro">Tudo o que você precisa para montar e divulgar seu catálogo:</p>
         <ul class="incl"><li>Vitrine com sua marca</li><li>Cadastro de produtos e serviços</li><li>Fotos, vídeos e preços</li><li>Categorias organizadas</li><li>Link para compartilhar</li><li>Pedidos direto no WhatsApp</li><li>Acesso ao painel</li><li>Tutorial de utilização</li></ul>

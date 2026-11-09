@@ -252,7 +252,7 @@ function oferta() {
 }
 app.get('/api/oferta', (req, res) => {
   const o = oferta();
-  res.set('Cache-Control', 'no-store').json(o ? { ativa: true, preco: o.preco, precoNormal: CFG.proPrice, periodo: o.periodo, fim: o.fim, agora: Date.now() } : { ativa: false });
+  res.set('Cache-Control', 'no-store').json(o ? { ativa: true, preco: o.preco, precoNormal: parseFloat(String(process.env.OFERTA_PRECO_DE || '').replace(',', '.')) || 150, periodo: o.periodo, fim: o.fim, agora: Date.now() } : { ativa: false });
 });
 app.get('/assinar/oferta', (req, res) => { const o = oferta(); res.redirect(302, o ? o.url : '/assinar/mensal'); });
 // Botões "Quero..." da página de vendas: vão direto para o pagamento da Kiwify (sem link configurado, caem no cadastro)
