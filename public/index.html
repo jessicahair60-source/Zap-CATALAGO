@@ -369,6 +369,18 @@
   .trio .t-dir { width: 42%; right: 1%; top: 8%; z-index: 2; transform: rotate(7deg); opacity: .96; }
   .trio figcaption { position: absolute; left: 50%; bottom: -14px; transform: translateX(-50%); z-index: 4; white-space: nowrap; background: #fff; border: 1px solid var(--line); color: var(--fg); font-size: 12.5px; font-weight: 700; padding: 7px 13px; border-radius: 99px; box-shadow: 0 8px 20px -10px rgba(80,20,50,.35); }
   @media (min-width: 760px) { .trio { max-width: 540px; } }
+
+  /* ===== organização: passos enxutos, faixas separando as seções ===== */
+  .passos { list-style: none; margin: 28px auto 0; padding: 0; display: grid; gap: 12px; max-width: 980px; text-align: left; counter-reset: none; }
+  .passos li { display: flex; gap: 14px; align-items: flex-start; background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 18px; }
+  .passos .n { flex: none; width: 38px; height: 38px; border-radius: 50%; background: var(--acc); color: #fff; display: grid; place-items: center; font: 800 17px var(--f-display); }
+  .passos b { display: block; font: 800 18px/1.2 var(--f-display); letter-spacing: -.01em; margin: 2px 0 4px; }
+  .passos span:not(.n) { display: block; color: var(--muted); font-size: 15px; line-height: 1.45; }
+  @media (min-width: 760px) { .passos { grid-template-columns: repeat(3, 1fr); gap: 16px; } .passos li { padding: 22px; } }
+  section.blk.faixa { margin: 72px -20px 0; padding: 52px 20px 52px; background: #fff; border-radius: 32px; border: 1px solid var(--line); }
+  section.blk.faixa .ben { background: var(--bg); }
+  @media (min-width: 760px) { section.blk.faixa { margin: 80px 0 0; padding: 60px 32px; } }
+  @media (max-width: 759px) { section.blk.faixa { margin-top: 54px; padding: 44px 20px; } .par-vit { max-width: 330px; } }
 </style>
 </head>
 <body>
@@ -408,18 +420,13 @@
 
   <!-- 3. Como funciona -->
   <section class="blk centro" id="como-funciona">
-    
     <h2>Seu catálogo pronto para divulgar <em>em 3 passos.</em></h2>
     <p class="txt">Do cadastro ao primeiro pedido, tudo pelo celular.</p>
-    <div class="shots" style="text-align:left">
-      <figure class="shot"><div class="pic"><img src="/static/exemplo/painel-banner.webp" width="684" height="855" loading="lazy" decoding="async" alt="Painel: envio da capa e da logo da loja"></div>
-        <figcaption><span class="n">1</span><b>Personalize</b><span>Coloque o nome, a capa e as cores do seu negócio.</span></figcaption></figure>
-      <figure class="shot"><div class="pic"><img src="/static/exemplo/painel-produtos.webp" width="684" height="1130" loading="lazy" decoding="async" alt="Painel: lista de produtos com fotos e vídeos"></div>
-        <figcaption><span class="n">2</span><b>Cadastre</b><span>Adicione seus produtos, fotos, vídeos e preços.</span></figcaption></figure>
-      <figure class="shot"><div class="pic"><img src="/static/exemplo/painel-3-passos.webp" width="600" height="965" loading="lazy" decoding="async" alt="Painel: vitrine no ar com o link para copiar e compartilhar"></div>
-        <figcaption><span class="n">3</span><b>Compartilhe</b><span>Divulgue seu link e receba os pedidos pelo WhatsApp.</span></figcaption></figure>
-    </div>
-    <p class="arraste">Arraste para ver os 3 passos →</p>
+    <ol class="passos">
+      <li><span class="n">1</span><div><b>Personalize</b><span>Coloque o nome, a capa e as cores do seu negócio.</span></div></li>
+      <li><span class="n">2</span><div><b>Cadastre</b><span>Adicione seus produtos, fotos, vídeos e preços.</span></div></li>
+      <li><span class="n">3</span><div><b>Compartilhe</b><span>Divulgue seu link e receba os pedidos pelo WhatsApp.</span></div></li>
+    </ol>
     <p class="comp"><b>Não precisa saber programar.</b> Você recebe acesso ao painel e um tutorial para aprender a usar.</p>
   </section>
 
@@ -448,7 +455,7 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
   </section>
 
   <!-- 5. Benefícios -->
-  <section class="blk" id="beneficios">
+  <section class="blk faixa" id="beneficios">
     <div class="centro">
     <h2>Muito mais que um link na bio. <em>Sua vitrine digital completa.</em></h2>
     <p class="txt" style="margin:14px auto 0">Apresente seus produtos de forma profissional e facilite o atendimento das suas clientes.</p></div>
