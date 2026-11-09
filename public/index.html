@@ -319,6 +319,11 @@
   .demo-dupla { display: grid; gap: 30px; margin-top: 30px; align-items: start; }
   .demo-dupla figure { margin: 0; display: grid; justify-items: center; }
   .demo-cat .phone { margin: 0; }
+  .par-vit { display: flex; align-items: flex-start; gap: 12px; justify-content: center; width: 100%; max-width: 400px; }
+  .par-vit img { flex: 1 1 0; min-width: 0; width: 100%; height: auto; border-radius: 0; box-shadow: 0 24px 40px -22px rgba(120,20,60,.45); }
+  .par-vit img + img { margin-top: -12px; }
+  .par-vit img:first-child { margin-top: 30px; border-radius: 14% / 6%; }
+  .par-vit img:last-child { border-radius: 14% / 5%; }
   .demo-wa .wa { margin: 0; text-align: left; }
   .demo-wa figcaption { margin-top: 12px; max-width: 340px; color: var(--muted); font-size: 14.5px; }
   .compra.so-plano { grid-template-columns: 1fr; max-width: 480px; margin-left: auto; margin-right: auto; }
@@ -421,12 +426,12 @@
   <!-- 4. Demonstração real: painel, catálogo e pedido -->
   <section class="blk centro" id="demonstracao">
     <h2>Veja o painel e o catálogo <em>funcionando de verdade</em></h2>
-    <p class="txt">Exemplo real: a loja Jessica Hair montada no Zap Catálogo.</p>
+    <p class="txt">Exemplos reais de lojas montadas no Zap Catálogo.</p>
     <figure class="demo-painel"><span class="rot"><b>1</b>Painel: você monta a loja</span>
       <div class="janela"><div class="bar"><i></i><i></i><i></i><span>Painel da lojista</span></div><img src="/static/exemplo/painel-computador.webp" width="1400" height="798" loading="lazy" decoding="async" alt="Painel do Zap Catálogo no computador, com o banner da Jessica Hair e a prévia da vitrine ao lado"></div></figure>
     <div class="demo-dupla">
       <figure class="demo-cat"><span class="rot"><b>2</b>Catálogo: sua cliente escolhe</span>
-        <div class="phone sm"><div class="screen"><div class="sbar" aria-hidden="true"><b>9:41</b><i class="isl"></i><span><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2.5" width="3" height="9.5" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="21" height="11" rx="3" fill="none" stroke="currentColor" opacity=".45"/><rect x="2.5" y="2.5" width="15" height="7" rx="1.5"/><rect x="23" y="4" width="2" height="4" rx="1" opacity=".45"/></svg></span></div><div class="sview"><iframe class="live" name="zcdemo" src="/jessica-hair?embed=1&amp;abrir=video" loading="lazy" title="Produto com vídeo na vitrine da Jessica Hair" data-produto="video"></iframe></div><i class="home" aria-hidden="true"></i></div></div></figure>
+        <div class="par-vit"><img src="/static/exemplo/demo-acessorios.webp" width="440" height="1022" loading="lazy" decoding="async" alt="Vitrine Acessórios da Lu no Zap Catálogo: brincos e colares com preço e botão Eu quero"><img src="/static/exemplo/demo-doceria.webp" width="440" height="1206" loading="lazy" decoding="async" alt="Vitrine Doceria Encanto no Zap Catálogo: doces, bolos e kits com preço e botão Eu quero"></div></figure>
       <figure class="demo-wa"><span class="rot"><b>3</b>WhatsApp: o pedido chega pronto</span>
       <div class="wa" role="img" aria-label="Exemplo de pedido recebido no WhatsApp">
         <div class="wa-top"><i>JH</i><span>Jessica Hair<small>WhatsApp</small></span></div>
