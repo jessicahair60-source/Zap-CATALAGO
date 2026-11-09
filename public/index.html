@@ -339,11 +339,6 @@
   .of-preco s { opacity: .8; font-size: 18px; }
   .of-preco b { font: 800 clamp(42px, 8vw, 56px)/1 var(--f-display); letter-spacing: -.02em; }
   .of-preco small { font-size: 16px; opacity: .92; }
-  .timer { display: flex; justify-content: center; align-items: center; gap: 8px; margin: 14px 0 24px; }
-  .timer div { background: #fff; color: var(--acc); border-radius: 16px; min-width: 76px; padding: 12px 8px 10px; box-shadow: 0 14px 30px -18px rgba(60,0,30,.6); }
-  .timer b { display: block; font: 800 32px/1 var(--f-display); font-variant-numeric: tabular-nums; }
-  .timer span { display: block; margin-top: 6px; font: 600 11px var(--f-body); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-  .timer i { font-style: normal; font: 800 26px var(--f-display); opacity: .8; }
   .oferta .btn { background: #fff; color: var(--acc); }
   .of-gar { margin: 16px auto 0; max-width: 520px; font-size: 13.5px; color: rgba(255,255,255,.9); }
   @media (min-width: 760px) {
@@ -355,7 +350,6 @@
   @media (max-width: 759px) {
     .hero h1 { font-size: 29px; }
     .parte { padding: 20px; }
-    .timer div { min-width: 68px; } .timer b { font-size: 28px; }
     .oferta { margin-top: 56px; padding: 36px 18px; }
     .oferta .btn { width: 100%; }
   }
@@ -385,6 +379,25 @@
   section.blk.faixa .ben { background: var(--bg); }
   @media (min-width: 760px) { section.blk.faixa { margin: 80px 0 0; padding: 60px 32px; } }
   @media (max-width: 759px) { section.blk.faixa { margin-top: 54px; padding: 44px 20px; } .par-vit { max-width: 330px; } }
+
+  /* números mais delicados: cronômetro em uma linha, preços e passos menores */
+  .timer { display: flex; width: fit-content; max-width: 100%; flex-wrap: nowrap; justify-content: center; align-items: center; gap: 8px; margin: 16px auto 24px; padding: 10px 18px; border-radius: 999px; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.35); }
+  .timer div, .timer i { display: none; }
+  .timer .t-lb, .timer .t-d { white-space: nowrap; }
+  .timer svg { flex: none; width: 18px; height: 18px; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; }
+  .timer .t-lb { font: 600 14px var(--f-body); letter-spacing: .01em; color: rgba(255,255,255,.92); }
+  .timer .t-d { display: inline-flex; align-items: baseline; gap: 2px; font: 600 13px var(--f-body); color: rgba(255,255,255,.85); }
+  .timer .t-d b { display: inline-block; min-width: 2ch; padding: 4px 7px; border-radius: 8px; background: #fff; color: var(--acc); font: 800 17px/1 var(--f-body); font-variant-numeric: tabular-nums; text-align: center; margin-right: 2px; }
+  .of-preco { margin: 20px 0 4px; gap: 10px; }
+  .of-preco b { font-size: clamp(34px, 6vw, 44px); }
+  .of-preco s { font-size: 16px; }
+  .plano .valor { font-size: 38px; }
+  .passos .n { width: 36px; height: 36px; font-size: 16px; background: #FFE4EE; color: var(--acc); }
+  .passos li { grid-template-columns: 36px 1fr; }
+  .passos .t { padding-top: 6px; font-size: 18px; }
+  .rot b { width: 24px; height: 24px; font-size: 12px; background: #FFE4EE; color: var(--acc); }
+  @media (max-width: 759px) { .plano .valor { font-size: 36px; } .timer { gap: 6px; padding: 8px 14px; } .timer .t-lb { font-size: 13px; } .timer .t-d { font-size: 12px; } .timer .t-d b { font-size: 16px; padding: 4px 6px; } .timer svg { width: 16px; height: 16px; } }
+  @media (max-width: 370px) { .timer .t-lb { display: none; } }
 </style>
 </head>
 <body>
@@ -488,7 +501,7 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
     <h2 id="of-tit">OFERTA ESPECIAL SOMENTE HOJE!</h2>
     <p class="of-txt" id="of-txt">Aproveite as condições especiais de hoje para ter seu próprio catálogo online e começar a organizar suas vendas.</p>
     <div class="of-preco"><s id="of-de"></s><b id="of-por"></b><small id="of-per"></small></div>
-    <div class="timer" role="timer" aria-live="off"><div><b id="of-h">00</b><span>horas</span></div><i>:</i><div><b id="of-m">00</b><span>minutos</span></div><i>:</i><div><b id="of-s">00</b><span>segundos</span></div></div>
+    <div class="timer" role="timer" aria-live="off"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg><span class="t-lb">Termina em</span><span class="t-d"><b id="of-h">00</b>h</span><span class="t-d"><b id="of-m">00</b>min</span><span class="t-d"><b id="of-s">00</b>s</span></div>
     <a class="btn big" href="/assinar/oferta">QUERO APROVEITAR A OFERTA</a>
     <p class="of-gar">7 dias de garantia: você pode solicitar o reembolso em até 7 dias após a compra, conforme as condições aplicáveis da compra pela Kiwify.</p>
   </section>
