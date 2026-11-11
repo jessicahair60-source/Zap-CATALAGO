@@ -570,6 +570,27 @@ body:not(.showsort) .sortrow { display: none; }
 .foot { margin-top: 48px; }
 .depo { margin-top: 48px; }
 /* Painel repaginado */
+/* Início em estilo Dashboard: fundo rosa claro, cartões grandes com ícone e Resumo Mensal */
+body.painel { background: linear-gradient(180deg, #FCEEF5 0, #FDF3F8 420px, #FBF5F8 100%); background-attachment: fixed; }
+.dhead { display: block !important; }
+.dhead h2 { margin: 6px 0 2px; font-family: var(--f-display); font-size: 30px; letter-spacing: -.01em; }
+.dhead p { margin: 0 0 16px; color: var(--p-muted); font-size: 14px; }
+.dacts { display: grid; gap: 10px; }
+.dact { display: flex; align-items: center; gap: 14px; width: 100%; text-align: left; background: #fff; border: 1px solid #F3DCE7; border-radius: 18px; padding: 18px 16px; font: inherit; color: var(--p-fg); cursor: pointer; box-shadow: 0 8px 24px -18px rgba(176,48,106,.55); transition: transform .15s, box-shadow .15s; }
+.dact:hover { transform: translateY(-1px); box-shadow: 0 12px 28px -18px rgba(176,48,106,.7); }
+.dico { width: 48px; height: 48px; flex: none; border-radius: 14px; display: grid; place-items: center; background: #FCE4EF; color: #E0287D; }
+.dico svg { width: 24px; height: 24px; }
+.dtx { display: grid; gap: 3px; min-width: 0; } .dtx b { font-size: 16px; font-weight: 700; } .dtx small { font-size: 13px; color: var(--p-muted); line-height: 1.35; }
+.dtitle { margin: 24px 2px 10px; font-family: var(--f-display); font-size: 20px; }
+body.painel .fsteps { margin-top: 12px; }
+.dsumh { margin-top: 26px; } .dsumh b { font-family: var(--f-display); font-size: 20px; }
+.dsum { display: grid; gap: 10px; margin-bottom: 14px; }
+.dstat { position: relative; background: #fff; border: 1px solid #F3DCE7; border-radius: 18px; padding: 16px 18px; box-shadow: 0 8px 24px -20px rgba(176,48,106,.5); }
+.dstat .dsl { display: block; font-size: 13px; font-weight: 600; color: var(--p-muted); }
+.dstat b { display: block; margin: 2px 0 0; line-height: 1.15; font-family: var(--f-display); font-size: 30px; font-weight: 700; color: #E0287D; font-variant-numeric: tabular-nums; }
+.dstat small { font-size: 12.5px; color: var(--p-muted); }
+.dstat i { position: absolute; top: 16px; right: 16px; color: #EBA3C3; } .dstat i svg { width: 22px; height: 22px; }
+@media (min-width: 720px) { .dacts, .dsum { grid-template-columns: 1fr 1fr; } }
 body.painel #view-painel { padding-top: 8px; }
 .phead small { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--p-muted); }
 .phead h2 { margin: 2px 0 14px; font-family: var(--f-display); font-size: 24px; }
@@ -1633,6 +1654,17 @@ const MEDIDAS_HTML = `<div class="sizes-t">
 function sec(id, title, sub, body) {
   return `<details class="pcard" data-sec="${id}" ${pui.open.has(id) ? 'open' : ''}><summary><span><h3>${title}</h3><small>${sub}</small></span><span class="chev" aria-hidden="true">›</span></summary><div class="sbody">${body}</div></details>`;
 }
+/* Ícones dos cartões do Dashboard */
+const DSVG = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+const DICO = {
+  bag: DSVG('<path d="M6 7h12l-1 13H7z"/><path d="M9 7a3 3 0 0 1 6 0"/><path d="M12 11v5M9.5 13.5h5"/>'),
+  share: DSVG('<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/>'),
+  paint: DSVG('<circle cx="12" cy="12" r="9"/><circle cx="8.5" cy="10" r="1.3"/><circle cx="12" cy="7.5" r="1.3"/><circle cx="15.5" cy="10" r="1.3"/><path d="M12 21a2.5 2.5 0 0 1 0-5h2a3 3 0 0 0 3-3"/>'),
+  chart: DSVG('<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>'),
+  eye: DSVG('<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'),
+  heart: DSVG('<path d="M12 20s-7-4.4-9-9a4.8 4.8 0 0 1 9-3 4.8 4.8 0 0 1 9 3c-2 4.6-9 9-9 9z"/>'),
+  zap: DSVG('<path d="M4 20l1.3-4A8 8 0 1 1 8 18.7z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.6-2-1-1 .8a4 4 0 0 1-2.2-2.2l.8-1-1-2z"/>')};
+const firstStepsDone = () => { const s = S.store; return String(s.phone || '').replace(/\D/g, '').length >= 12 && !!(s.bannerImg || s.bannerImgM || s.logo || s.logoText) && S.products.some(p => !p.demo); };
 /* Crie a sua loja em 3 passos: cada passo leva para a aba dele */
 function firstSteps() {
   const s = S.store;
@@ -1655,7 +1687,15 @@ function renderPainel() {
     <option value="soldout" ${val === 'soldout' ? 'selected' : ''}>Mostrar como esgotado</option><option value="hide" ${val === 'hide' ? 'selected' : ''}>Ocultar do catálogo</option></select>`;
   const active = S.products.filter(p => p.active).length;
   $('#view-painel').innerHTML = `
-    <div class="phead"><div><small>Painel da lojista</small><h2>Olá, ${esc(s.name)}</h2></div></div>
+    <div class="dhead"><h2>Dashboard</h2><p>Visão geral da vitrine ${esc(s.name)}</p></div>
+    <div class="dacts">
+      <button class="dact" data-go="prod"><span class="dico">${DICO.bag}</span><span class="dtx"><b>Cadastrar novo produto</b><small>Fotos, vídeos e preço em poucos passos</small></span></button>
+      <button class="dact" data-dshare="1"><span class="dico">${DICO.share}</span><span class="dtx"><b>Compartilhar minha vitrine</b><small>Mande o link no Instagram e no WhatsApp</small></span></button>
+      <button class="dact" data-go="banner"><span class="dico">${DICO.paint}</span><span class="dtx"><b>Personalizar o visual</b><small>Banner, logo e cores da sua marca</small></span></button>
+      ${MODE === 'panel' ? `<button class="dact" data-go="relatorio"><span class="dico">${DICO.chart}</span><span class="dtx"><b>Ver relatório completo</b><small>Visitas, cliques e pedidos de cada dia</small></span></button>`
+        : `<button class="dact" data-dview="1"><span class="dico">${DICO.eye}</span><span class="dtx"><b>Ver minha vitrine</b><small>Veja como as clientes enxergam a loja</small></span></button>`}
+    </div>
+    <h3 class="dtitle">Sua vitrine</h3>
     <section class="hero ${s.online === false || expired() ? 'is-off' : ''}">
       <div class="hrow"><span class="dot"></span><div class="hst"><b>${expired() ? 'Vitrine fora do ar' : s.online === false ? 'Vitrine fora do ar' : 'Vitrine no ar'}</b><small>${expired() ? 'Assinatura vencida: assine para voltar' : s.online === false ? 'As clientes veem um aviso de pausa' : 'Suas clientes já podem ver e pedir'}</small></div>
         <label class="sw" title="Ligar ou desligar a vitrine"><input type="checkbox" id="sonline" ${s.online === false ? '' : 'checked'} aria-label="Vitrine no ar"><i></i></label></div>
@@ -1666,13 +1706,14 @@ function renderPainel() {
         <p class="err" id="slugerr" hidden></p></div>
       ${s.online === false ? `<div class="field"><label for="soffmsg">Aviso que as clientes veem</label><input class="in" id="soffmsg" value="${esc(s.offMsg ?? 'Estamos repondo o estoque. Voltamos em breve!')}"></div>` : ''}
     </section>
-    ${firstSteps()}
+    ${firstStepsDone() ? '' : firstSteps()}
     ${MODE === 'panel' ? sec('assinatura', 'Sua assinatura', planSub(), planCard()) : ''}
-    <div class="kpihead"><b>Relatórios</b><small>Últimos 30 dias</small></div>
-    <div class="stats">
-      <div class="stat"><b id="kpiv">${MODE === 'panel' ? '·' : '0'}</b><span>pessoas visitaram</span></div>
-      <div class="stat"><b id="kpic">${MODE === 'panel' ? '·' : '0'}</b><span>cliques no Eu quero</span></div>
-      <div class="stat"><b>${active}</b><span>produtos ativos</span></div>
+    <div class="kpihead dsumh"><b>Resumo Mensal</b><small>Últimos 30 dias</small></div>
+    <div class="dsum">
+      <div class="dstat"><span class="dsl">Visitas na vitrine</span><b id="kpiv">${MODE === 'panel' ? '·' : '0'}</b><small>Pessoas que abriram o seu link</small><i>${DICO.eye}</i></div>
+      <div class="dstat"><span class="dsl">Cliques no Eu quero</span><b id="kpic">${MODE === 'panel' ? '·' : '0'}</b><small>Vezes que tocaram para pedir</small><i>${DICO.heart}</i></div>
+      <div class="dstat"><span class="dsl">Pedidos no WhatsApp</span><b id="kpio">${MODE === 'panel' ? '·' : '0'}</b><small>Pedidos enviados pelo carrinho</small><i>${DICO.zap}</i></div>
+      <div class="dstat"><span class="dsl">Produtos ativos</span><b>${active}</b><small>De ${S.products.length} cadastrados no catálogo</small><i>${DICO.bag}</i></div>
     </div>
     <h3 class="pgroup">Produtos<small>Cadastre, organize e controle o estoque</small></h3>
     ${MODE === 'panel' ? sec('importar', 'Importar catálogo pronto', 'Traga de uma vez os produtos de outro catálogo', `
@@ -1872,6 +1913,8 @@ function renderPainel() {
   $('#sharelink').onclick = async () => { const url = fullUrl(); const text = `Confira a vitrine da ${s.name}: ${url}`;
     if (navigator.share) { try { await navigator.share({ title: s.name, text, url }); } catch (e) {} } else window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank', 'noopener'); };
   $('#openstore').onclick = () => show('loja');
+  document.querySelectorAll('[data-dshare]').forEach(b => b.onclick = () => $('#sharelink').click());
+  document.querySelectorAll('[data-dview]').forEach(b => b.onclick = () => $('#openstore').click());
   $('#editslug').onclick = () => { $('#slugbox').hidden = !$('#slugbox').hidden; if (!$('#slugbox').hidden) $('#sslug').focus(); };
   $('#saveslug').onclick = async () => { const v = slugify($('#sslug').value); $('#slugerr').hidden = true;
     if (MODE === 'demo') { s.slug = v; save(); renderPainel(); return; }
@@ -2145,7 +2188,7 @@ async function importZip(file) {
 // Números do início (visitas e cliques), guardados por 1 minuto para não buscar a cada mudança
 const kpi = { at: 0, j: null };
 async function loadKpi() {
-  const put = j => { if ($('#kpiv')) $('#kpiv').textContent = j.totals.view.toLocaleString('pt-BR'); if ($('#kpic')) $('#kpic').textContent = j.totals.click.toLocaleString('pt-BR'); };
+  const put = j => { if ($('#kpiv')) $('#kpiv').textContent = j.totals.view.toLocaleString('pt-BR'); if ($('#kpic')) $('#kpic').textContent = j.totals.click.toLocaleString('pt-BR'); if ($('#kpio')) $('#kpio').textContent = j.totals.order.toLocaleString('pt-BR'); };
   if (kpi.j && Date.now() - kpi.at < 60000) return put(kpi.j);
   try { kpi.j = await api('GET', '/api/stats?days=30'); kpi.at = Date.now(); put(kpi.j); } catch (e) {}
 }
