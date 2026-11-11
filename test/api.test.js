@@ -191,3 +191,25 @@ test('oferta da página de vendas: desligada sem configuração, liga com prazo 
     r = await c('GET', '/assinar/oferta'); assert.strictEqual(r.headers.get('location'), '/assinar/mensal');
   } finally { for (const k of ['OFERTA_PRECO', 'OFERTA_FIM', 'OFERTA_CHECKOUT_URL']) delete process.env[k]; }
 });
+
+test('link do pedido: página com as fotos e prévia do WhatsApp', async () => {
+  const c = client();
+  let r = await c('POST', '/api/signup', { name: 'Lu', storeName: 'Acessórios da Lu', email: 'lu@teste.com', password: 'senha-forte', terms: true }); assert.strictEqual(r.status, 200);
+  r = await c('POST', '/api/billing/checkout'); assert.strictEqual(r.status, 200);
+  r = await c('POST', '/api/media', PNG, { 'Content-Type': 'image/png' }); const foto = r.json.id;
+  const st = state(3); const big = 1731000000123;
+  st.products[0].name = 'Brinco Coração Dourado'; st.products[0].media = [{ id: foto, type: 'img' }];
+  st.products[1].id = big; st.products[1].name = 'Colar <Brilhante>'; st.products[1].media = [{ id: foto, type: 'img' }];
+  r = await c('PUT', '/api/store', { state: st }); assert.strictEqual(r.status, 200);
+  const pub = client();
+  const code = `1.${big.toString(36)}-2.zzz-x.999`;
+  r = await pub('GET', `/acessorios-da-lu/pedido/${code}`); assert.strictEqual(r.status, 200);
+  assert.match(r.text, /<meta property="og:title" content="Loja Teste">/);
+  assert.match(r.text, /Pedido com 3 produtos/); assert.match(r.text, /Brinco Coração Dourado/); assert.match(r.text, /Colar &lt;Brilhante&gt;/); assert.match(r.text, /2 unidades/);
+  assert.match(r.text, new RegExp(`/u/${foto.replace('.', '\\.')}`));
+  const og = /property="og:image" content="([^"]+)"/.exec(r.text)[1].replace('http://localhost', '');
+  r = await fetch(base + og); assert.strictEqual(r.status, 200); assert.strictEqual(r.headers.get('content-type'), 'image/png');
+  // pedido sem produto válido volta para a vitrine; loja que não existe dá 404
+  r = await pub('GET', '/acessorios-da-lu/pedido/zzz'); assert.strictEqual(r.status, 302);
+  r = await pub('GET', '/nao-existe/pedido/1'); assert.strictEqual(r.status, 404);
+});

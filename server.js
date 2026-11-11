@@ -9,7 +9,7 @@ const { db, DATA_DIR } = require('./lib/db');
 const { pixPayload } = require('./lib/pix');
 const mp = require('./lib/mercadopago');
 const kiwify = require('./lib/kiwify');
-const { shareCard } = require('./lib/sharecard');
+const { shareCard, orderCard } = require('./lib/sharecard');
 const { readZip } = require('./lib/zipread');
 const wa = require('./lib/whatsapp');
 const mail = require('./lib/mail');
@@ -767,6 +767,69 @@ app.get('/og/:slug.png', (req, res) => {
     ogCache.set(key, png);
   }
   res.type('image/png').set('Cache-Control', 'public, max-age=86400').send(png);
+});
+
+/* ---------- página do pedido (link que vai na mensagem do WhatsApp) ---------- */
+// O link leva os produtos e as quantidades no próprio endereço (/loja/pedido/ab12-2.cd34): nada é gravado
+// e nenhum dado da cliente (nome, endereço) vai no link. A prévia do link no WhatsApp mostra as fotos.
+function parseOrder(code) {
+  const items = [];
+  for (const part of String(code || '').split('.').slice(0, 30)) {
+    const m = /^([0-9a-z]{1,12})(?:-([0-9]{1,3}))?$/.exec(part); if (!m) continue;
+    const id = String(parseInt(m[1], 36)), qty = Math.max(1, Math.min(999, parseInt(m[2] || '1', 10)));
+    const ex = items.find(x => x.id === id); if (ex) ex.qty += qty; else items.push({ id, qty });
+  }
+  return items;
+}
+function orderOf(store, code) {
+  const state = publicState(store); if (!state) return null;
+  const byId = new Map((state.products || []).map(p => [String(p && p.id), p]));
+  const items = parseOrder(code).map(x => ({ ...x, p: byId.get(x.id) })).filter(x => x.p);
+  return items.length ? { state, items } : null;
+}
+const orderStore = slug => db.prepare('SELECT * FROM stores WHERE slug = ?').get(String(slug).toLowerCase());
+const orderCache = new Map();
+app.get('/og/pedido/:slug/:code.png', (req, res) => {
+  const store = orderStore(req.params.slug);
+  if (!store || store.blocked || !isPro(store)) return res.sendStatus(404);
+  const o = orderOf(store, req.params.code); if (!o) return res.sendStatus(404);
+  const key = `${store.id}:${store.updated_at}:${o.items.map(x => x.id).join('.')}`;
+  let png = orderCache.get(key);
+  if (png === undefined) {
+    try { png = orderCard({ state: o.state, ids: o.items.map(x => x.id), uploads: UPLOADS }); }
+    catch (e) { console.error('og pedido', e.message); return res.sendStatus(500); }
+    if (orderCache.size > 300) orderCache.delete(orderCache.keys().next().value);
+    orderCache.set(key, png);
+  }
+  if (!png) return res.redirect(302, `/og/${encodeURIComponent(store.slug)}.png?v=${store.updated_at || 0}`);
+  res.type('image/png').set('Cache-Control', 'public, max-age=86400').send(png);
+});
+app.get('/:slug/pedido/:code', (req, res) => {
+  const store = orderStore(req.params.slug);
+  if (!store) return res.status(404).send(simplePage('Vitrine não encontrada', 'Confira o endereço digitado.'));
+  if (store.blocked || !isPro(store)) return res.status(404).send(simplePage(store.name, 'Esta vitrine está indisponível no momento.'));
+  const o = orderOf(store, req.params.code);
+  const shop = publicUrlOf(store);
+  if (!o) return res.redirect(302, shop);
+  const st = o.state.store || {}, c = o.state.colors || {};
+  const col = (v, d) => /^#[0-9a-f]{6}$/i.test(String(v || '')) ? v : d;
+  const name = escHtml(st.name || store.name);
+  const n = o.items.reduce((a, x) => a + x.qty, 0);
+  const desc = `Pedido com ${n} ${n === 1 ? 'produto' : 'produtos'} · Vitrine Digital`;
+  const og = `${CFG.publicUrl}/og/pedido/${encodeURIComponent(store.slug)}/${encodeURIComponent(req.params.code)}.png?v=${store.updated_at || 0}`;
+  const pic = p => { const m = (p.media || []).find(m => m && m.type !== 'video' && m.id && m.id !== 'demo'); return m ? (m.id.startsWith('ex-') ? '/static/exemplo/' + m.id.slice(3) : '/u/' + String(m.id).replace(/^\/u\//, '')) : ''; };
+  const rows = o.items.map(x => { const u = pic(x.p);
+    return `<li>${u ? `<img src="${escHtml(u)}" alt="" loading="lazy">` : '<span class="ph"></span>'}<div><b>${escHtml(x.p.name)}</b><small>${x.qty} ${x.qty === 1 ? 'unidade' : 'unidades'}</small></div></li>`; }).join('');
+  res.set('Cache-Control', 'no-cache').type('html').send(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pedido · ${name}</title><meta name="robots" content="noindex">
+<meta property="og:type" content="website"><meta property="og:site_name" content="${name}"><meta property="og:title" content="${name}"><meta property="og:description" content="${escHtml(desc)}">
+<meta property="og:url" content="${escHtml(CFG.publicUrl + req.path)}"><meta property="og:image" content="${escHtml(og)}"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="400"><meta property="og:image:height" content="400">
+<style>body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:${col(c.bg, '#FBF3F5')};color:${col(c.title, '#2A1A22')}}main{max-width:520px;margin:0 auto;padding:28px 16px 40px}
+h1{font-size:22px;margin:0 0 4px}p{margin:0 0 20px;color:${col(c.muted, '#8C7480')}}ul{list-style:none;margin:0 0 24px;padding:0;display:grid;gap:10px}
+li{display:flex;gap:12px;align-items:center;background:#fff;border-radius:16px;padding:10px}li img,li .ph{width:72px;height:72px;border-radius:12px;object-fit:cover;flex:none;background:#f1e4e9}
+li b{display:block;font-size:16px}li small{color:${col(c.muted, '#8C7480')};font-size:14px}
+a.btn{display:block;text-align:center;text-decoration:none;font-weight:700;padding:15px;border-radius:999px;background:${col(c.buyBg, '#B9476F')};color:${col(c.buyText, '#FFFFFF')}}</style></head>
+<body><main><h1>${name}</h1><p>Pedido com ${n} ${n === 1 ? 'produto' : 'produtos'}</p><ul>${rows}</ul><a class="btn" href="${escHtml(shop)}">Ver a vitrine</a></main></body></html>`);
 });
 
 /* ---------- vitrine pelo endereço /nome-da-loja ---------- */
