@@ -1044,7 +1044,7 @@ const DEFAULT_TESTI = [
 const RATINGS = { 1: [4.9, 32], 2: [4.8, 57], 3: [5, 14], 4: [4.7, 41], 5: [4.9, 12], 6: [4.8, 26], 7: [4.6, 9], 8: [4.9, 88], 101: [5, 64], 102: [4.9, 23], 201: [4.9, 210], 202: [5, 18], 301: [4.9, 47], 303: [5, 31] };
 Object.values(EXAMPLES).forEach(e => e.products.forEach(p => { const r = RATINGS[p.id]; if (r) [p.rating, p.reviewsCount] = r; }));
 const MSG_OLD = 'Olá! 👋\nAcabei de escolher alguns produtos no seu catálogo e gostaria de finalizar meu pedido! 🛍️\n\nProdutos escolhidos:\n{nome_dos_produtos}';
-const MSG_DEFAULT = 'Eu quero os produtos:\n{nome_dos_produtos}';
+const MSG_DEFAULT = 'Acabei de escolher alguns produtos no seu catálogo e gostaria de finalizar meu pedido!\n\nProdutos escolhidos:\n{nome_dos_produtos}';
 const DEFAULT = {
   v: 4,
   store: { name: 'Ateliê Exemplo', bannerImg: '', bannerKicker: 'Nova coleção', bannerTitle: 'Verão 2026',
@@ -1096,7 +1096,7 @@ if (!S.store.p4) { S.store.layout = 'list'; S.store.p4 = true; }
 if (!S.store.p3) { if (S.store.theme === 'rosa') Object.assign(S.colors, { bNew: '#FFFFFF', bTop: '#FFFFFF', bPromo: '#FFFFFF', badgeText: '#2A1A22' }); S.store.p3 = true; }
 if (!S.store.p2) { if (S.store.theme === 'rosa') S.colors = { ...DEFAULT_COLORS }; S.store.p2 = true; }
 if (!S.testimonials) S.testimonials = FRESH ? [] : JSON.parse(JSON.stringify(DEFAULT_TESTI));
-if (!S.store.greeting || S.store.greeting === 'Olá! Quero fazer este pedido:' || S.store.greeting === MSG_OLD) S.store.greeting = MSG_DEFAULT;
+if (!S.store.greeting || S.store.greeting === 'Olá! Quero fazer este pedido:' || S.store.greeting === MSG_OLD || S.store.greeting === 'Eu quero os produtos:\n{nome_dos_produtos}') S.store.greeting = MSG_DEFAULT;
 S.products = S.products.map(normP);
 function save() {
   if (MODE === 'panel') return scheduleSync();
@@ -1572,12 +1572,12 @@ const cartHas = k => cart.some(c => cp(c).kind === k);
 const payList = () => S.store.payments.split(',').map(x => x.trim()).filter(Boolean);
 const entList = () => [S.store.delivery && 'Entrega', S.store.pickup && 'Retirada'].filter(Boolean);
 function buildMsg() {
-  const t = totals();
-  const lines = cart.map(c => { const p = cp(c); return `✅ ${p.name}${c.size ? ` (${p.optLabel}: ${c.size})` : ''} – ${c.qty} un${hasPrice(p) ? ' · ' + (p.fromPrice ? 'a partir de ' : '') + brl(p.price * c.qty) : ''}${c.kit ? pickTxt(c).map(x => `\n   - ${x}`).join('') : ''}`; });
+  // só os nomes dos produtos (sem preço nem total); a quantidade aparece quando é mais de um
+  const lines = cart.map(c => { const p = cp(c); return `✅ ${c.qty > 1 ? c.qty + 'x ' : ''}${p.name}${c.size ? ` (${p.optLabel}: ${c.size})` : ''}${c.kit ? pickTxt(c).map(x => `\n   - ${x}`).join('') : ''}`; });
   const ent = cartHas('fisico') ? co.entrega : '';
   const g = S.store.greeting || MSG_DEFAULT; const list = lines.join('\n');
   const head = g.includes('{nome_dos_produtos}') ? g.split('{nome_dos_produtos}').join(list) : `${g}\n\n${list}`;
-  return `${head}${t.sub ? `\n\nSubtotal: ${brl(t.sub)}${t.disc ? `\nCupom ${S.store.coupon}: − ${brl(t.disc)}` : ''}\n*Total: ${brl(t.total)}*` : ''}\n\nNome: ${co.nome || '—'}${ent === 'Entrega' ? `\nEntrega em: ${co.end || '—'}` : ent === 'Retirada' ? '\nVou retirar na loja' : ''}${cartHas('servico') ? `\nMelhor dia e horário: ${co.data || '—'}` : ''}${cartHas('digital') ? `\nE-mail para o acesso: ${co.email || '—'}` : ''}${co.pag ? `\nPagamento: ${co.pag}` : ''}${orderLink() ? `\n\n📸 Fotos do pedido: ${orderLink()}` : ''}`;
+  return `${head}${ui.couponOk && S.store.coupon ? `\n\nCupom: ${S.store.coupon}` : ''}\n\nNome: ${co.nome || '—'}${ent === 'Entrega' ? `\nEntrega em: ${co.end || '—'}` : ent === 'Retirada' ? '\nVou retirar na loja' : ''}${cartHas('servico') ? `\nMelhor dia e horário: ${co.data || '—'}` : ''}${cartHas('digital') ? `\nE-mail para o acesso: ${co.email || '—'}` : ''}${co.pag ? `\nPagamento: ${co.pag}` : ''}${orderLink() ? `\n\n📸 Fotos do pedido: ${orderLink()}` : ''}`;
 }
 // Link da página do pedido: no WhatsApp ele vira a prévia com as fotos dos produtos e o nome da loja.
 // Leva só os produtos e as quantidades (nada da cliente). Não vale na demonstração nem nas vitrines de exemplo.
