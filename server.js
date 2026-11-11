@@ -148,6 +148,7 @@ function externalize(storeId, value) {
 
 app.use('/u', express.static(UPLOADS, { maxAge: '30d', immutable: true, fallthrough: false }));
 app.use('/static', express.static(path.join(PUB, 'static'), { maxAge: '1h' }));
+app.get('/favicon.ico', (req, res) => res.set('Cache-Control', 'public, max-age=86400').sendFile(path.join(PUB, 'static', 'favicon.ico')));
 
 /* ---------- páginas da vitrine ---------- */
 const APP_HTML = () => fs.readFileSync(path.join(PUB, 'app.html'), 'utf8');
@@ -200,7 +201,7 @@ function renderStore(res, store, embed = false) {
   const desc = escHtml(bio || 'Veja nossos produtos e faça seu pedido pelo WhatsApp.');
   // prévia do link no WhatsApp: imagem com "CATÁLOGO" e o nome da loja, que muda quando a loja muda
   const og = `${CFG.publicUrl}/og/${encodeURIComponent(store.slug)}.png?v=${store.updated_at || 0}`;
-  const head = `<title>${title}</title><meta name="description" content="${desc}"><meta property="og:type" content="website"><meta property="og:site_name" content="${title}"><meta property="og:title" content="Catálogo ${title}"><meta property="og:description" content="${desc}"><meta property="og:url" content="${escHtml(publicUrlOf(store))}"><meta property="og:image" content="${og}"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">${embed ? '<meta name="robots" content="noindex">' : trackingTags(st)}`;
+  const head = `<title>${title}</title><meta name="description" content="${desc}"><meta property="og:type" content="website"><meta property="og:site_name" content="${title}"><meta property="og:title" content="Catálogo ${title}"><meta property="og:description" content="${desc}"><meta property="og:url" content="${escHtml(publicUrlOf(store))}"><meta property="og:image" content="${og}"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:card" content="summary_large_image">${ICON_HEAD}<meta name="apple-mobile-web-app-title" content="${title}">${embed ? '<meta name="robots" content="noindex">' : trackingTags(st)}`;
   const html = APP_HTML().replace('<!--HEAD-->', head).replace('<!--BOOT-->', `<script>window.__BOOT__=${jsonForScript(boot)}</script>`);
   res.set('Cache-Control', 'no-cache');
   sendApp(res, html, 'https://connect.facebook.net https://www.googletagmanager.com');
@@ -269,13 +270,16 @@ app.get('/sair', (req, res) => {
   res.set('Set-Cookie', 'vz=; Path=/; Max-Age=0').redirect(req.query.para === 'admin' ? '/admin' : '/entrar');
 });
 // O painel funciona como aplicativo: dá para instalar na tela inicial do celular
-const APP_HEAD = '<link rel="manifest" href="/manifest.webmanifest"><meta name="theme-color" content="#FBF3F5"><link rel="apple-touch-icon" href="/static/icon-180.png">'
-  + '<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Zap Catálogo"><link rel="icon" href="/static/logo.svg" type="image/svg+xml">';
+// Ícone do app (sacolinha rosa): aparece na aba do navegador e quando o catálogo ou o painel é salvo na tela inicial
+const ICON_V = 2; // mude quando trocar os arquivos de ícone, para os celulares baixarem de novo
+const ICON_HEAD = `<link rel="icon" href="/static/favicon-32.png?v=${ICON_V}" sizes="32x32" type="image/png"><link rel="icon" href="/static/icon-192.png?v=${ICON_V}" sizes="192x192" type="image/png"><link rel="apple-touch-icon" href="/static/icon-180.png?v=${ICON_V}">`;
+const APP_HEAD = '<link rel="manifest" href="/manifest.webmanifest"><meta name="theme-color" content="#FBF3F5">' + ICON_HEAD
+  + '<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Zap Catálogo">';
 app.get('/manifest.webmanifest', (req, res) => res.type('application/manifest+json').set('Cache-Control', 'public, max-age=3600').send(JSON.stringify({
   name: CFG.brand, short_name: CFG.brand, description: 'Painel da sua vitrine com pedido no WhatsApp', lang: 'pt-BR',
   id: '/painel', start_url: '/painel', scope: '/', display: 'standalone', background_color: '#FBF3F5', theme_color: '#FBF3F5',
-  icons: [{ src: '/static/icon-192.png', sizes: '192x192', type: 'image/png' }, { src: '/static/icon-512.png', sizes: '512x512', type: 'image/png' },
-    { src: '/static/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }]
+  icons: [{ src: `/static/icon-192.png?v=${ICON_V}`, sizes: '192x192', type: 'image/png' }, { src: `/static/icon-512.png?v=${ICON_V}`, sizes: '512x512', type: 'image/png' },
+    { src: `/static/icon-maskable-512.png?v=${ICON_V}`, sizes: '512x512', type: 'image/png', purpose: 'maskable' }]
 })));
 // Service worker mínimo: deixa instalar o app; sem conexão, mostra um aviso em vez da tela do navegador
 app.get('/sw.js', (req, res) => res.type('application/javascript').set('Cache-Control', 'no-cache').send(`self.addEventListener('install', () => self.skipWaiting());
