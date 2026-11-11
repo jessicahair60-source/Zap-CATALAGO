@@ -1552,11 +1552,20 @@ const payList = () => S.store.payments.split(',').map(x => x.trim()).filter(Bool
 const entList = () => [S.store.delivery && 'Entrega', S.store.pickup && 'Retirada'].filter(Boolean);
 function buildMsg() {
   const t = totals();
-  const lines = cart.map(c => { const p = cp(c); return `- ${c.qty > 1 ? c.qty + 'x ' : ''}${p.name}${c.size ? ` (${p.optLabel}: ${c.size})` : ''}${hasPrice(p) ? ' — ' + (p.fromPrice ? 'a partir de ' : '') + brl(p.price * c.qty) : ''}${c.kit ? pickTxt(c).map(x => `\n   - ${x}`).join('') : ''}`; });
+  const lines = cart.map(c => { const p = cp(c); return `✅ ${p.name}${c.size ? ` (${p.optLabel}: ${c.size})` : ''} – ${c.qty} un${hasPrice(p) ? ' · ' + (p.fromPrice ? 'a partir de ' : '') + brl(p.price * c.qty) : ''}${c.kit ? pickTxt(c).map(x => `\n   - ${x}`).join('') : ''}`; });
   const ent = cartHas('fisico') ? co.entrega : '';
   const g = S.store.greeting || MSG_DEFAULT; const list = lines.join('\n');
   const head = g.includes('{nome_dos_produtos}') ? g.split('{nome_dos_produtos}').join(list) : `${g}\n\n${list}`;
-  return `${head}${t.sub ? `\n\nSubtotal: ${brl(t.sub)}${t.disc ? `\nCupom ${S.store.coupon}: − ${brl(t.disc)}` : ''}\n*Total: ${brl(t.total)}*` : ''}\n\nNome: ${co.nome || '—'}${ent === 'Entrega' ? `\nEntrega em: ${co.end || '—'}` : ent === 'Retirada' ? '\nVou retirar na loja' : ''}${cartHas('servico') ? `\nMelhor dia e horário: ${co.data || '—'}` : ''}${cartHas('digital') ? `\nE-mail para o acesso: ${co.email || '—'}` : ''}${co.pag ? `\nPagamento: ${co.pag}` : ''}`;
+  return `${head}${t.sub ? `\n\nSubtotal: ${brl(t.sub)}${t.disc ? `\nCupom ${S.store.coupon}: − ${brl(t.disc)}` : ''}\n*Total: ${brl(t.total)}*` : ''}\n\nNome: ${co.nome || '—'}${ent === 'Entrega' ? `\nEntrega em: ${co.end || '—'}` : ent === 'Retirada' ? '\nVou retirar na loja' : ''}${cartHas('servico') ? `\nMelhor dia e horário: ${co.data || '—'}` : ''}${cartHas('digital') ? `\nE-mail para o acesso: ${co.email || '—'}` : ''}${co.pag ? `\nPagamento: ${co.pag}` : ''}${orderLink() ? `\n\n📸 Fotos do pedido: ${orderLink()}` : ''}`;
+}
+// Link da página do pedido: no WhatsApp ele vira a prévia com as fotos dos produtos e o nome da loja.
+// Leva só os produtos e as quantidades (nada da cliente). Não vale na demonstração nem nas vitrines de exemplo.
+function orderLink() {
+  if (MODE !== 'store' || !BOOT.home || !BOOT.store || !BOOT.store.slug || BOOT.store.slug.startsWith('exemplo-')) return '';
+  const q = new Map();
+  cart.forEach(c => (c.kit ? (c.picks || []).map(x => x.id) : [c.id]).forEach(id => { if (/^\d+$/.test(String(id))) q.set(String(id), (q.get(String(id)) || 0) + c.qty); }));
+  const code = [...q].slice(0, 30).map(([id, n]) => Number(id).toString(36) + (n > 1 ? '-' + Math.min(n, 999) : '')).join('.');
+  return code ? `${BOOT.home}/${encodeURIComponent(BOOT.store.slug)}/pedido/${code}` : '';
 }
 function openCheckout() {
   if (!entList().includes(co.entrega)) co.entrega = entList()[0] || '';
