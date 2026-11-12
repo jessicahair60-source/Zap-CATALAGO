@@ -412,9 +412,9 @@
   .topo .preco-mini { margin-top: 12px; }
   .topo-vit { margin: 0; min-width: 0; position: relative; padding: 22px 0 56px; border-radius: 28px; background: radial-gradient(120% 90% at 50% 0%, #FFE4EE 0%, #FFF3F7 55%, #FBEAF0 100%); border: 1px solid var(--line); overflow: hidden; }
   .esteira { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
-  .trilho { display: flex; width: max-content; animation: esteira 5s linear infinite; }
-  .trilho img { flex: none; width: 168px; height: auto; margin-right: 14px; filter: drop-shadow(0 16px 18px rgba(120,20,60,.25)); }
-  @keyframes esteira { to { transform: translateX(-50%); } }
+  .trilho { display: flex; width: max-content; animation: esteira 3.6s linear infinite; }
+  .trilho img { flex: none; width: 176px; height: auto; margin-right: 14px; border-radius: 22px; box-shadow: 0 18px 30px -16px rgba(120,20,60,.45); }
+  @keyframes esteira { to { transform: translateX(-33.3333%); } }
   .topo-vit figcaption { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); white-space: nowrap; background: #fff; border: 1px solid var(--line); color: var(--fg); font-size: 12.5px; font-weight: 700; padding: 6px 13px; border-radius: 99px; }
   @media (prefers-reduced-motion: reduce) { .trilho { animation-duration: 30s; } }
   @media (max-width: 559px) { .topo-cta { width: 100%; } .topo-lead { font-size: 16px; } .topo-selo { font-size: 11.5px; padding: 9px 14px; } }
@@ -427,7 +427,7 @@
   @media (min-width: 960px) {
     .topo { grid-template-columns: 1.05fr .95fr; gap: 48px; text-align: left; padding-top: 48px; }
     .topo-txt { justify-items: start; }
-    .trilho img { width: 200px; margin-right: 18px; }
+    .trilho img { width: 210px; margin-right: 18px; }
   }
 </style>
 </head>
@@ -451,12 +451,10 @@
     <figure class="topo-vit" aria-label="Vitrines reais feitas no Zap Catálogo">
       <div class="esteira">
         <div class="trilho">
-          <img src="/static/exemplo/celular-jessicahair.webp" width="440" height="951" alt="Vitrine Jessica Hair, de cabelos, no Zap Catálogo" fetchpriority="high">
-          <img src="/static/exemplo/celular-boutique.webp" width="440" height="951" alt="Vitrine Boutique da Maria, de roupas e bolsas" fetchpriority="high">
-          <img src="/static/exemplo/celular-alimentos.webp" width="440" height="951" alt="Vitrine Doceria Encanto, de doces e bolos">
-          <img src="/static/exemplo/celular-servicos.webp" width="440" height="951" alt="Vitrine Studio Bella, salão de beleza">
-          <img src="/static/exemplo/celular-jessicahair-produtos.webp" width="440" height="951" alt="Produtos da Jessica Hair com botão Eu quero">
-          <img src="/static/exemplo/celular-mentorias.webp" width="440" height="951" alt="Vitrine da Mentora Jéssica Ferreira">
+          <img src="/static/exemplo/topo-acessorios.webp" width="540" height="1080" alt="Vitrine Acessórios da Lu, de bijuterias e semijoias, no Zap Catálogo" fetchpriority="high">
+          <img src="/static/exemplo/topo-boutique.webp" width="540" height="1080" alt="Vitrine Boutique da Maria, de moda feminina" fetchpriority="high">
+          <img src="/static/exemplo/topo-mentoria.webp" width="540" height="1080" alt="Vitrine Mentoria Empreendedora, de mentorias e e-books">
+          <img src="/static/exemplo/topo-doceria.webp" width="540" height="1080" alt="Vitrine Doceria Encanto, de doces e salgados">
         </div>
       </div>
       <figcaption>Vitrines reais feitas no Zap Catálogo</figcaption>
@@ -659,7 +657,7 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
 <script>
   // esteira do topo: duplica os celulares para o giro ficar contínuo
   (function () { var t = document.querySelector('.trilho'); if (!t) return;
-    Array.prototype.slice.call(t.children).forEach(function (im) { var c = im.cloneNode(); c.alt = ''; c.setAttribute('aria-hidden', 'true'); c.removeAttribute('fetchpriority'); c.loading = 'lazy'; t.appendChild(c); }); })();
+    var orig = Array.prototype.slice.call(t.children); [1, 2].forEach(function () { orig.forEach(function (im) { var c = im.cloneNode(); c.alt = ''; c.setAttribute('aria-hidden', 'true'); c.removeAttribute('fetchpriority'); t.appendChild(c); }); }); })();
 </script>
 </body>
 </html>
