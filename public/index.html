@@ -497,6 +497,7 @@
   .vid-tel video { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 28px; background: #FCE4EC; }
   .vid916 figcaption { position: relative; z-index: 1; max-width: 30em; color: var(--muted); font-size: 15px; }
   @media (min-width: 960px) { .vid-tel { width: 320px; } }
+  .vid-som { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); border: 0; border-radius: 99px; background: rgba(255,255,255,.94); color: var(--fg); font: 700 13px/1 var(--f-body); padding: 9px 14px; box-shadow: 0 8px 20px -8px rgba(0,0,0,.35); cursor: pointer; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -600,7 +601,7 @@
     <h2>Veja como seu mini site <em>funciona de verdade</em></h2>
     <p class="txt">Conheça a experiência de quem acessa a vitrine e descubra como é simples organizar seus produtos.</p>
     <figure class="vid916">
-      <div class="vid-tel"><video src="/static/exemplo/vitrine-video.mp4" poster="/static/exemplo/vitrine-video-capa.webp" muted loop playsinline autoplay preload="metadata" aria-label="Demonstração do mini site: produto sendo escolhido, carrinho e pedido no WhatsApp"></video></div>
+      <div class="vid-tel"><video src="/static/exemplo/demo-mini-site.mp4" poster="/static/exemplo/demo-mini-site-capa.webp" muted loop playsinline autoplay preload="metadata" aria-label="Demonstração do mini site: produto sendo escolhido, carrinho e pedido no WhatsApp"></video><button type="button" class="vid-som" aria-pressed="false">🔊 Ativar som</button></div>
       <figcaption>O produto sendo escolhido, o carrinho e o pedido chegando no WhatsApp.</figcaption>
     </figure>
   </section>
@@ -802,6 +803,11 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
   // esteira do topo: duplica os celulares para o giro ficar contínuo
   (function () { var t = document.querySelector('.trilho'); if (!t) return;
     var orig = Array.prototype.slice.call(t.children); [1, 2].forEach(function () { orig.forEach(function (im) { var c = im.cloneNode(); c.alt = ''; c.setAttribute('aria-hidden', 'true'); c.removeAttribute('fetchpriority'); t.appendChild(c); }); }); })();
+</script>
+<script>
+  // vídeo da seção "Veja na prática": botão de som
+  (function () { var b = document.querySelector('.vid-som'); if (!b) return; var v = b.parentNode.querySelector('video');
+    b.addEventListener('click', function () { v.muted = !v.muted; if (!v.muted) { v.currentTime = 0; v.play(); } b.textContent = v.muted ? '🔊 Ativar som' : '🔇 Tirar som'; b.setAttribute('aria-pressed', String(!v.muted)); }); })();
 </script>
 </body>
 </html>
