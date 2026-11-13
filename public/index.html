@@ -470,6 +470,26 @@
   .cmenos { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start; text-align: left; max-width: 980px; margin: 14px auto 0; background: var(--acc); color: #fff; border-radius: 22px; padding: 20px; box-shadow: 0 24px 50px -28px rgba(232,8,122,.8); }
   .cmenos .ico { background: rgba(255,255,255,.18); color: #fff; } .cmenos b { display: block; font: 800 19px/1.25 var(--f-display); } .cmenos p { margin: 6px 0 0; color: rgba(255,255,255,.92); }
   @media (min-width: 960px) { .cpassos { grid-template-columns: repeat(3, 1fr); } .cpassos li { grid-template-columns: 1fr; padding: 14px; align-items: start; align-content: start; } .cv { height: 190px; } .cv-tel { max-width: 150px; font-size: 10px; } .cv-grade img { height: 58px; } .cv-grade u, .cv-bt { font-size: 9px; } .cv-tit { font-size: 12px; } .cv-item { grid-template-columns: 30px 1fr; } .cv-item img { width: 30px; height: 30px; } .cv-msg, .cv-watop { font-size: 10px; } .cv-msg time { font-size: 8px; } .cv-watop i { width: 18px; height: 18px; font-size: 7.5px; } }
+
+  /* cards mais bonitos */
+  .cpassos { gap: 18px; }
+  .cpassos li { grid-template-columns: 1fr; gap: 0; padding: 0; border-radius: 26px; overflow: hidden; box-shadow: 0 22px 44px -30px rgba(150,20,80,.45); transition: transform .2s ease, box-shadow .2s ease; }
+  .cpassos li:hover { transform: translateY(-4px); box-shadow: 0 30px 54px -30px rgba(150,20,80,.55); }
+  .cv { height: 178px; border-radius: 0; padding: 18px 18px 0; background: radial-gradient(90% 80% at 50% 0%, #FFF3F8 0%, #FFD6E6 60%, #FFC2DA 100%); position: relative; }
+  .cv::before { content: ""; position: absolute; width: 120px; height: 120px; border-radius: 50%; background: rgba(255,255,255,.45); top: -40px; right: -30px; }
+  .cv::after { content: ""; position: absolute; width: 70px; height: 70px; border-radius: 50%; background: rgba(232,8,122,.08); bottom: 14px; left: -20px; }
+  .cv-tel { position: relative; z-index: 1; max-width: 140px; font-size: 9.5px; border: 4px solid #fff; border-bottom: 0; box-shadow: 0 16px 30px -14px rgba(150,20,80,.6); }
+  .cv-grade img { height: 52px; } .cv-grade u, .cv-bt { font-size: 8.5px; } .cv-tit { font-size: 11px; } .cv-item { grid-template-columns: 28px 1fr; } .cv-item img { width: 28px; height: 28px; } .cv-msg, .cv-watop { font-size: 9.5px; } .cv-msg time { font-size: 7.5px; } .cv-watop i { width: 17px; height: 17px; font-size: 7px; }
+  .ctx { position: relative; padding: 30px 20px 22px; }
+  .cnum { position: absolute; top: -22px; left: 20px; width: 44px; height: 44px; border-radius: 50%; background: var(--acc); color: #fff; display: grid; place-items: center; font: 800 19px/1 var(--f-display); border: 4px solid #fff; box-shadow: 0 10px 20px -8px rgba(232,8,122,.7); }
+  .cpassos h3 { font-size: 20px; margin: 0 0 6px; }
+  .cmenos { border-radius: 26px; padding: 22px 22px; background: linear-gradient(135deg, #F0168A 0%, #D6066F 100%); }
+  .pi { border-radius: 22px; box-shadow: 0 18px 36px -28px rgba(150,20,80,.5); transition: transform .2s ease; position: relative; overflow: hidden; }
+  .pi::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 4px; background: linear-gradient(90deg, #FF7AB6, var(--acc)); }
+  .pi:hover { transform: translateY(-4px); }
+  .pi .ico { width: 48px; height: 48px; border-radius: 15px; background: linear-gradient(145deg, #FFE4EE, #FFC9DD); } .pi .ico svg { width: 22px; height: 22px; }
+  @media (min-width: 960px) { .cv { height: 210px; } .cv-tel { max-width: 160px; } }
+  @media (prefers-reduced-motion: reduce) { .cpassos li, .pi { transition: none; } }
 </style>
 </head>
 <body>
@@ -544,7 +564,7 @@
         <div class="cv" aria-hidden="true"><div class="cv-tel">
           <div class="cv-grade"><span><img src="/static/exemplo/boutique-conj1.webp" alt="" loading="lazy" width="90" height="112"><i></i><u>Eu quero</u></span><span><img src="/static/exemplo/boutique-bolsa1.webp" alt="" loading="lazy" width="90" height="112"><i></i><u>Eu quero</u></span><span><img src="/static/exemplo/boutique-conj2.webp" alt="" loading="lazy" width="90" height="112"><i></i><u>Eu quero</u></span><span><img src="/static/exemplo/boutique-bolsa2.webp" alt="" loading="lazy" width="90" height="112"><i></i><u>Eu quero</u></span></div>
         </div></div>
-        <div><h3>1. Explore a vitrine</h3><p>O cliente encontra seus produtos organizados, com fotos, vídeos e preços.</p></div>
+        <div class="ctx"><span class="cnum">1</span><h3>Explore a vitrine</h3><p>O cliente encontra seus produtos organizados, com fotos, vídeos e preços.</p></div>
       </li>
       <li>
         <div class="cv" aria-hidden="true"><div class="cv-tel">
@@ -554,14 +574,14 @@
           <div class="cv-tot"><span>Total</span><b>R$ 219,80</b></div>
           <u class="cv-bt">Enviar pedido</u>
         </div></div>
-        <div><h3>2. Monte o carrinho</h3><p>Ele adiciona todos os itens que deseja comprar e já vê o valor total.</p></div>
+        <div class="ctx"><span class="cnum">2</span><h3>Monte o carrinho</h3><p>Ele adiciona todos os itens que deseja comprar e já vê o valor total.</p></div>
       </li>
       <li>
         <div class="cv cv-wa" aria-hidden="true"><div class="cv-tel">
           <div class="cv-watop"><i>BM</i>Boutique da Maria</div>
           <div class="cv-msg">Eu quero os produtos:<br>• Conjunto Cropped<br>• Bolsa Caramelo<br><b>Total: R$ 219,80</b><time>10:42 ✓✓</time></div>
         </div></div>
-        <div><h3>3. Envie pelo WhatsApp</h3><p>O pedido completo chega para você continuar o atendimento.</p></div>
+        <div class="ctx"><span class="cnum">3</span><h3>Envie pelo WhatsApp</h3><p>O pedido completo chega para você continuar o atendimento.</p></div>
       </li>
     </ol>
     <div class="cmenos"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.6-5.4A8.4 8.4 0 1 1 21 11.5z"/></svg></span><div><b>Menos perguntas repetidas. Mais facilidade para atender.</b><p>O cliente já chega com os produtos escolhidos e o valor total, sem você precisar mandar foto e preço de cada item.</p></div></div>
