@@ -490,6 +490,13 @@
   .pi .ico { width: 48px; height: 48px; border-radius: 15px; background: linear-gradient(145deg, #FFE4EE, #FFC9DD); } .pi .ico svg { width: 22px; height: 22px; }
   @media (min-width: 960px) { .cv { height: 210px; } .cv-tel { max-width: 160px; } }
   @media (prefers-reduced-motion: reduce) { .cpassos li, .pi { transition: none; } }
+  /* seção 4: vídeo 9:16 */
+  .vid916 { margin: 28px auto 0; display: grid; justify-items: center; gap: 14px; position: relative; }
+  .vid916::before { content: ""; position: absolute; top: 8%; left: 50%; width: min(520px, 100%); aspect-ratio: 1; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(circle, #FFC9DD 0%, rgba(255,201,221,0) 68%); z-index: 0; }
+  .vid-tel { position: relative; z-index: 1; width: min(290px, 78vw); aspect-ratio: 9 / 16; border-radius: 36px; padding: 9px; background: #1E1418; box-shadow: inset 0 0 0 2px #3A2A31, 0 40px 70px -30px rgba(150,20,80,.6); }
+  .vid-tel video { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 28px; background: #FCE4EC; }
+  .vid916 figcaption { position: relative; z-index: 1; max-width: 30em; color: var(--muted); font-size: 15px; }
+  @media (min-width: 960px) { .vid-tel { width: 320px; } }
 </style>
 </head>
 <body>
@@ -585,6 +592,17 @@
       </li>
     </ol>
     <div class="cmenos"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.6-5.4A8.4 8.4 0 1 1 21 11.5z"/></svg></span><div><b>Menos perguntas repetidas. Mais facilidade para atender.</b><p>O cliente já chega com os produtos escolhidos e o valor total, sem você precisar mandar foto e preço de cada item.</p></div></div>
+  </section>
+
+  <!-- 4. Veja na prática: vídeo 9:16 (troque o arquivo em /static/exemplo/ para o vídeo novo) -->
+  <section class="blk centro pratica" id="pratica">
+    <p class="eyebrow">Veja na prática</p>
+    <h2>Veja como seu mini site <em>funciona de verdade</em></h2>
+    <p class="txt">Conheça a experiência de quem acessa a vitrine e descubra como é simples organizar seus produtos.</p>
+    <figure class="vid916">
+      <div class="vid-tel"><video src="/static/exemplo/vitrine-video.mp4" poster="/static/exemplo/vitrine-video-capa.webp" muted loop playsinline autoplay preload="metadata" aria-label="Demonstração do mini site: produto sendo escolhido, carrinho e pedido no WhatsApp"></video></div>
+      <figcaption>O produto sendo escolhido, o carrinho e o pedido chegando no WhatsApp.</figcaption>
+    </figure>
   </section>
 
   <!-- 2. O que é: painel x catálogo -->
