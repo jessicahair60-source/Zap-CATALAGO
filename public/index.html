@@ -400,6 +400,130 @@
   @media (max-width: 370px) { .timer .t-lb { display: none; } }
   .cta-row { display: none; } /* o botão fixo embaixo já faz esse papel */
   .quem-c .mk { width: min(220px, 100%); height: auto; margin: 0 0 12px; filter: drop-shadow(0 22px 26px rgba(120,20,60,.28)); }
+  /* topo novo: mini site profissional + esteira de vitrines reais */
+  .topo { display: grid; gap: 26px; align-items: center; text-align: center; padding: 26px 0 8px; }
+  .topo-txt { display: grid; justify-items: center; min-width: 0; }
+  .topo-selo { display: inline-block; margin: 0 0 18px; padding: 10px 18px; border-radius: 99px; background: #FFE4EE; color: var(--acc); font: 700 12.5px/1.35 var(--f-body); letter-spacing: .08em; text-transform: uppercase; text-wrap: balance; }
+  .topo h1 { font-size: clamp(32px, 5.4vw, 54px); line-height: 1.08; letter-spacing: -.02em; max-width: 15em; text-wrap: balance; }
+  .topo h1 em { font-style: normal; color: var(--acc); }
+  .topo-sub { margin: 16px 0 0; font: 700 clamp(18px, 2.2vw, 22px)/1.3 var(--f-display); color: var(--fg); }
+  .topo-lead { margin: 10px 0 0; max-width: 32em; font-size: 17px; line-height: 1.6; color: var(--muted); text-wrap: pretty; }
+  .topo-cta { margin-top: 24px; letter-spacing: .04em; }
+  .topo .preco-mini { margin-top: 12px; }
+  .topo-vit { margin: 0; min-width: 0; position: relative; padding: 22px 0 56px; border-radius: 28px; background: radial-gradient(120% 90% at 50% 0%, #FFE4EE 0%, #FFF3F7 55%, #FBEAF0 100%); border: 1px solid var(--line); overflow: hidden; }
+  .esteira { position: relative; overflow: hidden; }
+  .esteira::before, .esteira::after { content: ""; position: absolute; top: 0; bottom: 0; width: 28px; z-index: 2; pointer-events: none; }
+  .esteira::before { left: 0; background: linear-gradient(90deg, #FFEAF2, rgba(255,234,242,0)); } .esteira::after { right: 0; background: linear-gradient(270deg, #FFEAF2, rgba(255,234,242,0)); }
+  .trilho { display: flex; width: max-content; will-change: transform; -webkit-transform: translate3d(0,0,0); transform: translate3d(0,0,0); -webkit-backface-visibility: hidden; backface-visibility: hidden; -webkit-animation: esteira 3.6s linear infinite; animation: esteira 3.6s linear infinite; }
+  .trilho img { flex: none; display: block; width: 176px; height: 352px; object-fit: cover; margin-right: 14px; border-radius: 22px; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+  @-webkit-keyframes esteira { from { -webkit-transform: translate3d(0,0,0); } to { -webkit-transform: translate3d(-33.3333%,0,0); } }
+  @keyframes esteira { from { transform: translate3d(0,0,0); } to { transform: translate3d(-33.3333%,0,0); } }
+  .topo-vit figcaption { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); white-space: nowrap; background: #fff; border: 1px solid var(--line); color: var(--fg); font-size: 12.5px; font-weight: 700; padding: 6px 13px; border-radius: 99px; }
+  @media (prefers-reduced-motion: reduce) { .trilho { animation-duration: 30s; } }
+  @media (max-width: 559px) { .topo-cta { width: 100%; } .topo-lead { font-size: 16px; } .topo-selo { font-size: 11.5px; padding: 9px 14px; } }
+  @media (max-width: 959px) {
+    .topo { display: flex; flex-direction: column; align-items: center; gap: 0; }
+    .topo-txt { display: contents; }
+    .topo-vit { order: 1; width: 100%; margin-top: 24px; }
+    .topo-cta { order: 2; } .topo .preco-mini { order: 3; }
+  }
+  @media (min-width: 960px) {
+    .topo { grid-template-columns: 1.05fr .95fr; gap: 48px; text-align: left; padding-top: 48px; }
+    .topo-txt { justify-items: start; }
+    .trilho img { width: 210px; height: 420px; margin-right: 18px; }
+  }
+  /* seção 2: mini site pronto */
+  .pronto-grade { display: grid; gap: 18px; margin-top: 28px; align-items: center; text-align: left; }
+  .pmock { justify-self: center; width: 100%; max-width: 400px; background: #FFF0F5; border: 1px solid var(--line); border-radius: 26px; padding: 12px 12px 14px; box-shadow: 0 30px 60px -36px rgba(150,20,80,.5); display: grid; gap: 10px; font-size: 14px; }
+  .pm-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #fff; border-radius: 16px; padding: 8px 8px 8px 10px; }
+  .pm-marca { display: flex; align-items: center; gap: 7px; font: 800 14px/1 var(--f-display); white-space: nowrap; } .pm-marca img { border-radius: 8px; }
+  .pm-abas { display: flex; background: #F6EEF1; border-radius: 99px; padding: 3px; font-size: 11.5px; white-space: nowrap; } .pm-abas i { font-style: normal; color: var(--muted); padding: 5px 8px; } .pm-abas b { background: #fff; border-radius: 99px; padding: 5px 10px; box-shadow: 0 2px 6px -3px rgba(0,0,0,.2); }
+  .pm-card { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 14px; display: grid; gap: 11px; }
+  .pm-ar { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; } .pm-ar b { display: block; font-size: 16px; } .pm-ar small { color: var(--muted); font-size: 12.5px; }
+  .pm-dot { width: 10px; height: 10px; border-radius: 50%; background: #1FA855; box-shadow: 0 0 0 4px #DFF3E6; }
+  .pm-sw { width: 44px; height: 26px; border-radius: 99px; background: #1FA855; position: relative; } .pm-sw::after { content: ""; position: absolute; right: 3px; top: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; }
+  .pm-link { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #F6EEF1; border-radius: 12px; padding: 5px 5px 5px 12px; font-weight: 700; font-size: 13px; min-width: 0; } .pm-link span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pm-link em { font-style: normal; background: var(--acc); color: #fff; border-radius: 9px; padding: 7px 12px; font-size: 12.5px; }
+  .pm-acoes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; } .pm-acoes span { display: grid; justify-items: center; gap: 4px; border: 1px solid var(--line); border-radius: 12px; padding: 9px 4px; font-size: 12px; font-weight: 700; }
+  .pm-acoes svg, .pi svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .pm-pronta { display: flex; justify-content: space-between; align-items: baseline; } .pm-pronta b { font: 800 16px/1.2 var(--f-display); } .pm-pronta small { color: var(--muted); }
+  .pm-barra { height: 6px; border-radius: 99px; background: var(--acc); }
+  .pm-passos { list-style: none; margin: 0; padding: 0; display: grid; } .pm-passos li { display: grid; grid-template-columns: 30px 1fr; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid var(--line); } .pm-passos li:first-child { border-top: 0; }
+  .pm-passos i { width: 28px; height: 28px; border-radius: 50%; background: var(--acc); color: #fff; display: grid; place-items: center; font-style: normal; font-weight: 800; font-size: 13px; }
+  .pm-passos small { display: block; color: var(--acc); font-weight: 700; font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; } .pm-passos b { display: block; text-decoration: line-through; color: var(--muted); font-size: 14px; } .pm-passos span { display: block; color: var(--muted); font-size: 12px; }
+  .pronto-itens { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .pi { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px 14px; text-align: center; display: grid; justify-items: center; gap: 6px; }
+  .pi .ico { background: #FFE4EE; color: var(--acc); } .pi b { font: 800 16.5px/1.2 var(--f-display); } .pi p { margin: 0; color: var(--muted); font-size: 13.5px; line-height: 1.45; }
+  @media (min-width: 960px) { .pronto-grade { grid-template-columns: 1fr 1fr; gap: 32px; } .pi { padding: 24px 18px; } }
+  /* seção 3: carrinho */
+  .cpassos { list-style: none; margin: 28px auto 0; padding: 0; display: grid; gap: 14px; max-width: 980px; text-align: left; }
+  .cpassos li { display: grid; grid-template-columns: 132px 1fr; gap: 16px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: 12px; }
+  .cpassos h3 { font-size: 19px; margin: 0 0 4px; } .cpassos p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.5; }
+  .cv { height: 132px; border-radius: 16px; background: linear-gradient(160deg, #FFE4EE, #FFC9DD); display: grid; place-items: end center; overflow: hidden; padding: 12px 12px 0; }
+  .cv-tel { width: 100%; max-width: 104px; height: 100%; background: #fff; border-radius: 14px 14px 0 0; padding: 8px 7px 0; box-shadow: 0 10px 22px -12px rgba(150,20,80,.55); overflow: hidden; font-size: 7.5px; line-height: 1.25; color: var(--fg); }
+  .cv-grade { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; } .cv-grade span { display: grid; gap: 2px; } .cv-grade img { width: 100%; height: 40px; object-fit: cover; border-radius: 5px; display: block; }
+  .cv-grade i { height: 3px; width: 70%; background: #EBDDE3; border-radius: 2px; } .cv-grade u, .cv-bt { text-decoration: none; background: var(--acc); color: #fff; border-radius: 5px; font-weight: 700; text-align: center; padding: 2px 0; font-size: 6.5px; }
+  .cv-tit { display: block; font: 800 9px/1 var(--f-display); margin-bottom: 6px; }
+  .cv-item { display: grid; grid-template-columns: 22px 1fr; gap: 5px; align-items: center; padding: 3px 0; white-space: nowrap; border-bottom: 1px solid #F3E6EB; font-weight: 700; } .cv-item img { width: 22px; height: 22px; object-fit: cover; border-radius: 5px; } .cv-item small { display: block; font-weight: 500; color: var(--muted); }
+  .cv-tot { display: flex; justify-content: space-between; padding: 6px 0 5px; font-weight: 700; } .cv-tot b { color: var(--acc); }
+  .cv-bt { display: block; padding: 4px 0; font-size: 7px; }
+  .cv-wa .cv-tel { background: #EFE7DD; padding: 0; }
+  .cv-watop { display: flex; align-items: center; gap: 4px; background: #075E54; color: #fff; padding: 6px; font-weight: 700; font-size: 7px; } .cv-watop i { width: 13px; height: 13px; border-radius: 50%; background: #F3B5CB; color: #5A2440; font-style: normal; font-size: 5.5px; display: grid; place-items: center; }
+  .cv-msg { margin: 8px 6px 0 auto; width: 84%; background: #D9FDD3; border-radius: 7px 2px 7px 7px; padding: 5px 6px 4px; font-size: 7px; color: #111B21; } .cv-msg b { display: block; margin-top: 3px; } .cv-msg time { display: block; text-align: right; color: #667781; font-size: 6px; }
+  .cmenos { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start; text-align: left; max-width: 980px; margin: 14px auto 0; background: var(--acc); color: #fff; border-radius: 22px; padding: 20px; box-shadow: 0 24px 50px -28px rgba(232,8,122,.8); }
+  .cmenos .ico { background: rgba(255,255,255,.18); color: #fff; } .cmenos b { display: block; font: 800 19px/1.25 var(--f-display); } .cmenos p { margin: 6px 0 0; color: rgba(255,255,255,.92); }
+  @media (min-width: 960px) { .cpassos { grid-template-columns: repeat(3, 1fr); } .cpassos li { grid-template-columns: 1fr; padding: 14px; align-items: start; align-content: start; } .cv { height: 190px; } .cv-tel { max-width: 150px; font-size: 10px; } .cv-grade img { height: 58px; } .cv-grade u, .cv-bt { font-size: 9px; } .cv-tit { font-size: 12px; } .cv-item { grid-template-columns: 30px 1fr; } .cv-item img { width: 30px; height: 30px; } .cv-msg, .cv-watop { font-size: 10px; } .cv-msg time { font-size: 8px; } .cv-watop i { width: 18px; height: 18px; font-size: 7.5px; } }
+
+  /* cards mais bonitos */
+  .cpassos { gap: 18px; }
+  .cpassos li { grid-template-columns: 1fr; gap: 0; padding: 0; border-radius: 26px; overflow: hidden; box-shadow: 0 22px 44px -30px rgba(150,20,80,.45); transition: transform .2s ease, box-shadow .2s ease; }
+  .cpassos li:hover { transform: translateY(-4px); box-shadow: 0 30px 54px -30px rgba(150,20,80,.55); }
+  .cv { height: 178px; border-radius: 0; padding: 18px 18px 0; background: radial-gradient(90% 80% at 50% 0%, #FFF3F8 0%, #FFD6E6 60%, #FFC2DA 100%); position: relative; }
+  .cv::before { content: ""; position: absolute; width: 120px; height: 120px; border-radius: 50%; background: rgba(255,255,255,.45); top: -40px; right: -30px; }
+  .cv::after { content: ""; position: absolute; width: 70px; height: 70px; border-radius: 50%; background: rgba(232,8,122,.08); bottom: 14px; left: -20px; }
+  .cv-tel { position: relative; z-index: 1; max-width: 140px; font-size: 9.5px; border: 4px solid #fff; border-bottom: 0; box-shadow: 0 16px 30px -14px rgba(150,20,80,.6); }
+  .cv-grade img { height: 52px; } .cv-grade u, .cv-bt { font-size: 8.5px; } .cv-tit { font-size: 11px; } .cv-item { grid-template-columns: 28px 1fr; } .cv-item img { width: 28px; height: 28px; } .cv-msg, .cv-watop { font-size: 9.5px; } .cv-msg time { font-size: 7.5px; } .cv-watop i { width: 17px; height: 17px; font-size: 7px; }
+  .ctx { position: relative; padding: 30px 20px 22px; }
+  .cnum { position: absolute; top: -22px; left: 20px; width: 44px; height: 44px; border-radius: 50%; background: var(--acc); color: #fff; display: grid; place-items: center; font: 800 19px/1 var(--f-display); border: 4px solid #fff; box-shadow: 0 10px 20px -8px rgba(232,8,122,.7); }
+  .cpassos h3 { font-size: 20px; margin: 0 0 6px; }
+  .cmenos { border-radius: 26px; padding: 22px 22px; background: linear-gradient(135deg, #F0168A 0%, #D6066F 100%); }
+  .pi { border-radius: 22px; box-shadow: 0 18px 36px -28px rgba(150,20,80,.5); transition: transform .2s ease; position: relative; overflow: hidden; }
+  .pi::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 4px; background: linear-gradient(90deg, #FF7AB6, var(--acc)); }
+  .pi:hover { transform: translateY(-4px); }
+  .pi .ico { width: 48px; height: 48px; border-radius: 15px; background: linear-gradient(145deg, #FFE4EE, #FFC9DD); } .pi .ico svg { width: 22px; height: 22px; }
+  @media (min-width: 960px) { .cv { height: 210px; } .cv-tel { max-width: 160px; } }
+  @media (prefers-reduced-motion: reduce) { .cpassos li, .pi { transition: none; } }
+  /* seção 4: vídeo 9:16 */
+  .vid916 { margin: 28px auto 0; display: grid; justify-items: center; gap: 14px; position: relative; }
+  .vid916::before { content: ""; position: absolute; top: 8%; left: 50%; width: min(520px, 100%); aspect-ratio: 1; transform: translateX(-50%); border-radius: 50%; background: radial-gradient(circle, #FFC9DD 0%, rgba(255,201,221,0) 68%); z-index: 0; }
+  .vid-tel { position: relative; z-index: 1; width: min(290px, 78vw); aspect-ratio: 9 / 16; border-radius: 36px; padding: 9px; background: #1E1418; box-shadow: inset 0 0 0 2px #3A2A31, 0 40px 70px -30px rgba(150,20,80,.6); }
+  .vid-tel video { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 28px; background: #FCE4EC; }
+  .vid916 figcaption { position: relative; z-index: 1; max-width: 30em; color: var(--muted); font-size: 15px; }
+  @media (min-width: 960px) { .vid-tel { width: 320px; } }
+
+  /* vídeo 9:16 dentro do celular */
+  .vid-palco { position: relative; z-index: 1; display: grid; justify-items: center; gap: 22px; }
+  .vid-tel { position: relative; width: min(280px, 76vw); padding: 10px; border-radius: 46px; background: linear-gradient(145deg, #3A2A31, #160E12 55%, #2B1E24); box-shadow: inset 0 0 0 1.5px #5A4650, inset 0 0 0 4px #120B0E, 0 50px 80px -34px rgba(150,20,80,.65), 0 0 0 8px rgba(255,255,255,.55); }
+  .vt-tela { position: relative; width: 100%; border-radius: 37px; overflow: hidden; background: #fff; display: flex; flex-direction: column; }
+  .vt-status { flex: none; height: 38px; display: flex; align-items: center; justify-content: space-between; padding: 4px 22px 0 26px; font-size: 13px; color: #1E1418; } .vt-status span { display: flex; gap: 5px; align-items: center; } .vt-status svg { height: 10px; width: auto; fill: currentColor; }
+  .vt-tela video { display: block; width: 100%; height: auto; aspect-ratio: 512 / 910; object-fit: cover; padding-bottom: 0; }
+  .vt-tela::after { content: ""; display: block; height: 18px; background: #fff; }
+  .vt-ilha { position: absolute; top: 8px; left: 50%; width: 78px; height: 22px; margin-left: -39px; border-radius: 20px; background: #0B0709; }
+  .vt-home { position: absolute; bottom: 7px; left: 50%; width: 96px; height: 4px; margin-left: -48px; border-radius: 3px; background: rgba(30,20,24,.5); }
+  .vt-bt { position: absolute; width: 3px; border-radius: 2px; background: #2A1D22; }
+  .vt-b1 { left: -3px; top: 96px; height: 26px; } .vt-b2 { left: -3px; top: 134px; height: 46px; } .vt-b3 { right: -3px; top: 150px; height: 66px; }
+  .vt-selo { position: relative; z-index: 2; display: inline-flex; justify-self: center; align-items: center; gap: 6px; background: #fff; color: var(--fg); font: 800 17px/1 var(--f-display); padding: 13px 22px; gap: 10px; border-radius: 99px; border: 2px solid #FFD1E3; box-shadow: 0 14px 30px -12px rgba(150,20,80,.55); white-space: nowrap; }
+  .vt-selo i { width: 11px; height: 11px; border-radius: 50%; background: var(--acc); box-shadow: 0 0 0 0 rgba(232,8,122,.6); animation: pulso 1.6s infinite; }
+  @keyframes pulso { 70% { box-shadow: 0 0 0 8px rgba(232,8,122,0); } 100% { box-shadow: 0 0 0 0 rgba(232,8,122,0); } }
+  .vid-passos { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; width: min(340px, 100%); text-align: left; }
+  .vid-passos li { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 10px 14px; box-shadow: 0 12px 26px -22px rgba(150,20,80,.6); font-weight: 600; font-size: 15px; }
+  .vid-passos b { flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--acc); color: #fff; display: grid; place-items: center; font: 800 14px/1 var(--f-display); }
+  @media (min-width: 960px) {
+    .vid-palco { grid-template-columns: auto 300px; align-items: center; gap: 48px; }
+    .vid-tel { width: 300px; }
+    .vid-passos { gap: 14px; } .vid-passos li { padding: 14px 16px; font-size: 16px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .vt-selo i { animation: none; } }
 </style>
 </head>
 <body>
@@ -410,91 +534,116 @@
   </nav>
 
   <!-- 1. Primeira tela -->
-  <header class="hero">
-    <div>
-      <p class="tag">Zap Catálogo | Sua vitrine digital</p>
-      <h1>Cansada de enviar fotos, preços e informações dos seus produtos <em>toda vez que uma cliente pergunta?</em></h1>
-      <p class="lead">Com o Zap Catálogo, você cria seu próprio catálogo online, com a sua marca, e recebe pedidos diretamente no WhatsApp.</p>
-      <ul class="ok3"><li>Seu próprio painel para cadastrar e editar tudo</li><li>Catálogo com a sua marca em um único link</li><li>Pedidos direto no seu WhatsApp</li></ul>
-      <a class="btn big" id="cta-topo" href="/assinar/mensal">QUERO CRIAR MEU CATÁLOGO</a>
+  <header class="topo">
+    <div class="topo-txt">
+      <p class="topo-selo">Você vende pelo Instagram ou WhatsApp?</p>
+      <h1>Chegou sua vez de ter um <em>mini site profissional!</em></h1>
+      <p class="topo-sub">Link da bio + vitrine dos seus produtos</p>
+      <p class="topo-lead">Apresente seus produtos de forma profissional, desperte o interesse dos seus clientes e leve quem quer comprar direto para o seu WhatsApp.</p>
+      <a class="btn big topo-cta" id="cta-topo" href="/assinar/mensal">QUERO MEU MINI SITE <span aria-hidden="true">→</span></a>
       <p class="preco-mini">De <s>R$ 150,00</s> por <b>R$ 47,00/mês</b> • Acesso após a confirmação do pagamento</p>
     </div>
-    <figure class="trio" aria-label="Exemplos de vitrines feitas no Zap Catálogo">
-      <img class="t-esq" src="/static/exemplo/mockup-acessorios.webp" width="520" height="1220" alt="Vitrine Acessórios da Lu: bijuterias e semijoias, com botões das redes e produtos com Eu quero" fetchpriority="high">
-      <img class="t-dir" src="/static/exemplo/mockup-doceria.webp" width="520" height="1425" alt="Vitrine Doceria Encanto: doces e salgados com pedido pelo WhatsApp">
-      <img class="t-meio" src="/static/exemplo/mockup-boutique.webp" width="520" height="1220" alt="Vitrine Boutique da Maria: moda feminina com categorias e produtos" fetchpriority="high">
-      <figcaption>Vitrines feitas no Zap Catálogo</figcaption>
+    <figure class="topo-vit" aria-label="Vitrines reais feitas no Zap Catálogo">
+      <div class="esteira">
+        <div class="trilho">
+          <img src="/static/exemplo/topo-acessorios.webp" width="540" height="1080" alt="Vitrine Acessórios da Lu, de bijuterias e semijoias, no Zap Catálogo" fetchpriority="high">
+          <img src="/static/exemplo/topo-boutique.webp" width="540" height="1080" alt="Vitrine Boutique da Maria, de moda feminina" fetchpriority="high">
+          <img src="/static/exemplo/topo-mentoria.webp" width="540" height="1080" alt="Vitrine Mentoria Empreendedora, de mentorias e e-books">
+          <img src="/static/exemplo/topo-doceria.webp" width="540" height="1080" alt="Vitrine Doceria Encanto, de doces e salgados">
+        </div>
+      </div>
+      <figcaption>Vitrines reais feitas no Zap Catálogo</figcaption>
     </figure>
   </header>
 
-  <!-- 2. O que é: painel x catálogo -->
-  <section class="blk centro" id="o-que-e">
-    <h2>O que é o <em>Zap Catálogo?</em></h2>
-    <p class="txt">É uma plataforma para você ter seu próprio catálogo online. Ela funciona em duas partes:</p>
-    <div class="duas">
-      <div class="parte"><span class="quem-ve">Só você acessa</span><h3>Seu painel</h3><p>É onde você cadastra produtos ou serviços, fotos, vídeos e preços, escolhe a capa e as cores da vitrine e acompanha visitas e pedidos.</p></div>
-      <div class="parte cat"><span class="quem-ve">Suas clientes acessam</span><h3>Seu catálogo</h3><p>É o link que você divulga no Instagram e no WhatsApp. Sua cliente vê seus produtos com a sua marca, escolhe e envia o pedido para o seu WhatsApp.</p></div>
-    </div>
-  </section>
-
-  <!-- 3. Como funciona -->
-  <section class="blk centro" id="como-funciona">
-    <h2>Seu catálogo pronto para divulgar <em>em 3 passos.</em></h2>
-    <p class="txt">Do cadastro ao primeiro pedido, tudo pelo celular.</p>
-    <ol class="passos">
-      <li><span class="n">1</span><div><h3 class="t">Personalize</h3><p class="d">Coloque o nome, a capa e as cores do seu negócio.</p></div></li>
-      <li><span class="n">2</span><div><h3 class="t">Cadastre</h3><p class="d">Adicione seus produtos, fotos, vídeos e preços.</p></div></li>
-      <li><span class="n">3</span><div><h3 class="t">Compartilhe</h3><p class="d">Divulgue seu link e receba os pedidos pelo WhatsApp.</p></div></li>
-    </ol>
-    <p class="comp"><b>Não precisa saber programar.</b> Você recebe acesso ao painel e um tutorial para aprender a usar.</p>
-  </section>
-
-  <!-- 4. Demonstração real: painel, catálogo e pedido -->
-  <section class="blk centro" id="demonstracao">
-    <h2>Veja o painel e o catálogo <em>funcionando de verdade</em></h2>
-    <p class="txt">Exemplos reais de lojas montadas no Zap Catálogo.</p>
-    <figure class="demo-painel"><span class="rot"><b>1</b>Painel: você monta a loja</span>
-      <div class="janela"><div class="bar"><i></i><i></i><i></i><span>Painel da lojista</span></div><img src="/static/exemplo/painel-computador.webp" width="1400" height="798" loading="lazy" decoding="async" alt="Painel do Zap Catálogo no computador, com o banner da Jessica Hair e a prévia da vitrine ao lado"></div></figure>
-    <div class="demo-dupla">
-      <figure class="demo-cat"><span class="rot"><b>2</b>Catálogo: sua cliente escolhe</span>
-        <div class="par-vit"><img src="/static/exemplo/demo-acessorios.webp" width="440" height="1022" loading="lazy" decoding="async" alt="Vitrine Acessórios da Lu no Zap Catálogo: brincos e colares com preço e botão Eu quero"><img src="/static/exemplo/demo-doceria.webp" width="440" height="1206" loading="lazy" decoding="async" alt="Vitrine Doceria Encanto no Zap Catálogo: doces, bolos e kits com preço e botão Eu quero"></div></figure>
-      <figure class="demo-wa"><span class="rot"><b>3</b>WhatsApp: o pedido chega pronto</span>
-      <div class="wa" role="img" aria-label="Exemplo de pedido recebido no WhatsApp">
-        <div class="wa-top"><i>JH</i><span>Jessica Hair<small>WhatsApp</small></span></div>
-        <div class="wa-body"><span class="wa-day">Hoje</span>
-          <div class="wa-msg">Eu quero os produtos:
-- Modelo Ondulado Chocolate
-- Modelo Ruivinha
-- 2x Modelo Sarah
-
-Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
+  <!-- 2. Mini site pronto: painel desenhado + o que ela personaliza -->
+  <section class="blk centro pronto" id="pronto">
+    <p class="eyebrow">Pronto para personalizar</p>
+    <h2>Seu mini site já vem pronto. <em>Você só deixa com a cara da sua marca!</em></h2>
+    <p class="txt">Nada de começar do zero. A estrutura já está funcionando: você só coloca as informações da sua empresa, escolhe as cores, adiciona seu banner e cadastra seus produtos.</p>
+    <div class="pronto-grade">
+      <div class="pmock" role="img" aria-label="Painel do Zap Catálogo com a vitrine no ar e os 3 passos concluídos">
+        <div class="pm-top"><span class="pm-marca"><img src="/static/logo-zap.webp" width="28" height="28" alt="">Zap Catálogo</span><span class="pm-abas"><i>Ver como cliente</i><b>Painel</b></span></div>
+        <div class="pm-card">
+          <div class="pm-ar"><span class="pm-dot"></span><div><b>Vitrine no ar</b><small>Suas clientes já podem ver e pedir</small></div><span class="pm-sw"></span></div>
+          <div class="pm-link"><span>zapcatalogo.com/sua-loja</span><em>Copiar</em></div>
+          <div class="pm-acoes"><span><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>Compartilhar</span><span><svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>Ver vitrine</span><span><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>Editar link</span></div>
+        </div>
+        <div class="pm-card">
+          <div class="pm-pronta"><b>Sua loja está pronta 🎉</b><small>3 de 3</small></div>
+          <div class="pm-barra"></div>
+          <ol class="pm-passos">
+            <li><i>✓</i><div><small>Passo 1 · feito</small><b>Informações da loja</b><span>Nome, WhatsApp, frase e links</span></div></li>
+            <li><i>✓</i><div><small>Passo 2 · feito</small><b>Banner, logo e cores</b><span>Deixe a vitrine com a cara da sua marca</span></div></li>
+            <li><i>✓</i><div><small>Passo 3 · feito</small><b>Subir produtos</b><span>Fotos, vídeos, preços e categorias</span></div></li>
+          </ol>
+        </div>
       </div>
-        <figcaption>Com o nome de cada produto e a quantidade. Se tiver preço na vitrine, o valor vai junto.</figcaption></figure>
+      <div class="pronto-itens">
+        <div class="pi"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.8 1.6-1.6 0-.9-.7-1.3-.7-2.1 0-.9.7-1.5 1.6-1.5H17a4 4 0 0 0 4-4c0-4.9-4-8.8-9-8.8z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10.5" cy="7" r="1.2"/><circle cx="15" cy="7.5" r="1.2"/></svg></span><b>Suas cores</b><p>Escolha as cores que combinam com o seu negócio.</p></div>
+        <div class="pi"><span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg></span><b>Seu banner</b><p>Coloque uma capa bonita no topo da sua vitrine.</p></div>
+        <div class="pi"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/></svg></span><b>Seus produtos</b><p>Fotos, vídeos, preços e categorias, do seu jeito.</p></div>
+        <div class="pi"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z"/></svg></span><b>Sua marca</b><p>Seu nome, sua logo e o seu link para divulgar.</p></div>
+      </div>
     </div>
   </section>
 
-  <!-- 5. Benefícios -->
-  <section class="blk faixa" id="beneficios">
-    <div class="centro">
-    <h2>Muito mais que um link na bio. <em>Sua vitrine digital completa.</em></h2>
-    <p class="txt" style="margin:14px auto 0">Apresente seus produtos de forma profissional e facilite o atendimento das suas clientes.</p></div>
-    <div class="bens"><div class="ben"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z"/></svg></span><b>Sua marca, do seu jeito</b><p>Personalize a capa, as cores e a identidade do catálogo.</p></div><div class="ben"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><circle cx="12" cy="12" r="3.2"/><path d="M8 5l1.5-2h5L16 5"/></svg></span><b>Fotos, vídeos e preços</b><p>Mostre os detalhes dos seus produtos em uma vitrine organizada.</p></div><div class="ben"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.6-5.4A8.4 8.4 0 1 1 21 11.5z"/></svg></span><b>Pedidos direto no WhatsApp</b><p>Sua cliente escolhe os itens e envia o pedido para você finalizar a venda.</p></div><div class="ben"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg></span><b>Um link para divulgar</b><p>Coloque na bio do Instagram, nos stories e nos grupos de WhatsApp.</p></div><div class="ben"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M3 9h18M9 21V9"/></svg></span><b>Controle pelo painel</b><p>Cadastre, edite e organize seus produtos sempre que precisar.</p></div><div class="ben"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><b>Acompanhe seu negócio</b><p>Veja quantas pessoas visitaram sua vitrine, os cliques no “Eu quero” e os pedidos de cada dia.</p></div></div>
+  <!-- 3. Carrinho: cliente escolhe, pedido chega no WhatsApp -->
+  <section class="blk centro carr" id="carrinho">
+    <p class="eyebrow">Mais praticidade para vender</p>
+    <h2>Seus clientes escolhem, o carrinho organiza. <em>O pedido chega no seu WhatsApp!</em></h2>
+    <p class="txt">Seus clientes podem escolher vários produtos, adicionar ao carrinho e enviar o pedido completo, com a lista dos itens e o valor total, direto para o seu WhatsApp.</p>
+    <ol class="cpassos">
+      <li>
+        <div class="cv" aria-hidden="true"><div class="cv-tel">
+          <div class="cv-grade"><span><img src="/static/exemplo/boutique-conj1.webp" alt="" loading="lazy" width="90" height="112"><i></i><u>Eu quero</u></span><span><img src="/static/exemplo/boutique-bolsa1.webp" alt="" loading="lazy" width="90" height="112"><i></i><u>Eu quero</u></span><span><img src="/static/exemplo/boutique-conj2.webp" alt="" loading="lazy" width="90" height="112"><i></i><u>Eu quero</u></span><span><img src="/static/exemplo/boutique-bolsa2.webp" alt="" loading="lazy" width="90" height="112"><i></i><u>Eu quero</u></span></div>
+        </div></div>
+        <div class="ctx"><span class="cnum">1</span><h3>Explore a vitrine</h3><p>O cliente encontra seus produtos organizados, com fotos, vídeos e preços.</p></div>
+      </li>
+      <li>
+        <div class="cv" aria-hidden="true"><div class="cv-tel">
+          <b class="cv-tit">Seu carrinho</b>
+          <div class="cv-item"><img src="/static/exemplo/boutique-conj1.webp" alt="" loading="lazy" width="40" height="40"><span>Conjunto Cropped<small>1 × R$ 129,90</small></span></div>
+          <div class="cv-item"><img src="/static/exemplo/boutique-bolsa1.webp" alt="" loading="lazy" width="40" height="40"><span>Bolsa Caramelo<small>1 × R$ 89,90</small></span></div>
+          <div class="cv-tot"><span>Total</span><b>R$ 219,80</b></div>
+          <u class="cv-bt">Enviar pedido</u>
+        </div></div>
+        <div class="ctx"><span class="cnum">2</span><h3>Monte o carrinho</h3><p>Ele adiciona todos os itens que deseja comprar e já vê o valor total.</p></div>
+      </li>
+      <li>
+        <div class="cv cv-wa" aria-hidden="true"><div class="cv-tel">
+          <div class="cv-watop"><i>BM</i>Boutique da Maria</div>
+          <div class="cv-msg">Eu quero os produtos:<br>• Conjunto Cropped<br>• Bolsa Caramelo<br><b>Total: R$ 219,80</b><time>10:42 ✓✓</time></div>
+        </div></div>
+        <div class="ctx"><span class="cnum">3</span><h3>Envie pelo WhatsApp</h3><p>O pedido completo chega para você continuar o atendimento.</p></div>
+      </li>
+    </ol>
+    <div class="cmenos"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.6-5.4A8.4 8.4 0 1 1 21 11.5z"/></svg></span><div><b>Menos perguntas repetidas. Mais facilidade para atender.</b><p>O cliente já chega com os produtos escolhidos e o valor total, sem você precisar mandar foto e preço de cada item.</p></div></div>
   </section>
 
-  <!-- 6. Exemplos para cada tipo de negócio, girando -->
-  <section class="blk centro vitrines" id="exemplos">
-    
-    <h2>Olha como seu negócio pode ficar <em>com o Zap Catálogo!</em></h2>
-    <p class="txt">Cada negócio tem seu estilo. Com o Zap Catálogo, você cria uma vitrine com a identidade da sua marca.</p>
-    <div class="ex-tabs" role="tablist" aria-label="Tipos de negócio"><button type="button" class="on">Produtos</button><button type="button">Serviços</button><button type="button">Comida</button><button type="button">Mentoria</button></div>
-    <div class="quem">
-      <div class="quem-c on"><img class="mk" src="/static/exemplo/celular-boutique.webp" width="440" height="951" loading="lazy" decoding="async" alt="Vitrine Boutique da Maria, de roupas e bolsas, no Zap Catálogo"><b>Quem vende produtos</b><span>Roupas, bolsas, cabelos, acessórios, cosméticos, revenda.</span><a href="/exemplo/boutique" target="_blank" rel="noopener">Abrir exemplo →</a></div>
-      <div class="quem-c"><img class="mk" src="/static/exemplo/celular-servicos.webp" width="440" height="951" loading="lazy" decoding="async" alt="Vitrine Studio Bella, salão de beleza, no Zap Catálogo"><b>Quem oferece serviços</b><span>Salão, unhas, sobrancelha, estética, aulas, consultoria.</span><a href="/exemplo/servicos" target="_blank" rel="noopener">Abrir exemplo →</a></div>
-      <div class="quem-c"><img class="mk" src="/static/exemplo/celular-alimentos.webp" width="440" height="951" loading="lazy" decoding="async" alt="Vitrine Doceria Encanto, de doces e bolos, no Zap Catálogo"><b>Quem vende comida</b><span>Doces, bolos, salgados, marmitas, lanches e bebidas.</span><a href="/exemplo/alimentos" target="_blank" rel="noopener">Abrir exemplo →</a></div>
-      <div class="quem-c"><img class="mk" src="/static/exemplo/celular-mentorias.webp" width="440" height="951" loading="lazy" decoding="async" alt="Vitrine da Mentora Jéssica Ferreira no Zap Catálogo"><b>Quem vende mentoria</b><span>Mentorias, cursos, e-books, consultorias e materiais digitais.</span><a href="/exemplo/mentorias" target="_blank" rel="noopener">Abrir exemplo →</a></div>
-    </div>
-    <div class="dots" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></div>
-    <div class="cta-row"><a class="btn big" href="/assinar/mensal">QUERO CRIAR MEU CATÁLOGO</a></div>
+  <!-- 4. Veja na prática: vídeo 9:16 (troque o arquivo em /static/exemplo/ para o vídeo novo) -->
+  <section class="blk centro pratica" id="pratica">
+    <p class="eyebrow">Veja na prática</p>
+    <h2>Veja como seu mini site <em>funciona de verdade</em></h2>
+    <p class="txt">Conheça a experiência que o seu cliente vai ter ao acessar a sua vitrine.</p>
+    <figure class="vid916">
+      <span class="vt-selo"><i></i>Demonstração real</span>
+      <div class="vid-palco">
+        <div class="vid-tel">
+          <span class="vt-bt vt-b1"></span><span class="vt-bt vt-b2"></span><span class="vt-bt vt-b3"></span>
+          <div class="vt-tela">
+            <div class="vt-status"><b>9:41</b><span><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="22" height="11" rx="3" fill="none" stroke="currentColor"/><rect x="2" y="2" width="17" height="8" rx="2"/><rect x="23.5" y="4" width="2" height="4" rx="1"/></svg></span></div>
+            <video src="/static/exemplo/demo-mini-site.mp4" poster="/static/exemplo/demo-mini-site-capa.webp" muted loop playsinline autoplay preload="metadata" aria-label="Demonstração real: cliente escolhe o produto, monta o carrinho e envia o pedido pelo WhatsApp"></video>
+            <span class="vt-ilha"></span><span class="vt-home"></span>
+          </div>
+        </div>
+        <ol class="vid-passos">
+          <li><b>1</b><span>Abre o link da bio</span></li>
+          <li><b>2</b><span>Escolhe e põe no carrinho</span></li>
+          <li><b>3</b><span>Envia o pedido no WhatsApp</span></li>
+        </ol>
+      </div>
+    </figure>
   </section>
 
   <!-- 7. Oferta por tempo limitado: só aparece quando configurada no servidor (OFERTA_*) -->
@@ -526,21 +675,10 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
     </div>
   </section>
 
-  <!-- 9. Perguntas frequentes -->
-  <section class="blk centro" id="duvidas">
-    <h2>Perguntas <em>frequentes</em></h2>
-    <div class="faq"><details><summary>Preciso saber programar?</summary><p>Não. Você cadastra e organiza seus produtos pelo painel, com a ajuda do tutorial.</p></details><details><summary>Posso colocar vídeos dos produtos?</summary><p>Sim! Você pode adicionar fotos e vídeos para apresentar melhor seus produtos.</p></details><details><summary>Como os pedidos chegam?</summary><p>Sua cliente escolhe os produtos no catálogo e envia o pedido pelo WhatsApp. Você recebe os itens selecionados e finaliza o atendimento.</p></details><details><summary>Posso usar o link no Instagram?</summary><p>Sim. Você pode colocar o link na bio, divulgar nos stories e compartilhar no WhatsApp.</p></details><details><summary>Como recebo meu acesso?</summary><p>Após a confirmação do pagamento, você recebe as instruções de acesso pelo e-mail utilizado na compra.</p></details><details><summary>E se eu não gostar?</summary><p>Você pode solicitar o reembolso em até 7 dias após a compra, conforme as condições aplicáveis.</p></details><details><summary>Como funciona o pagamento?</summary><p>O Zap Catálogo custa R$ 47,00 por mês, em uma assinatura recorrente.</p></details></div>
-  </section>
 
-  <section class="final">
-    <h2>Pare de enviar foto por foto. Tenha todos os seus produtos em um único link!</h2>
-    <p>Crie sua vitrine digital, organize seus produtos e facilite seus pedidos pelo WhatsApp.</p>
-    <a class="btn big" href="/assinar/mensal">QUERO CRIAR MEU CATÁLOGO</a>
-  </section>
 
   <footer class="site"><span>© Zap Catálogo</span><span><a href="/termos">Termos de uso</a> · <a href="/privacidade">Privacidade</a> · <a href="/entrar">Entrar</a></span></footer>
 </div>
-<div class="fixo" id="fixo" aria-hidden="true"><a class="btn" href="/assinar/mensal" tabindex="-1">EU QUERO MEU CATÁLOGO</a></div>
 <script>
 /* Catálogo de exemplo de verdade dentro dos celulares: ajusta ao tamanho e desce sozinho até a cliente mexer */
 (function () {
@@ -609,16 +747,14 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
 })();
 </script>
 <script>
-/* Botão de compra fixo embaixo: aparece depois da primeira tela */
-(function () {
-  var fixo = document.getElementById('fixo'), alvo = document.getElementById('cta-topo');
-  if (!('IntersectionObserver' in window)) return;
-  document.body.classList.add('tem-fixo');
-  new IntersectionObserver(function (es) {
-    var on = !es[0].isIntersecting && es[0].boundingClientRect.top < 0;
-    fixo.classList.toggle('on', on); document.body.classList.toggle('fixo-on', on); fixo.setAttribute('aria-hidden', on ? 'false' : 'true'); fixo.querySelectorAll('a').forEach(function (a) { a.tabIndex = on ? 0 : -1; });
-  }).observe(alvo);
-})();
+  // esteira do topo: duplica os celulares para o giro ficar contínuo
+  (function () { var t = document.querySelector('.trilho'); if (!t) return;
+    var orig = Array.prototype.slice.call(t.children); [1, 2].forEach(function () { orig.forEach(function (im) { var c = im.cloneNode(); c.alt = ''; c.setAttribute('aria-hidden', 'true'); c.removeAttribute('fetchpriority'); t.appendChild(c); }); });
+    var st = document.createElement('style'), n = 0, ultimo = 0; document.head.appendChild(st);
+    function medir() { var a = t.children[0], b = t.children[orig.length]; if (!a || !b) return; var d = b.offsetLeft - a.offsetLeft; if (!d || d === ultimo) return; ultimo = d; n++;
+      st.textContent = '@-webkit-keyframes est' + n + '{from{-webkit-transform:translate3d(0,0,0)}to{-webkit-transform:translate3d(-' + d + 'px,0,0)}}@keyframes est' + n + '{from{transform:translate3d(0,0,0)}to{transform:translate3d(-' + d + 'px,0,0)}}';
+      t.style.webkitAnimationName = t.style.animationName = 'est' + n; }
+    medir(); window.addEventListener('resize', medir); window.addEventListener('load', medir); })();
 </script>
 </body>
 </html>
