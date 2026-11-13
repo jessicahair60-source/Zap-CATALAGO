@@ -539,6 +539,26 @@
   .bn { display: grid; grid-template-columns: 40px 1fr; gap: 12px; align-items: start; padding: 12px 14px; border-radius: 16px; background: #FFF2F7; border: 1px solid #FBD3E3; }
   .bn-ico { width: 40px; height: 40px; border-radius: 12px; background: #fff; color: var(--acc); display: grid; place-items: center; } .bn-ico svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
   .bn b { display: block; font: 800 15.5px/1.25 var(--f-display); color: var(--fg); } .bn p { margin: 3px 0 0; font-size: 14px; line-height: 1.45; color: var(--muted); text-wrap: pretty; }
+  /* etiquetas com setinha em volta do celular do vídeo */
+  .etq-tit { margin: 0; font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--acc); }
+  .vid-mesa { display: grid; grid-template-columns: minmax(0,1fr) auto minmax(0,1fr); align-items: center; gap: 4px; width: 100%; max-width: 100%; }
+  .vid-palco { width: 100%; min-width: 0; }
+  .etq { list-style: none; margin: 0; padding: 0; display: grid; gap: 34px; align-content: center; }
+  .etq li { display: flex; align-items: center; gap: 4px; }
+  .etq span { background: #fff; border: 1px solid #FBD3E3; border-radius: 12px; padding: 6px 6px; font-size: 10.5px; min-width: 0; line-height: 1.25; font-weight: 700; color: var(--fg); box-shadow: 0 8px 18px -12px rgba(150,20,80,.55); text-align: center; flex: 1; }
+  .etq .seta { flex: none; width: 12px; height: 12px; fill: none; stroke: var(--acc); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+  .etq em { font-style: normal; display: none; } .etq i { font-style: normal; }
+  .etq-dir li { flex-direction: row-reverse; } .etq-dir .seta { transform: scaleX(-1); }
+  @media (max-width: 959px) { .vid-mesa .vid-tel { width: min(180px, 47vw); padding: 7px; border-radius: 34px; } .vid-mesa .vt-tela { border-radius: 28px; } .vid-mesa .vt-status { height: 30px; font-size: 11px; padding: 3px 16px 0 20px; } .vid-mesa .vt-ilha { width: 58px; height: 17px; margin-left: -29px; top: 6px; } }
+  @media (max-width: 959px) { .vid-passos { margin-top: 4px; } }
+  @media (min-width: 960px) {
+    .vid-palco { grid-template-columns: 1fr; justify-items: center; }
+    .vid-mesa { grid-template-columns: 1fr auto 1fr; gap: 18px; max-width: 900px; }
+    .etq em { display: inline; } .etq i { display: none; }
+    .etq { gap: 56px; } .etq span { font-size: 15px; padding: 11px 16px; border-radius: 14px; flex: none; } .etq .seta { width: 34px; }
+    .etq-esq li { justify-content: flex-end; } .etq-dir li { justify-content: flex-end; }
+    .vid-passos { grid-template-columns: repeat(3, 1fr); width: min(900px, 100%); }
+  }
 </style>
 </head>
 <body>
@@ -644,6 +664,9 @@
     <figure class="vid916">
       <span class="vt-selo"><i></i>Demonstração real</span>
       <div class="vid-palco">
+        <p class="etq-tit">O que você coloca na sua vitrine</p>
+        <div class="vid-mesa">
+        <ul class="etq etq-esq"><li><span>Logo e nome</span><svg class="seta" viewBox="0 0 34 12" aria-hidden="true"><path d="M1 6h30M26 1l6 5-6 5"/></svg></li><li><span>Banner<em> da loja</em></span><svg class="seta" viewBox="0 0 34 12" aria-hidden="true"><path d="M1 6h30M26 1l6 5-6 5"/></svg></li><li><span><em>Links das redes sociais</em><i>Redes sociais</i></span><svg class="seta" viewBox="0 0 34 12" aria-hidden="true"><path d="M1 6h30M26 1l6 5-6 5"/></svg></li></ul>
         <div class="vid-tel">
           <span class="vt-bt vt-b1"></span><span class="vt-bt vt-b2"></span><span class="vt-bt vt-b3"></span>
           <div class="vt-tela">
@@ -651,6 +674,8 @@
             <video src="/static/exemplo/demo-mini-site.mp4" poster="/static/exemplo/demo-mini-site-capa.webp" muted loop playsinline autoplay preload="metadata" aria-label="Demonstração real: cliente escolhe o produto, monta o carrinho e envia o pedido pelo WhatsApp"></video>
             <span class="vt-ilha"></span><span class="vt-home"></span>
           </div>
+        </div>
+        <ul class="etq etq-dir"><li><span>Fotos e vídeos</span><svg class="seta" viewBox="0 0 34 12" aria-hidden="true"><path d="M1 6h30M26 1l6 5-6 5"/></svg></li><li><span>Preços<em> e categorias</em></span><svg class="seta" viewBox="0 0 34 12" aria-hidden="true"><path d="M1 6h30M26 1l6 5-6 5"/></svg></li><li><span><em>Botão do </em>WhatsApp</span><svg class="seta" viewBox="0 0 34 12" aria-hidden="true"><path d="M1 6h30M26 1l6 5-6 5"/></svg></li></ul>
         </div>
         <ol class="vid-passos">
           <li><b>1</b><span>Abre o link da bio</span></li>
