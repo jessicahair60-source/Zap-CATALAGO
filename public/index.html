@@ -509,7 +509,7 @@
   .vt-home { position: absolute; bottom: 7px; left: 50%; width: 96px; height: 4px; margin-left: -48px; border-radius: 3px; background: rgba(30,20,24,.5); }
   .vt-bt { position: absolute; width: 3px; border-radius: 2px; background: #2A1D22; }
   .vt-b1 { left: -3px; top: 96px; height: 26px; } .vt-b2 { left: -3px; top: 134px; height: 46px; } .vt-b3 { right: -3px; top: 150px; height: 66px; }
-  .vt-selo { position: absolute; top: 34%; left: -22px; display: flex; align-items: center; gap: 6px; background: #fff; color: var(--fg); font: 700 12px/1 var(--f-body); padding: 8px 12px; border-radius: 99px; box-shadow: 0 10px 24px -10px rgba(150,20,80,.5); white-space: nowrap; }
+  .vt-selo { position: relative; z-index: 2; display: inline-flex; justify-self: center; align-items: center; gap: 6px; background: #fff; color: var(--fg); font: 700 12px/1 var(--f-body); padding: 8px 12px; border-radius: 99px; box-shadow: 0 10px 24px -10px rgba(150,20,80,.5); white-space: nowrap; }
   .vt-selo i { width: 8px; height: 8px; border-radius: 50%; background: var(--acc); box-shadow: 0 0 0 0 rgba(232,8,122,.6); animation: pulso 1.6s infinite; }
   @keyframes pulso { 70% { box-shadow: 0 0 0 8px rgba(232,8,122,0); } 100% { box-shadow: 0 0 0 0 rgba(232,8,122,0); } }
   .vid-passos { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; width: min(340px, 100%); text-align: left; }
@@ -624,6 +624,7 @@
     <h2>Veja como seu mini site <em>funciona de verdade</em></h2>
     <p class="txt">Conheça a experiência de quem acessa a vitrine e descubra como é simples organizar seus produtos.</p>
     <figure class="vid916">
+      <span class="vt-selo"><i></i>Demonstração real</span>
       <div class="vid-palco">
         <div class="vid-tel">
           <span class="vt-bt vt-b1"></span><span class="vt-bt vt-b2"></span><span class="vt-bt vt-b3"></span>
@@ -632,7 +633,6 @@
             <video src="/static/exemplo/demo-mini-site.mp4" poster="/static/exemplo/demo-mini-site-capa.webp" muted loop playsinline autoplay preload="metadata" aria-label="Demonstração real: cliente escolhe o produto, monta o carrinho e envia o pedido pelo WhatsApp"></video>
             <span class="vt-ilha"></span><span class="vt-home"></span>
           </div>
-          <span class="vt-selo"><i></i>Demonstração real</span>
         </div>
         <ol class="vid-passos">
           <li><b>1</b><span>Abre o link da bio</span></li>
