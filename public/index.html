@@ -429,6 +429,29 @@
     .topo-txt { justify-items: start; }
     .trilho img { width: 210px; margin-right: 18px; }
   }
+  /* seção 2: mini site pronto */
+  .pronto-grade { display: grid; gap: 18px; margin-top: 28px; align-items: center; text-align: left; }
+  .pmock { justify-self: center; width: 100%; max-width: 400px; background: #FFF0F5; border: 1px solid var(--line); border-radius: 26px; padding: 12px 12px 14px; box-shadow: 0 30px 60px -36px rgba(150,20,80,.5); display: grid; gap: 10px; font-size: 14px; }
+  .pm-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #fff; border-radius: 16px; padding: 8px 8px 8px 10px; }
+  .pm-marca { display: flex; align-items: center; gap: 7px; font: 800 14px/1 var(--f-display); white-space: nowrap; } .pm-marca img { border-radius: 8px; }
+  .pm-abas { display: flex; background: #F6EEF1; border-radius: 99px; padding: 3px; font-size: 11.5px; white-space: nowrap; } .pm-abas i { font-style: normal; color: var(--muted); padding: 5px 8px; } .pm-abas b { background: #fff; border-radius: 99px; padding: 5px 10px; box-shadow: 0 2px 6px -3px rgba(0,0,0,.2); }
+  .pm-card { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 14px; display: grid; gap: 11px; }
+  .pm-ar { display: grid; grid-template-columns: auto 1fr auto; gap: 10px; align-items: center; } .pm-ar b { display: block; font-size: 16px; } .pm-ar small { color: var(--muted); font-size: 12.5px; }
+  .pm-dot { width: 10px; height: 10px; border-radius: 50%; background: #1FA855; box-shadow: 0 0 0 4px #DFF3E6; }
+  .pm-sw { width: 44px; height: 26px; border-radius: 99px; background: #1FA855; position: relative; } .pm-sw::after { content: ""; position: absolute; right: 3px; top: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; }
+  .pm-link { display: flex; align-items: center; justify-content: space-between; gap: 8px; background: #F6EEF1; border-radius: 12px; padding: 5px 5px 5px 12px; font-weight: 700; font-size: 13px; min-width: 0; } .pm-link span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .pm-link em { font-style: normal; background: var(--acc); color: #fff; border-radius: 9px; padding: 7px 12px; font-size: 12.5px; }
+  .pm-acoes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; } .pm-acoes span { display: grid; justify-items: center; gap: 4px; border: 1px solid var(--line); border-radius: 12px; padding: 9px 4px; font-size: 12px; font-weight: 700; }
+  .pm-acoes svg, .pi svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .pm-pronta { display: flex; justify-content: space-between; align-items: baseline; } .pm-pronta b { font: 800 16px/1.2 var(--f-display); } .pm-pronta small { color: var(--muted); }
+  .pm-barra { height: 6px; border-radius: 99px; background: var(--acc); }
+  .pm-passos { list-style: none; margin: 0; padding: 0; display: grid; } .pm-passos li { display: grid; grid-template-columns: 30px 1fr; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid var(--line); } .pm-passos li:first-child { border-top: 0; }
+  .pm-passos i { width: 28px; height: 28px; border-radius: 50%; background: var(--acc); color: #fff; display: grid; place-items: center; font-style: normal; font-weight: 800; font-size: 13px; }
+  .pm-passos small { display: block; color: var(--acc); font-weight: 700; font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; } .pm-passos b { display: block; text-decoration: line-through; color: var(--muted); font-size: 14px; } .pm-passos span { display: block; color: var(--muted); font-size: 12px; }
+  .pronto-itens { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .pi { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px 14px; text-align: center; display: grid; justify-items: center; gap: 6px; }
+  .pi .ico { background: #FFE4EE; color: var(--acc); } .pi b { font: 800 16.5px/1.2 var(--f-display); } .pi p { margin: 0; color: var(--muted); font-size: 13.5px; line-height: 1.45; }
+  @media (min-width: 960px) { .pronto-grade { grid-template-columns: 1fr 1fr; gap: 32px; } .pi { padding: 24px 18px; } }
 </style>
 </head>
 <body>
@@ -460,6 +483,38 @@
       <figcaption>Vitrines reais feitas no Zap Catálogo</figcaption>
     </figure>
   </header>
+
+  <!-- 2. Mini site pronto: painel desenhado + o que ela personaliza -->
+  <section class="blk centro pronto" id="pronto">
+    <p class="eyebrow">Pronto para personalizar</p>
+    <h2>Seu mini site já vem pronto. <em>Você só deixa com a cara da sua marca!</em></h2>
+    <p class="txt">Nada de começar do zero. A estrutura já está funcionando: você só coloca as informações da sua empresa, escolhe as cores, adiciona seu banner e cadastra seus produtos.</p>
+    <div class="pronto-grade">
+      <div class="pmock" role="img" aria-label="Painel do Zap Catálogo com a vitrine no ar e os 3 passos concluídos">
+        <div class="pm-top"><span class="pm-marca"><img src="/static/logo-zap.webp" width="28" height="28" alt="">Zap Catálogo</span><span class="pm-abas"><i>Ver como cliente</i><b>Painel</b></span></div>
+        <div class="pm-card">
+          <div class="pm-ar"><span class="pm-dot"></span><div><b>Vitrine no ar</b><small>Suas clientes já podem ver e pedir</small></div><span class="pm-sw"></span></div>
+          <div class="pm-link"><span>zapcatalogo.com/sua-loja</span><em>Copiar</em></div>
+          <div class="pm-acoes"><span><svg viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg>Compartilhar</span><span><svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>Ver vitrine</span><span><svg viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>Editar link</span></div>
+        </div>
+        <div class="pm-card">
+          <div class="pm-pronta"><b>Sua loja está pronta 🎉</b><small>3 de 3</small></div>
+          <div class="pm-barra"></div>
+          <ol class="pm-passos">
+            <li><i>✓</i><div><small>Passo 1 · feito</small><b>Informações da loja</b><span>Nome, WhatsApp, frase e links</span></div></li>
+            <li><i>✓</i><div><small>Passo 2 · feito</small><b>Banner, logo e cores</b><span>Deixe a vitrine com a cara da sua marca</span></div></li>
+            <li><i>✓</i><div><small>Passo 3 · feito</small><b>Subir produtos</b><span>Fotos, vídeos, preços e categorias</span></div></li>
+          </ol>
+        </div>
+      </div>
+      <div class="pronto-itens">
+        <div class="pi"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 1.6-.8 1.6-1.6 0-.9-.7-1.3-.7-2.1 0-.9.7-1.5 1.6-1.5H17a4 4 0 0 0 4-4c0-4.9-4-8.8-9-8.8z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10.5" cy="7" r="1.2"/><circle cx="15" cy="7.5" r="1.2"/></svg></span><b>Suas cores</b><p>Escolha as cores que combinam com o seu negócio.</p></div>
+        <div class="pi"><span class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg></span><b>Seu banner</b><p>Coloque uma capa bonita no topo da sua vitrine.</p></div>
+        <div class="pi"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 2l9 5v10l-9 5-9-5V7z"/><path d="M3 7l9 5 9-5M12 12v10"/></svg></span><b>Seus produtos</b><p>Fotos, vídeos, preços e categorias, do seu jeito.</p></div>
+        <div class="pi"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z"/></svg></span><b>Sua marca</b><p>Seu nome, sua logo e o seu link para divulgar.</p></div>
+      </div>
+    </div>
+  </section>
 
   <!-- 2. O que é: painel x catálogo -->
   <section class="blk centro" id="o-que-e">
