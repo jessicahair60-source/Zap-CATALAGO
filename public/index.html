@@ -525,6 +525,12 @@
   }
   @media (prefers-reduced-motion: reduce) { .vt-selo i { animation: none; } }
   .vid-cta { margin-top: 28px; }
+
+  /* urgência no plano */
+  .esperar { max-width: 32em; margin: 16px auto 0; padding: 12px 18px; border-radius: 16px; background: #FFE4EE; color: var(--acc); font-size: 16px; line-height: 1.45; }
+  .prazo { display: inline-block; margin: 0 0 10px; padding: 7px 14px; border-radius: 99px; background: var(--acc); color: #fff; font-size: 13.5px; font-weight: 600; }
+  .bonus { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; text-align: left; margin: 18px 0 14px; padding: 14px 16px; border-radius: 18px; border: 2px dashed #F7A8C9; background: #FFF4F8; }
+  .bonus > span { font-size: 26px; } .bonus b { display: block; color: var(--acc); font: 800 16px/1.2 var(--f-display); } .bonus p { margin: 3px 0 0; font-size: 14.5px; color: var(--fg); }
 </style>
 </head>
 <body>
@@ -661,14 +667,16 @@
 
   <!-- 8. Plano e garantia -->
   <section class="blk" id="planos">
-    <div class="centro"><h2>Comece a criar sua vitrine digital <em>hoje!</em></h2><p class="txt" style="margin:14px auto 0">Tudo o que você viu acima em um plano só, sem taxa sobre as suas vendas.</p></div>
+    <div class="centro"><h2>Comece a criar sua vitrine digital <em>hoje!</em></h2><p class="txt" style="margin:14px auto 0">Tudo o que você viu acima em um plano só, sem taxa sobre as suas vendas.</p><p class="esperar"><b>Cada dia sem catálogo é cliente perguntando preço no direct e desistindo.</b></p></div>
     <div class="compra so-plano">
       <div class="plano">
         <span class="nome">ZAP CATÁLOGO</span>
+        <p class="prazo" id="prazo" hidden>Preço de lançamento só até <b id="prazo-data"></b></p>
         <div class="de">De <s>R$ 150,00</s> por</div>
         <div class="valor">R$ 47,00<small>/mês</small></div>
         <p class="intro">Tudo o que você precisa para montar e divulgar seu catálogo:</p>
         <ul class="incl"><li>Vitrine com sua marca</li><li>Cadastro de produtos e serviços</li><li>Fotos, vídeos e preços</li><li>Categorias organizadas</li><li>Link para compartilhar</li><li>Pedidos direto no WhatsApp</li><li>Acesso ao painel</li><li>Tutorial de utilização</li></ul>
+        <div class="bonus"><span aria-hidden="true">🎁</span><div><b>Bônus para quem entra hoje</b><p>A gente cadastra os seus primeiros 20 produtos para você.</p></div></div>
         <a class="btn big" href="/assinar/mensal">QUERO CRIAR MEU CATÁLOGO</a>
         <div class="garantia"><span class="selo" aria-hidden="true"><span><b>7</b>DIAS</span></span>
           <div><strong>7 dias de garantia</strong><p>Você tem até 7 dias após a compra para solicitar o reembolso, conforme as condições aplicáveis da compra realizada pela Kiwify.</p></div></div>
@@ -734,6 +742,7 @@
   function dois(n) { return (n < 10 ? '0' : '') + n; }
   fetch('/api/oferta', { cache: 'no-store' }).then(function (r) { return r.json(); }).then(function (o) {
     if (!o || !o.ativa) return;
+    try { var pz = document.getElementById('prazo'); document.getElementById('prazo-data').textContent = new Date(o.fim).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' }); pz.hidden = false; } catch (e) {}
     var desvio = o.agora - Date.now();
     if (o.precoNormal > o.preco) document.getElementById('of-de').textContent = brl(o.precoNormal);
     document.getElementById('of-por').textContent = brl(o.preco);
