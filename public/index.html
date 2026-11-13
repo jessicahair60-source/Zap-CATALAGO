@@ -679,7 +679,6 @@
 
   <footer class="site"><span>© Zap Catálogo</span><span><a href="/termos">Termos de uso</a> · <a href="/privacidade">Privacidade</a> · <a href="/entrar">Entrar</a></span></footer>
 </div>
-<div class="fixo" id="fixo" aria-hidden="true"><a class="btn" href="/assinar/mensal" tabindex="-1">EU QUERO MEU CATÁLOGO</a></div>
 <script>
 /* Catálogo de exemplo de verdade dentro dos celulares: ajusta ao tamanho e desce sozinho até a cliente mexer */
 (function () {
@@ -745,18 +744,6 @@
     }
     sec.hidden = false; tic(); var t = setInterval(tic, 1000);
   }).catch(function () {});
-})();
-</script>
-<script>
-/* Botão de compra fixo embaixo: aparece depois da primeira tela */
-(function () {
-  var fixo = document.getElementById('fixo'), alvo = document.getElementById('cta-topo');
-  if (!('IntersectionObserver' in window)) return;
-  document.body.classList.add('tem-fixo');
-  new IntersectionObserver(function (es) {
-    var on = !es[0].isIntersecting && es[0].boundingClientRect.top < 0;
-    fixo.classList.toggle('on', on); document.body.classList.toggle('fixo-on', on); fixo.setAttribute('aria-hidden', on ? 'false' : 'true'); fixo.querySelectorAll('a').forEach(function (a) { a.tabIndex = on ? 0 : -1; });
-  }).observe(alvo);
 })();
 </script>
 <script>
