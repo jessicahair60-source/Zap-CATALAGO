@@ -411,10 +411,13 @@
   .topo-cta { margin-top: 24px; letter-spacing: .04em; }
   .topo .preco-mini { margin-top: 12px; }
   .topo-vit { margin: 0; min-width: 0; position: relative; padding: 22px 0 56px; border-radius: 28px; background: radial-gradient(120% 90% at 50% 0%, #FFE4EE 0%, #FFF3F7 55%, #FBEAF0 100%); border: 1px solid var(--line); overflow: hidden; }
-  .esteira { overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
-  .trilho { display: flex; width: max-content; animation: esteira 3.6s linear infinite; }
-  .trilho img { flex: none; width: 176px; height: auto; margin-right: 14px; border-radius: 22px; box-shadow: 0 18px 30px -16px rgba(120,20,60,.45); }
-  @keyframes esteira { to { transform: translateX(-33.3333%); } }
+  .esteira { position: relative; overflow: hidden; }
+  .esteira::before, .esteira::after { content: ""; position: absolute; top: 0; bottom: 0; width: 28px; z-index: 2; pointer-events: none; }
+  .esteira::before { left: 0; background: linear-gradient(90deg, #FFEAF2, rgba(255,234,242,0)); } .esteira::after { right: 0; background: linear-gradient(270deg, #FFEAF2, rgba(255,234,242,0)); }
+  .trilho { display: flex; width: max-content; will-change: transform; -webkit-transform: translate3d(0,0,0); transform: translate3d(0,0,0); -webkit-backface-visibility: hidden; backface-visibility: hidden; -webkit-animation: esteira 3.6s linear infinite; animation: esteira 3.6s linear infinite; }
+  .trilho img { flex: none; display: block; width: 176px; height: 352px; object-fit: cover; margin-right: 14px; border-radius: 22px; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
+  @-webkit-keyframes esteira { from { -webkit-transform: translate3d(0,0,0); } to { -webkit-transform: translate3d(-33.3333%,0,0); } }
+  @keyframes esteira { from { transform: translate3d(0,0,0); } to { transform: translate3d(-33.3333%,0,0); } }
   .topo-vit figcaption { position: absolute; left: 50%; bottom: 12px; transform: translateX(-50%); white-space: nowrap; background: #fff; border: 1px solid var(--line); color: var(--fg); font-size: 12.5px; font-weight: 700; padding: 6px 13px; border-radius: 99px; }
   @media (prefers-reduced-motion: reduce) { .trilho { animation-duration: 30s; } }
   @media (max-width: 559px) { .topo-cta { width: 100%; } .topo-lead { font-size: 16px; } .topo-selo { font-size: 11.5px; padding: 9px 14px; } }
@@ -427,7 +430,7 @@
   @media (min-width: 960px) {
     .topo { grid-template-columns: 1.05fr .95fr; gap: 48px; text-align: left; padding-top: 48px; }
     .topo-txt { justify-items: start; }
-    .trilho img { width: 210px; margin-right: 18px; }
+    .trilho img { width: 210px; height: 420px; margin-right: 18px; }
   }
   /* seção 2: mini site pronto */
   .pronto-grade { display: grid; gap: 18px; margin-top: 28px; align-items: center; text-align: left; }
@@ -839,7 +842,12 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
 <script>
   // esteira do topo: duplica os celulares para o giro ficar contínuo
   (function () { var t = document.querySelector('.trilho'); if (!t) return;
-    var orig = Array.prototype.slice.call(t.children); [1, 2].forEach(function () { orig.forEach(function (im) { var c = im.cloneNode(); c.alt = ''; c.setAttribute('aria-hidden', 'true'); c.removeAttribute('fetchpriority'); t.appendChild(c); }); }); })();
+    var orig = Array.prototype.slice.call(t.children); [1, 2].forEach(function () { orig.forEach(function (im) { var c = im.cloneNode(); c.alt = ''; c.setAttribute('aria-hidden', 'true'); c.removeAttribute('fetchpriority'); t.appendChild(c); }); });
+    var st = document.createElement('style'), n = 0, ultimo = 0; document.head.appendChild(st);
+    function medir() { var a = t.children[0], b = t.children[orig.length]; if (!a || !b) return; var d = b.offsetLeft - a.offsetLeft; if (!d || d === ultimo) return; ultimo = d; n++;
+      st.textContent = '@-webkit-keyframes est' + n + '{from{-webkit-transform:translate3d(0,0,0)}to{-webkit-transform:translate3d(-' + d + 'px,0,0)}}@keyframes est' + n + '{from{transform:translate3d(0,0,0)}to{transform:translate3d(-' + d + 'px,0,0)}}';
+      t.style.webkitAnimationName = t.style.animationName = 'est' + n; }
+    medir(); window.addEventListener('resize', medir); window.addEventListener('load', medir); })();
 </script>
 </body>
 </html>
