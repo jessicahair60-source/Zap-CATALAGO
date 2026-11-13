@@ -527,8 +527,6 @@
   .vid-cta { margin-top: 28px; }
 
   /* urgência no plano */
-  .bonus { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; text-align: left; margin: 18px 0 14px; padding: 14px 16px; border-radius: 18px; border: 2px dashed #F7A8C9; background: #FFF4F8; }
-  .bonus > span { font-size: 26px; } .bonus b { display: block; color: var(--acc); font: 800 16px/1.2 var(--f-display); } .bonus p { margin: 3px 0 0; font-size: 14.5px; color: var(--fg); }
   .hoje { display: grid; gap: 6px; justify-items: center; text-align: center; margin: 18px 0 0; padding: 14px; border-radius: 18px; background: linear-gradient(135deg, #F0168A, #D6066F); color: #fff; }
   .hoje b { font: 800 17px/1.2 var(--f-display); } .hoje-t { font-size: 14px; } .hoje-t i { font-style: normal; font-weight: 800; font-size: 17px; background: rgba(255,255,255,.2); border-radius: 7px; padding: 2px 6px; margin: 0 1px; }
   .hoje + .bonus { margin-top: 10px; }
@@ -536,6 +534,12 @@
   .porque li { display: grid; grid-template-columns: 40px 1fr; gap: 12px; align-items: center; background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; }
   .porque span { width: 40px; height: 40px; border-radius: 12px; background: #FFE4EE; display: grid; place-items: center; font-size: 19px; }
   .porque p { margin: 0; font-size: 15px; line-height: 1.45; color: var(--muted); text-wrap: pretty; } .porque b { color: var(--fg); }
+  .bonus { margin: 18px 0 14px; padding: 14px 16px; border-radius: 18px; border: 2px dashed #F7A8C9; background: #FFF4F8; text-align: left; }
+  .bn-tit { display: block; color: var(--acc); font: 800 16px/1.2 var(--f-display); margin-bottom: 8px; }
+  .bonus ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; counter-reset: bn; }
+  .bonus li { counter-increment: bn; display: grid; grid-template-columns: 24px 1fr; column-gap: 10px; align-items: start; }
+  .bonus li::before { content: counter(bn); grid-row: span 2; width: 24px; height: 24px; border-radius: 50%; background: var(--acc); color: #fff; display: grid; place-items: center; font: 800 12px/1 var(--f-display); margin-top: 1px; }
+  .bonus li b { font-size: 15px; line-height: 1.3; color: var(--fg); } .bonus li span { font-size: 13.5px; line-height: 1.35; color: var(--muted); }
 </style>
 </head>
 <body>
@@ -685,7 +689,7 @@
         <p class="intro">Tudo o que você precisa para montar e divulgar seu catálogo:</p>
         <ul class="incl"><li>Vitrine com sua marca</li><li>Cadastro de produtos e serviços</li><li>Fotos, vídeos e preços</li><li>Categorias organizadas</li><li>Link para compartilhar</li><li>Pedidos direto no WhatsApp</li><li>Acesso ao painel</li><li>Tutorial de utilização</li></ul>
         <div class="hoje" id="hoje" data-fim="2026-11-13T23:59:59-03:00" hidden><b>Promoção e bônus terminam hoje!</b><span class="hoje-t" role="timer" aria-live="off">Faltam <i id="hj-h">00</i>h <i id="hj-m">00</i>min <i id="hj-s">00</i>s</span></div>
-        <div class="bonus" id="bonus"><span aria-hidden="true">🎁</span><div><b>Bônus: Script copia e cola</b><p>Como vender mais usando o catálogo. Mensagens prontas para você copiar, colar e divulgar.</p></div></div>
+        <div class="bonus" id="bonus"><b class="bn-tit"><span aria-hidden="true">🎁</span> 2 bônus de hoje</b><ol><li><b>Script copia e cola</b><span>Como vender mais usando o catálogo</span></li><li><b>Banner com IA em 5 minutos</b><span>Aprenda a criar a capa da sua vitrine</span></li></ol></div>
         <a class="btn big" href="/assinar/mensal">QUERO CRIAR MEU CATÁLOGO</a>
         <div class="garantia"><span class="selo" aria-hidden="true"><span><b>7</b>DIAS</span></span>
           <div><strong>7 dias de garantia</strong><p>Você tem até 7 dias após a compra para solicitar o reembolso, conforme as condições aplicáveis da compra realizada pela Kiwify.</p></div></div>
