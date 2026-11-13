@@ -530,6 +530,9 @@
   .esperar { max-width: 32em; margin: 16px auto 0; padding: 12px 18px; border-radius: 16px; background: #FFE4EE; color: var(--acc); font-size: 16px; line-height: 1.45; }
   .bonus { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; text-align: left; margin: 18px 0 14px; padding: 14px 16px; border-radius: 18px; border: 2px dashed #F7A8C9; background: #FFF4F8; }
   .bonus > span { font-size: 26px; } .bonus b { display: block; color: var(--acc); font: 800 16px/1.2 var(--f-display); } .bonus p { margin: 3px 0 0; font-size: 14.5px; color: var(--fg); }
+  .hoje { display: grid; gap: 6px; justify-items: center; text-align: center; margin: 18px 0 0; padding: 14px; border-radius: 18px; background: linear-gradient(135deg, #F0168A, #D6066F); color: #fff; }
+  .hoje b { font: 800 17px/1.2 var(--f-display); } .hoje-t { font-size: 14px; } .hoje-t i { font-style: normal; font-weight: 800; font-size: 17px; background: rgba(255,255,255,.2); border-radius: 7px; padding: 2px 6px; margin: 0 1px; }
+  .hoje + .bonus { margin-top: 10px; }
 </style>
 </head>
 <body>
@@ -674,7 +677,8 @@
         <div class="valor">R$ 47,00<small>/mês</small></div>
         <p class="intro">Tudo o que você precisa para montar e divulgar seu catálogo:</p>
         <ul class="incl"><li>Vitrine com sua marca</li><li>Cadastro de produtos e serviços</li><li>Fotos, vídeos e preços</li><li>Categorias organizadas</li><li>Link para compartilhar</li><li>Pedidos direto no WhatsApp</li><li>Acesso ao painel</li><li>Tutorial de utilização</li></ul>
-        <div class="bonus"><span aria-hidden="true">🎁</span><div><b>Bônus: Script copia e cola</b><p>Como vender mais usando o catálogo. Mensagens prontas para você copiar, colar e divulgar.</p></div></div>
+        <div class="hoje" id="hoje" data-fim="2026-11-13T23:59:59-03:00" hidden><b>Promoção e bônus terminam hoje!</b><span class="hoje-t" role="timer" aria-live="off">Faltam <i id="hj-h">00</i>h <i id="hj-m">00</i>min <i id="hj-s">00</i>s</span></div>
+        <div class="bonus" id="bonus"><span aria-hidden="true">🎁</span><div><b>Bônus: Script copia e cola</b><p>Como vender mais usando o catálogo. Mensagens prontas para você copiar, colar e divulgar.</p></div></div>
         <a class="btn big" href="/assinar/mensal">QUERO CRIAR MEU CATÁLOGO</a>
         <div class="garantia"><span class="selo" aria-hidden="true"><span><b>7</b>DIAS</span></span>
           <div><strong>7 dias de garantia</strong><p>Você tem até 7 dias após a compra para solicitar o reembolso, conforme as condições aplicáveis da compra realizada pela Kiwify.</p></div></div>
@@ -763,6 +767,15 @@
       st.textContent = '@-webkit-keyframes est' + n + '{from{-webkit-transform:translate3d(0,0,0)}to{-webkit-transform:translate3d(-' + d + 'px,0,0)}}@keyframes est' + n + '{from{transform:translate3d(0,0,0)}to{transform:translate3d(-' + d + 'px,0,0)}}';
       t.style.webkitAnimationName = t.style.animationName = 'est' + n; }
     medir(); window.addEventListener('resize', medir); window.addEventListener('load', medir); })();
+</script>
+<script>
+  // "Termina hoje": prazo fixo (data-fim). Depois do prazo, o aviso e o bônus somem sozinhos. Não reinicia.
+  (function () { var bx = document.getElementById('hoje'); if (!bx) return; var fim = Date.parse(bx.getAttribute('data-fim')), bn = document.getElementById('bonus');
+    var h = document.getElementById('hj-h'), m = document.getElementById('hj-m'), sg = document.getElementById('hj-s');
+    function d(n) { return (n < 10 ? '0' : '') + n; }
+    function tic() { var r = Math.floor((fim - Date.now()) / 1000); if (!(r > 0)) { bx.hidden = true; if (bn) bn.hidden = true; clearInterval(t); return; }
+      bx.hidden = false; h.textContent = d(Math.floor(r / 3600)); m.textContent = d(Math.floor(r % 3600 / 60)); sg.textContent = d(r % 60); }
+    var t = setInterval(tic, 1000); tic(); })();
 </script>
 </body>
 </html>
