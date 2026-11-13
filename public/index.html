@@ -527,13 +527,15 @@
   .vid-cta { margin-top: 28px; }
 
   /* urgência no plano */
-  .esperar { max-width: 32em; margin: 16px auto 0; padding: 12px 18px; border-radius: 16px; background: #FFE4EE; color: var(--acc); font-size: 16px; line-height: 1.45; }
   .bonus { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; text-align: left; margin: 18px 0 14px; padding: 14px 16px; border-radius: 18px; border: 2px dashed #F7A8C9; background: #FFF4F8; }
   .bonus > span { font-size: 26px; } .bonus b { display: block; color: var(--acc); font: 800 16px/1.2 var(--f-display); } .bonus p { margin: 3px 0 0; font-size: 14.5px; color: var(--fg); }
   .hoje { display: grid; gap: 6px; justify-items: center; text-align: center; margin: 18px 0 0; padding: 14px; border-radius: 18px; background: linear-gradient(135deg, #F0168A, #D6066F); color: #fff; }
   .hoje b { font: 800 17px/1.2 var(--f-display); } .hoje-t { font-size: 14px; } .hoje-t i { font-style: normal; font-weight: 800; font-size: 17px; background: rgba(255,255,255,.2); border-radius: 7px; padding: 2px 6px; margin: 0 1px; }
   .hoje + .bonus { margin-top: 10px; }
-  .esperar span { display: block; margin-top: 6px; color: var(--fg); font-size: 15px; }
+  .porque { list-style: none; margin: 22px auto 0; padding: 0; max-width: 560px; display: grid; gap: 10px; text-align: left; }
+  .porque li { display: grid; grid-template-columns: 40px 1fr; gap: 12px; align-items: center; background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; }
+  .porque span { width: 40px; height: 40px; border-radius: 12px; background: #FFE4EE; display: grid; place-items: center; font-size: 19px; }
+  .porque p { margin: 0; font-size: 15px; line-height: 1.45; color: var(--muted); text-wrap: pretty; } .porque b { color: var(--fg); }
 </style>
 </head>
 <body>
@@ -670,7 +672,11 @@
 
   <!-- 8. Plano e garantia -->
   <section class="blk" id="planos">
-    <div class="centro"><h2>Comece a criar sua vitrine digital <em>hoje!</em></h2><p class="txt" style="margin:14px auto 0">Tudo o que você viu acima em um plano só, sem taxa sobre as suas vendas.</p><p class="esperar"><b>Cada dia sem catálogo é cliente perguntando preço no direct e desistindo.</b><span>Monte hoje no intervalo do almoço e já divulgue nos stories à noite.</span></p></div>
+    <div class="centro"><h2>Comece a criar sua vitrine digital <em>agora</em></h2><p class="txt" style="margin:12px auto 0">Tudo o que você viu acima em um só plano, sem taxa sobre as suas vendas.</p>
+      <ul class="porque">
+        <li><span aria-hidden="true">⏳</span><p><b>Esperar custa caro.</b> Cada dia sem catálogo é cliente perguntando preço no direct e desistindo.</p></li>
+        <li><span aria-hidden="true">⚡</span><p><b>É rápido de montar.</b> Monte no intervalo do almoço e divulgue nos stories à noite.</p></li>
+      </ul></div>
     <div class="compra so-plano">
       <div class="plano">
         <span class="nome">ZAP CATÁLOGO</span>
