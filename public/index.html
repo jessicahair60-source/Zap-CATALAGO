@@ -497,7 +497,30 @@
   .vid-tel video { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 28px; background: #FCE4EC; }
   .vid916 figcaption { position: relative; z-index: 1; max-width: 30em; color: var(--muted); font-size: 15px; }
   @media (min-width: 960px) { .vid-tel { width: 320px; } }
-  .vid-som { position: absolute; left: 50%; bottom: 22px; transform: translateX(-50%); border: 0; border-radius: 99px; background: rgba(255,255,255,.94); color: var(--fg); font: 700 13px/1 var(--f-body); padding: 9px 14px; box-shadow: 0 8px 20px -8px rgba(0,0,0,.35); cursor: pointer; white-space: nowrap; }
+
+  /* vídeo 9:16 dentro do celular */
+  .vid-palco { position: relative; z-index: 1; display: grid; justify-items: center; gap: 22px; }
+  .vid-tel { position: relative; width: min(280px, 76vw); padding: 10px; border-radius: 46px; background: linear-gradient(145deg, #3A2A31, #160E12 55%, #2B1E24); box-shadow: inset 0 0 0 1.5px #5A4650, inset 0 0 0 4px #120B0E, 0 50px 80px -34px rgba(150,20,80,.65), 0 0 0 8px rgba(255,255,255,.55); }
+  .vt-tela { position: relative; width: 100%; border-radius: 37px; overflow: hidden; background: #fff; display: flex; flex-direction: column; }
+  .vt-status { flex: none; height: 38px; display: flex; align-items: center; justify-content: space-between; padding: 4px 22px 0 26px; font-size: 13px; color: #1E1418; } .vt-status span { display: flex; gap: 5px; align-items: center; } .vt-status svg { height: 10px; width: auto; fill: currentColor; }
+  .vt-tela video { display: block; width: 100%; height: auto; aspect-ratio: 512 / 910; object-fit: cover; padding-bottom: 0; }
+  .vt-tela::after { content: ""; display: block; height: 18px; background: #fff; }
+  .vt-ilha { position: absolute; top: 8px; left: 50%; width: 78px; height: 22px; margin-left: -39px; border-radius: 20px; background: #0B0709; }
+  .vt-home { position: absolute; bottom: 7px; left: 50%; width: 96px; height: 4px; margin-left: -48px; border-radius: 3px; background: rgba(30,20,24,.5); }
+  .vt-bt { position: absolute; width: 3px; border-radius: 2px; background: #2A1D22; }
+  .vt-b1 { left: -3px; top: 96px; height: 26px; } .vt-b2 { left: -3px; top: 134px; height: 46px; } .vt-b3 { right: -3px; top: 150px; height: 66px; }
+  .vt-selo { position: absolute; top: 34%; left: -22px; display: flex; align-items: center; gap: 6px; background: #fff; color: var(--fg); font: 700 12px/1 var(--f-body); padding: 8px 12px; border-radius: 99px; box-shadow: 0 10px 24px -10px rgba(150,20,80,.5); white-space: nowrap; }
+  .vt-selo i { width: 8px; height: 8px; border-radius: 50%; background: var(--acc); box-shadow: 0 0 0 0 rgba(232,8,122,.6); animation: pulso 1.6s infinite; }
+  @keyframes pulso { 70% { box-shadow: 0 0 0 8px rgba(232,8,122,0); } 100% { box-shadow: 0 0 0 0 rgba(232,8,122,0); } }
+  .vid-passos { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; width: min(340px, 100%); text-align: left; }
+  .vid-passos li { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 10px 14px; box-shadow: 0 12px 26px -22px rgba(150,20,80,.6); font-weight: 600; font-size: 15px; }
+  .vid-passos b { flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--acc); color: #fff; display: grid; place-items: center; font: 800 14px/1 var(--f-display); }
+  @media (min-width: 960px) {
+    .vid-palco { grid-template-columns: auto 300px; align-items: center; gap: 48px; }
+    .vid-tel { width: 300px; }
+    .vid-passos { gap: 14px; } .vid-passos li { padding: 14px 16px; font-size: 16px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .vt-selo i { animation: none; } }
 </style>
 </head>
 <body>
@@ -601,8 +624,22 @@
     <h2>Veja como seu mini site <em>funciona de verdade</em></h2>
     <p class="txt">Conheça a experiência de quem acessa a vitrine e descubra como é simples organizar seus produtos.</p>
     <figure class="vid916">
-      <div class="vid-tel"><video src="/static/exemplo/demo-mini-site.mp4" poster="/static/exemplo/demo-mini-site-capa.webp" muted loop playsinline autoplay preload="metadata" aria-label="Demonstração do mini site: produto sendo escolhido, carrinho e pedido no WhatsApp"></video><button type="button" class="vid-som" aria-pressed="false">🔊 Ativar som</button></div>
-      <figcaption>O produto sendo escolhido, o carrinho e o pedido chegando no WhatsApp.</figcaption>
+      <div class="vid-palco">
+        <div class="vid-tel">
+          <span class="vt-bt vt-b1"></span><span class="vt-bt vt-b2"></span><span class="vt-bt vt-b3"></span>
+          <div class="vt-tela">
+            <div class="vt-status"><b>9:41</b><span><svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg><svg viewBox="0 0 26 12"><rect x=".5" y=".5" width="22" height="11" rx="3" fill="none" stroke="currentColor"/><rect x="2" y="2" width="17" height="8" rx="2"/><rect x="23.5" y="4" width="2" height="4" rx="1"/></svg></span></div>
+            <video src="/static/exemplo/demo-mini-site.mp4" poster="/static/exemplo/demo-mini-site-capa.webp" muted loop playsinline autoplay preload="metadata" aria-label="Demonstração real: cliente escolhe o produto, monta o carrinho e envia o pedido pelo WhatsApp"></video>
+            <span class="vt-ilha"></span><span class="vt-home"></span>
+          </div>
+          <span class="vt-selo"><i></i>Demonstração real</span>
+        </div>
+        <ol class="vid-passos">
+          <li><b>1</b><span>Abre o link da bio</span></li>
+          <li><b>2</b><span>Escolhe e põe no carrinho</span></li>
+          <li><b>3</b><span>Envia o pedido no WhatsApp</span></li>
+        </ol>
+      </div>
     </figure>
   </section>
 
@@ -803,11 +840,6 @@ Nome: Lara<time>14:04<b>✓✓</b></time></div></div>
   // esteira do topo: duplica os celulares para o giro ficar contínuo
   (function () { var t = document.querySelector('.trilho'); if (!t) return;
     var orig = Array.prototype.slice.call(t.children); [1, 2].forEach(function () { orig.forEach(function (im) { var c = im.cloneNode(); c.alt = ''; c.setAttribute('aria-hidden', 'true'); c.removeAttribute('fetchpriority'); t.appendChild(c); }); }); })();
-</script>
-<script>
-  // vídeo da seção "Veja na prática": botão de som
-  (function () { var b = document.querySelector('.vid-som'); if (!b) return; var v = b.parentNode.querySelector('video');
-    b.addEventListener('click', function () { v.muted = !v.muted; if (!v.muted) { v.currentTime = 0; v.play(); } b.textContent = v.muted ? '🔊 Ativar som' : '🔇 Tirar som'; b.setAttribute('aria-pressed', String(!v.muted)); }); })();
 </script>
 </body>
 </html>
