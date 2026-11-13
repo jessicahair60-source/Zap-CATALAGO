@@ -452,6 +452,24 @@
   .pi { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 16px 14px; text-align: center; display: grid; justify-items: center; gap: 6px; }
   .pi .ico { background: #FFE4EE; color: var(--acc); } .pi b { font: 800 16.5px/1.2 var(--f-display); } .pi p { margin: 0; color: var(--muted); font-size: 13.5px; line-height: 1.45; }
   @media (min-width: 960px) { .pronto-grade { grid-template-columns: 1fr 1fr; gap: 32px; } .pi { padding: 24px 18px; } }
+  /* seção 3: carrinho */
+  .cpassos { list-style: none; margin: 28px auto 0; padding: 0; display: grid; gap: 14px; max-width: 980px; text-align: left; }
+  .cpassos li { display: grid; grid-template-columns: 132px 1fr; gap: 16px; align-items: center; background: var(--surface); border: 1px solid var(--line); border-radius: 22px; padding: 12px; }
+  .cpassos h3 { font-size: 19px; margin: 0 0 4px; } .cpassos p { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.5; }
+  .cv { height: 132px; border-radius: 16px; background: linear-gradient(160deg, #FFE4EE, #FFC9DD); display: grid; place-items: end center; overflow: hidden; padding: 12px 12px 0; }
+  .cv-tel { width: 100%; max-width: 104px; height: 100%; background: #fff; border-radius: 14px 14px 0 0; padding: 8px 7px 0; box-shadow: 0 10px 22px -12px rgba(150,20,80,.55); overflow: hidden; font-size: 7.5px; line-height: 1.25; color: var(--fg); }
+  .cv-grade { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; } .cv-grade span { display: grid; gap: 2px; } .cv-grade img { width: 100%; height: 40px; object-fit: cover; border-radius: 5px; display: block; }
+  .cv-grade i { height: 3px; width: 70%; background: #EBDDE3; border-radius: 2px; } .cv-grade u, .cv-bt { text-decoration: none; background: var(--acc); color: #fff; border-radius: 5px; font-weight: 700; text-align: center; padding: 2px 0; font-size: 6.5px; }
+  .cv-tit { display: block; font: 800 9px/1 var(--f-display); margin-bottom: 6px; }
+  .cv-item { display: grid; grid-template-columns: 22px 1fr; gap: 5px; align-items: center; padding: 3px 0; white-space: nowrap; border-bottom: 1px solid #F3E6EB; font-weight: 700; } .cv-item img { width: 22px; height: 22px; object-fit: cover; border-radius: 5px; } .cv-item small { display: block; font-weight: 500; color: var(--muted); }
+  .cv-tot { display: flex; justify-content: space-between; padding: 6px 0 5px; font-weight: 700; } .cv-tot b { color: var(--acc); }
+  .cv-bt { display: block; padding: 4px 0; font-size: 7px; }
+  .cv-wa .cv-tel { background: #EFE7DD; padding: 0; }
+  .cv-watop { display: flex; align-items: center; gap: 4px; background: #075E54; color: #fff; padding: 6px; font-weight: 700; font-size: 7px; } .cv-watop i { width: 13px; height: 13px; border-radius: 50%; background: #F3B5CB; color: #5A2440; font-style: normal; font-size: 5.5px; display: grid; place-items: center; }
+  .cv-msg { margin: 8px 6px 0 auto; width: 84%; background: #D9FDD3; border-radius: 7px 2px 7px 7px; padding: 5px 6px 4px; font-size: 7px; color: #111B21; } .cv-msg b { display: block; margin-top: 3px; } .cv-msg time { display: block; text-align: right; color: #667781; font-size: 6px; }
+  .cmenos { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start; text-align: left; max-width: 980px; margin: 14px auto 0; background: var(--acc); color: #fff; border-radius: 22px; padding: 20px; box-shadow: 0 24px 50px -28px rgba(232,8,122,.8); }
+  .cmenos .ico { background: rgba(255,255,255,.18); color: #fff; } .cmenos b { display: block; font: 800 19px/1.25 var(--f-display); } .cmenos p { margin: 6px 0 0; color: rgba(255,255,255,.92); }
+  @media (min-width: 960px) { .cpassos { grid-template-columns: repeat(3, 1fr); } .cpassos li { grid-template-columns: 1fr; padding: 14px; align-items: start; align-content: start; } .cv { height: 190px; } .cv-tel { max-width: 150px; font-size: 10px; } .cv-grade img { height: 58px; } .cv-grade u, .cv-bt { font-size: 9px; } .cv-tit { font-size: 12px; } .cv-item { grid-template-columns: 30px 1fr; } .cv-item img { width: 30px; height: 30px; } .cv-msg, .cv-watop { font-size: 10px; } .cv-msg time { font-size: 8px; } .cv-watop i { width: 18px; height: 18px; font-size: 7.5px; } }
 </style>
 </head>
 <body>
@@ -514,6 +532,39 @@
         <div class="pi"><span class="ico"><svg viewBox="0 0 24 24"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z"/></svg></span><b>Sua marca</b><p>Seu nome, sua logo e o seu link para divulgar.</p></div>
       </div>
     </div>
+  </section>
+
+  <!-- 3. Carrinho: cliente escolhe, pedido chega no WhatsApp -->
+  <section class="blk centro carr" id="carrinho">
+    <p class="eyebrow">Mais praticidade para vender</p>
+    <h2>Seus clientes escolhem, o carrinho organiza. <em>O pedido chega no seu WhatsApp!</em></h2>
+    <p class="txt">Seus clientes podem escolher vários produtos, adicionar ao carrinho e enviar o pedido completo, com a lista dos itens e o valor total, direto para o seu WhatsApp.</p>
+    <ol class="cpassos">
+      <li>
+        <div class="cv" aria-hidden="true"><div class="cv-tel">
+          <div class="cv-grade"><span><img src="/static/exemplo/boutique-conj1.webp" alt="" loading="lazy" width="90" height="112"><i></i><u>Eu quero</u></span><span><img src="/static/exemplo/boutique-bolsa1.webp" alt="" loading="lazy" width="90" height="112"><i></i><u>Eu quero</u></span><span><img src="/static/exemplo/boutique-conj2.webp" alt="" loading="lazy" width="90" height="112"><i></i><u>Eu quero</u></span><span><img src="/static/exemplo/boutique-bolsa2.webp" alt="" loading="lazy" width="90" height="112"><i></i><u>Eu quero</u></span></div>
+        </div></div>
+        <div><h3>1. Explore a vitrine</h3><p>O cliente encontra seus produtos organizados, com fotos, vídeos e preços.</p></div>
+      </li>
+      <li>
+        <div class="cv" aria-hidden="true"><div class="cv-tel">
+          <b class="cv-tit">Seu carrinho</b>
+          <div class="cv-item"><img src="/static/exemplo/boutique-conj1.webp" alt="" loading="lazy" width="40" height="40"><span>Conjunto Cropped<small>1 × R$ 129,90</small></span></div>
+          <div class="cv-item"><img src="/static/exemplo/boutique-bolsa1.webp" alt="" loading="lazy" width="40" height="40"><span>Bolsa Caramelo<small>1 × R$ 89,90</small></span></div>
+          <div class="cv-tot"><span>Total</span><b>R$ 219,80</b></div>
+          <u class="cv-bt">Enviar pedido</u>
+        </div></div>
+        <div><h3>2. Monte o carrinho</h3><p>Ele adiciona todos os itens que deseja comprar e já vê o valor total.</p></div>
+      </li>
+      <li>
+        <div class="cv cv-wa" aria-hidden="true"><div class="cv-tel">
+          <div class="cv-watop"><i>BM</i>Boutique da Maria</div>
+          <div class="cv-msg">Eu quero os produtos:<br>• Conjunto Cropped<br>• Bolsa Caramelo<br><b>Total: R$ 219,80</b><time>10:42 ✓✓</time></div>
+        </div></div>
+        <div><h3>3. Envie pelo WhatsApp</h3><p>O pedido completo chega para você continuar o atendimento.</p></div>
+      </li>
+    </ol>
+    <div class="cmenos"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.4 7.4L3 20.5l1.6-5.4A8.4 8.4 0 1 1 21 11.5z"/></svg></span><div><b>Menos perguntas repetidas. Mais facilidade para atender.</b><p>O cliente já chega com os produtos escolhidos e o valor total, sem você precisar mandar foto e preço de cada item.</p></div></div>
   </section>
 
   <!-- 2. O que é: painel x catálogo -->
