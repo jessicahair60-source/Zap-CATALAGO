@@ -46,6 +46,11 @@
   .trow .tinfo b { display: block; font-size: 15px; }
   .trow .tinfo small { display: block; color: var(--muted); font-size: 12.5px; margin-top: 2px; }
   .trow .acts { margin-top: 8px; }
+  .ttexts { margin-top: 10px; display: grid; gap: 8px; }
+  .ttexts .tlab { font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
+  .tblk { display: flex; gap: 6px; align-items: flex-start; }
+  .tblk textarea { flex: 1; min-height: 64px; resize: vertical; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; font: 400 14px var(--f-body); color: var(--fg); background: #fff; }
+  .tblk button { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; width: 34px; height: 34px; cursor: pointer; color: var(--danger); font-size: 16px; }
   .t-ok { background: #E3F6EA; color: #137A3D; } .t-no { background: #F2ECEF; color: var(--muted); }
   @media (min-width: 760px) { .kpis { grid-template-columns: repeat(4, 1fr); } }
 </style>
@@ -141,18 +146,32 @@ const TUTS = [['tour', 'Conheça o painel', 'Abre sozinho na 1ª vez que a lojis
   ['link', 'Extra 1 · Como pegar o link da sua vitrine', 'Início, embaixo do link da vitrine'],
   ['banner', 'Extra 2 · Bônus: Como criar o seu banner', 'Aba Visual, dentro de Banner e logo'],
   ['vender', 'Extra 3 · Bônus: Como vender mais usando a sua vitrine', 'Início, no fim da página']];
-let tutData = {};
+let tutData = {}, tutTexts = {}, tutDirty = {};
 const mmss = d => d ? `${Math.floor(d / 60)}:${String(Math.round(d % 60)).padStart(2, '0')}` : '';
 async function loadTuts() {
   const r = await fetch('/api/admin/tutoriais'); if (!r.ok) return;
-  tutData = (await r.json()).tutorials; renderTuts();
+  tutData = (await r.json()).tutorials;
+  const r2 = await fetch('/api/admin/tutoriais/textos'); if (r2.ok) tutTexts = (await r2.json()).texts;
+  renderTuts();
 }
 function renderTuts() {
   $('#tuts').innerHTML = TUTS.map(([k, t, where]) => { const v = tutData[k]; return `<div class="trow">
     ${v ? `<video src="${esc(v.url)}" muted playsinline preload="metadata"></video>` : '<div class="ph">▶</div>'}
     <div class="tinfo"><b>${esc(t)}</b><small>${esc(where)}</small>
       <small><span class="tag ${v ? 't-ok' : 't-no'}">${v ? 'No ar' : 'Sem vídeo'}</span>${v && v.dur ? ' · ' + mmss(v.dur) : ''}</small>
-      <div class="acts"><button data-tup="${k}">${v ? 'Trocar vídeo' : 'Enviar vídeo'}</button>${v ? `<a href="${esc(v.url)}" target="_blank" rel="noopener">Assistir</a><button class="danger" data-tdel="${k}">Tirar</button>` : ''}</div></div></div>`; }).join('');
+      <div class="acts"><button data-tup="${k}">${v ? 'Trocar vídeo' : 'Enviar vídeo'}</button>${v ? `<a href="${esc(v.url)}" target="_blank" rel="noopener">Assistir</a><button class="danger" data-tdel="${k}">Tirar</button>` : ''}</div>
+      <div class="ttexts"><span class="tlab">Textos da aula (aparecem embaixo do vídeo)</span>
+        ${(tutTexts[k] || []).map((t, i) => `<div class="tblk"><textarea data-tk="${k}" data-ti="${i}" placeholder="Escreva aqui uma dica ou explicação">${esc(t)}</textarea><button data-trm="${k}" data-ti="${i}" title="Apagar este texto" aria-label="Apagar este texto">×</button></div>`).join('')}
+        <div class="acts"><button data-tadd="${k}">+ Adicionar texto</button>${tutDirty[k] ? `<button data-tsave="${k}" style="background:#2A1A22;color:#fff;border-color:#2A1A22">Salvar textos</button>` : ''}</div></div></div></div>`; }).join('');
+  document.querySelectorAll('[data-tk]').forEach(t => t.oninput = () => { tutTexts[t.dataset.tk][+t.dataset.ti] = t.value;
+    if (!tutDirty[t.dataset.tk]) { tutDirty[t.dataset.tk] = 1; const pos = t.selectionStart; renderTuts(); const n = document.querySelector(`[data-tk="${t.dataset.tk}"][data-ti="${t.dataset.ti}"]`); if (n) { n.focus(); n.setSelectionRange(pos, pos); } } });
+  document.querySelectorAll('[data-tadd]').forEach(b => b.onclick = () => { const k = b.dataset.tadd; (tutTexts[k] = tutTexts[k] || []).push(''); tutDirty[k] = 1; renderTuts();
+    const all = document.querySelectorAll(`[data-tk="${k}"]`); if (all.length) all[all.length - 1].focus(); });
+  document.querySelectorAll('[data-trm]').forEach(b => b.onclick = () => { const k = b.dataset.trm; tutTexts[k].splice(+b.dataset.ti, 1); tutDirty[k] = 1; renderTuts(); });
+  document.querySelectorAll('[data-tsave]').forEach(b => b.onclick = async () => { const k = b.dataset.tsave; b.disabled = true; b.textContent = 'Salvando...';
+    const r = await fetch(`/api/admin/tutoriais/${k}/textos`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ texts: tutTexts[k] || [] }) });
+    const j = await r.json().catch(() => ({})); if (!r.ok) { toast(j.error || 'Não deu para salvar.'); b.disabled = false; b.textContent = 'Salvar textos'; return; }
+    tutTexts[k] = j.texts; tutData = j.tutorials; delete tutDirty[k]; renderTuts(); toast('Textos salvos'); });
   document.querySelectorAll('[data-tup]').forEach(b => b.onclick = () => pickTut(b.dataset.tup, b));
   document.querySelectorAll('[data-tdel]').forEach(b => b.onclick = async () => {
     if (!confirm('Tirar este vídeo? O botão do tutorial some do painel das lojistas.')) return;

@@ -920,6 +920,8 @@ body.painel.pv-on .pv { display: block; animation: pvIn .25s cubic-bezier(.2,.7,
 .tbox h4 { font-family: var(--f-display); font-size: 18px; margin: 0 40px 10px 4px; }
 .tbox .tv { border-radius: 16px; overflow: hidden; background: #2B1520; aspect-ratio: 9/16; max-height: 62vh; max-height: 62dvh; margin: 0 auto; }
 .tbox video { width: 100%; height: 100%; object-fit: contain; display: block; background: #2B1520; }
+.tbox .ttexts { margin: 12px 2px 0; display: grid; gap: 8px; }
+.tbox .ttexts p { margin: 0; background: var(--p-soft); border-radius: 12px; padding: 10px 12px; font-size: 14px; line-height: 1.45; white-space: pre-line; }
 .tbox .tbtns { display: flex; gap: 8px; margin-top: 12px; }
 .tbox .tok { flex: 1.6; background: #E0457B; color: #fff; border: 0; border-radius: 12px; padding: 12px; font-weight: 700; font-size: 15px; }
 .tbox .tclose { flex: 1; border: 1px solid var(--p-line); background: #fff; color: var(--p-fg); border-radius: 12px; padding: 12px; font-weight: 700; font-size: 15px; }
@@ -2508,6 +2510,7 @@ function openTut(k, auto) {
   m.innerHTML = `<div class="tbox" role="dialog" aria-modal="true" aria-label="${esc(title)}"><button class="tx" aria-label="Fechar">×</button>
     <div class="tk">${bonus ? 'Bônus' : 'Tutorial'}${tutDur(k) ? ' · ' + tutDur(k) : ''}</div><h4>${esc(title.replace('Bônus: ', ''))}</h4>
     <div class="tv"><video src="${esc(TUTS[k].url)}" controls playsinline preload="metadata"></video></div>
+    ${(TUTS[k].texts || []).length ? `<div class="ttexts">${TUTS[k].texts.map(t => `<p>${esc(t)}</p>`).join('')}</div>` : ''}
     <div class="tbtns"><button class="tok">Entendi, vou fazer</button><button class="tclose">Fechar</button></div>
     ${auto ? '<p class="tauto">Este vídeo abre sozinho só na primeira vez. Depois ele fica no botão rosa desta aba.</p>' : ''}</div>`;
   const close = () => { const v = m.querySelector('video'); if (v) v.pause(); m.remove(); tutDecorate(true); };
