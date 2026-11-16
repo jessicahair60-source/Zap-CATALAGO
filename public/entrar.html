@@ -30,6 +30,8 @@
   .sub { margin: 0 0 6px; color: var(--muted); font-size: 14.5px; }
   .f { margin-top: 14px; display: grid; gap: 6px; }
   .f label { font-size: 13px; font-weight: 700; }
+  .found { margin: 14px 0 0; font-size: 14px; line-height: 1.4; color: #137A3D; background: #E3F6EA; border-radius: 12px; padding: 10px 12px; font-weight: 600; }
+  .hint { margin: 2px 0 0; font-size: 12.5px; line-height: 1.4; color: #8A1460; background: #FFE6F4; border-radius: 10px; padding: 8px 10px; }
   .inp { position: relative; }
   .inp svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--muted); pointer-events: none; }
   .inp input { width: 100%; border: 1.5px solid var(--line); background: var(--bg); border-radius: 14px; padding: 14px 14px 14px 42px; font: 500 16px var(--f-body); color: var(--fg); }
@@ -105,6 +107,23 @@
           <div class="f"><label for="ip">Senha</label><div class="inp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10" width="16" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><input id="ip" type="password" autocomplete="current-password" required placeholder="Sua senha"><button type="button" class="eye" data-eye="ip" aria-label="Mostrar senha"></button></div></div>
           <p class="err" id="ierr" hidden></p>
           <button class="go" type="submit"><span class="spin"></span>Entrar</button>
+          <a class="link back" href="/ativar" id="to-ac">Já pagou e ainda não tem conta? <b>Ative seu acesso</b></a>
+        </form>
+
+        <form id="f-ac" hidden novalidate>
+          <h1>Ative seu acesso</h1>
+          <p class="sub" id="ac-sub">Já pagou? Coloque o e-mail que você usou na compra.</p>
+          <div class="f"><label for="ae">E-mail da compra</label><div class="inp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></svg><input id="ae" type="email" autocomplete="email" inputmode="email" required placeholder="voce@email.com"></div></div>
+          <div id="ac-more" hidden>
+            <p class="found">✓ Pagamento encontrado<span id="ac-name"></span>! Agora é só dar um nome para sua loja e criar uma senha.</p>
+            <div class="f"><label for="as">Nome da loja</label><div class="inp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9l1.5-5h13L20 9M4 9h16v11H4zM9 20v-6h6v6"/></svg><input id="as" required placeholder="Ex.: Jessica Hair"></div></div>
+            <div class="f"><label for="ap">Crie uma senha</label><div class="inp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10" width="16" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><input id="ap" type="password" autocomplete="new-password" minlength="4" required placeholder="4 caracteres ou mais"><button type="button" class="eye" data-eye="ap" aria-label="Mostrar senha"></button></div></div>
+            <label class="chk"><input type="checkbox" id="at"> <span>Li e aceito os <a href="/termos" target="_blank">termos de uso</a> e a <a href="/privacidade" target="_blank">política de privacidade</a>.</span></label>
+          </div>
+          <p class="err" id="aerr" hidden></p>
+          <a class="wa" id="ac-wa" hidden target="_blank" rel="noopener">Falar com o suporte no WhatsApp</a>
+          <button class="go" type="submit"><span class="spin"></span><span id="ac-go">Continuar</span></button>
+          <a class="link back" href="/entrar" data-back>Já tenho conta: entrar</a>
         </form>
 
         <form id="f-up" hidden novalidate>
@@ -112,7 +131,8 @@
           <p class="sub">Leva 1 minuto.</p>
           <div class="f"><label for="un">Seu nome</label><div class="inp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4.5-6 8-6s7 2 8 6"/></svg><input id="un" autocomplete="name" required placeholder="Como você se chama"></div></div>
           <div class="f"><label for="us">Nome da loja</label><div class="inp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9l1.5-5h13L20 9M4 9h16v11H4zM9 20v-6h6v6"/></svg><input id="us" required placeholder="Ex.: Jessica Hair"></div></div>
-          <div class="f"><label for="ue">E-mail</label><div class="inp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></svg><input id="ue" type="email" autocomplete="email" inputmode="email" required placeholder="voce@email.com"></div></div>
+          <div class="f"><label for="ue">E-mail</label><div class="inp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></svg><input id="ue" type="email" autocomplete="email" inputmode="email" required placeholder="voce@email.com"></div>
+            <p class="hint"><b>Já pagou?</b> Use o mesmo e-mail que você usou no pagamento. Assim sua vitrine é liberada na hora.</p></div>
           <div class="f"><label for="up">Senha</label><div class="inp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10" width="16" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><input id="up" type="password" autocomplete="new-password" minlength="4" required placeholder="4 caracteres ou mais"><button type="button" class="eye" data-eye="up" aria-label="Mostrar senha"></button></div></div>
           <label class="chk"><input type="checkbox" id="ut"> <span>Li e aceito os <a href="/termos" target="_blank">termos de uso</a> e a <a href="/privacidade" target="_blank">política de privacidade</a>.</span></label>
           <p class="err" id="uerr" hidden></p>
@@ -161,10 +181,10 @@ document.querySelectorAll('[data-eye]').forEach(b => { b.innerHTML = EYE; b.oncl
   const i = document.getElementById(b.dataset.eye); const show = i.type === 'password';
   i.type = show ? 'text' : 'password'; b.innerHTML = show ? EYE_OFF : EYE; b.setAttribute('aria-label', show ? 'Esconder senha' : 'Mostrar senha'); }; });
 
-const VIEWS = { in: '#f-in', up: '#f-up', fg: '#f-fg', sent: '#v-sent', rs: '#f-rs' };
+const VIEWS = { in: '#f-in', up: '#f-up', fg: '#f-fg', sent: '#v-sent', rs: '#f-rs', ac: '#f-ac' };
 // Veio de "Quero o plano mensal/anual" da página de vendas: o painel já abre o pagamento desse plano
 const plano = () => { const p = new URLSearchParams(location.search).get('plano'); return p === 'anual' || p === 'mensal' ? '?plano=' + p : ''; };
-const PATHS = { in: '/entrar', up: '/cadastro', fg: '/esqueci' };
+const PATHS = { in: '/entrar', up: '/cadastro', fg: '/esqueci', ac: '/ativar' };
 function view(v, push) {
   Object.entries(VIEWS).forEach(([k, sel]) => { $(sel).hidden = k !== v; });
   $('#seg').hidden = !(v === 'in' || v === 'up');
@@ -182,7 +202,7 @@ fetch('/api/password/options').then(r => r.json()).then(o => { OPT = o;
     $('#fg-sub').textContent = 'Escolha como quer receber o link para criar uma senha nova.'; }
   if (!o.email) { $('#fg-or').hidden = true; if (o.whatsapp) document.querySelectorAll('#f-fg .f, #f-fg .go').forEach(el => el.hidden = true); }
 }).catch(() => {});
-view(location.pathname === '/cadastro' ? 'up' : location.pathname === '/esqueci' ? 'fg' : location.pathname === '/nova-senha' && token ? 'rs' : 'in');
+view(location.pathname === '/ativar' ? 'ac' : location.pathname === '/cadastro' ? 'up' : location.pathname === '/esqueci' ? 'fg' : location.pathname === '/nova-senha' && token ? 'rs' : 'in');
 
 async function post(url, body, errEl, btn) {
   errEl.hidden = true; btn.disabled = true;
@@ -219,6 +239,26 @@ $('#f-fg').onsubmit = async e => { e.preventDefault(); const err = $('#ferr');
   const wa = $('#sent-wa'); wa.hidden = !j.support;
   if (j.support) wa.href = `https://wa.me/${j.support}?text=${encodeURIComponent(`Oi! Esqueci a senha do Zap Catálogo. Meu e-mail é ${$('#fe').value.trim()}`)}`;
   view('sent'); };
+$('#to-ac').onclick = e => { e.preventDefault(); view('ac', true); };
+{ const q = new URLSearchParams(location.search).get('email'); if (q) $('#ae').value = q; }
+let acOk = false;
+$('#ae').oninput = () => { if (acOk) { acOk = false; $('#ac-more').hidden = true; $('#ac-go').textContent = 'Continuar'; } };
+$('#f-ac').onsubmit = async e => { e.preventDefault(); const err = $('#aerr'); $('#ac-wa').hidden = true;
+  if (!okEmail($('#ae').value)) return need(err, 'Confira o e-mail.');
+  if (!acOk) {
+    const j = await post('/api/ativar/check', { email: $('#ae').value }, err, $('#f-ac .go')); if (!j) return; $('#f-ac .go').disabled = false;
+    if (j.status === 'account') { $('#ie').value = $('#ae').value.trim(); view('in', true); return need($('#ierr'), 'Este e-mail já tem conta. É só colocar sua senha e entrar.'); }
+    if (j.status === 'none') {
+      need(err, 'Não encontramos pagamento com este e-mail. Volte e coloque o mesmo e-mail que você usou na hora de pagar. Se você pagou com outro e-mail, fale com a gente: liberamos seu acesso em horário comercial.');
+      if (j.support) { const wa = $('#ac-wa'); wa.hidden = false; wa.href = `https://wa.me/${j.support}?text=${encodeURIComponent(`Oi! Já paguei o Zap Catálogo e não consigo ativar. Meu e-mail é ${$('#ae').value.trim()}`)}`; }
+      return;
+    }
+    acOk = true; $('#ac-name').textContent = j.name ? `, ${j.name}` : ''; $('#ac-more').hidden = false; $('#ac-go').textContent = 'Criar minha vitrine'; $('#as').focus(); return;
+  }
+  if (!$('#as').value.trim()) return need(err, 'Coloque o nome da sua loja.');
+  if ($('#ap').value.length < 4) return need(err, 'A senha precisa ter pelo menos 4 caracteres.');
+  if (!$('#at').checked) return need(err, 'Para continuar, aceite os termos de uso.');
+  const j = await post('/api/ativar', { email: $('#ae').value, storeName: $('#as').value, password: $('#ap').value, terms: true }, err, $('#f-ac .go')); if (j) location.href = j.redirect || '/painel'; };
 $('#f-rs').onsubmit = async e => { e.preventDefault(); const err = $('#rerr');
   if ($('#rp').value.length < 4) return need(err, 'A senha precisa ter pelo menos 4 caracteres.');
   const j = await post('/api/password/reset', { token, password: $('#rp').value }, err, $('#f-rs .go')); if (j) location.href = j.redirect || '/painel'; };

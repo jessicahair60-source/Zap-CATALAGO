@@ -30,7 +30,7 @@ const UPLOADS = path.join(DATA_DIR, 'uploads');
 const DAY = 86400000;
 const now = () => Date.now();
 const PUB = path.join(__dirname, 'public');
-const RESERVED = new Set(['painel', 'entrar', 'cadastro', 'sair', 'api', 'u', 'admin', 'termos', 'privacidade', 'static', 'assets', 'www', 'app', 'planos', 'ajuda', 'suporte', 'login', 'tutoriais']);
+const RESERVED = new Set(['painel', 'entrar', 'cadastro', 'sair', 'api', 'u', 'admin', 'termos', 'privacidade', 'static', 'assets', 'www', 'app', 'planos', 'ajuda', 'suporte', 'login', 'tutoriais', 'ativar']);
 
 const app = express();
 app.set('trust proxy', true);
@@ -314,7 +314,7 @@ app.get('/assinar/:plano', (req, res) => {
 });
 app.get('/privacidade', page('privacidade.html'));
 app.get(['/esqueci', '/nova-senha'], page('entrar.html'));
-app.get(['/entrar', '/cadastro'], (req, res) => currentUser(req) ? res.redirect('/painel') : res.sendFile(path.join(PUB, 'entrar.html')));
+app.get(['/entrar', '/cadastro', '/ativar'], (req, res) => currentUser(req) ? res.redirect('/painel') : res.sendFile(path.join(PUB, 'entrar.html')));
 app.get('/sair', (req, res) => {
   const t = cookies(req).vz; if (t) db.prepare('DELETE FROM sessions WHERE token = ?').run(t);
   res.set('Set-Cookie', 'vz=; Path=/; Max-Age=0').redirect(req.query.para === 'admin' ? '/admin' : '/entrar');
@@ -375,6 +375,39 @@ app.post('/api/signup', jsonBody, (req, res) => {
   });
   const userId = tx();
   applyKiwifyPending(email);
+  startSession(res, userId);
+  res.json({ ok: true, redirect: '/painel' });
+});
+
+// Ativar acesso: quem já pagou na Kiwify cria a conta só com o e-mail da compra, o nome da loja e uma senha
+app.post('/api/ativar/check', jsonBody, (req, res) => {
+  if (tooMany(req.ip, 'ativar')) return res.status(429).json({ error: 'Muitas tentativas. Espere 5 minutos e tente de novo.' });
+  const email = String(req.body.email || '').trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error: 'Confira o e-mail.' });
+  if (db.prepare('SELECT 1 FROM users WHERE email = ?').get(email)) return res.json({ status: 'account' });
+  const p = db.prepare('SELECT name FROM kiwify_pending WHERE email = ?').get(email);
+  res.json({ status: p ? 'paid' : 'none', name: p ? (p.name || '').split(' ')[0] : '', support: CFG.support });
+});
+app.post('/api/ativar', jsonBody, (req, res) => {
+  if (tooMany(req.ip, 'ativar')) return res.status(429).json({ error: 'Muitas tentativas. Espere 5 minutos e tente de novo.' });
+  const email = String(req.body.email || '').trim().toLowerCase();
+  const storeName = String(req.body.storeName || '').trim().slice(0, 80);
+  const pass = String(req.body.password || '');
+  if (!storeName) return res.status(400).json({ error: 'Coloque o nome da sua loja.' });
+  if (pass.length < 4) return res.status(400).json({ error: 'A senha precisa ter pelo menos 4 caracteres.' });
+  if (!req.body.terms) return res.status(400).json({ error: 'Para continuar, aceite os termos de uso e a política de privacidade.' });
+  if (db.prepare('SELECT 1 FROM users WHERE email = ?').get(email)) return res.status(409).json({ error: 'Este e-mail já tem conta. Toque em Entrar.' });
+  const p = db.prepare('SELECT * FROM kiwify_pending WHERE email = ?').get(email);
+  if (!p) return res.status(404).json({ error: 'Não encontramos pagamento com este e-mail.' });
+  const t = now();
+  const userId = db.transaction(() => {
+    const u = db.prepare('INSERT INTO users (name, email, pass, created_at) VALUES (?, ?, ?, ?)').run(p.name || storeName, email, hashPass(pass), t);
+    db.prepare('INSERT INTO stores (user_id, slug, name, trial_until, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)')
+      .run(u.lastInsertRowid, uniqueSlug(slugify(storeName)), storeName, null, t, t);
+    return u.lastInsertRowid;
+  })();
+  applyKiwifyPending(email);
+  clearTries(req.ip, 'ativar');
   startSession(res, userId);
   res.json({ ok: true, redirect: '/painel' });
 });
@@ -672,8 +705,8 @@ app.post('/api/webhooks/kiwify', express.raw({ type: '*/*', limit: '1mb' }), (re
     // Vale até a próxima cobrança, com 2 dias de folga; sem a data, 32 dias
     const until = k.nextPayment > now() ? k.nextPayment + 2 * DAY : Math.max(now(), (store && store.pro_until) || 0) + (k.yearly ? 367 : 32) * DAY;
     if (!store) {
-      db.prepare(`INSERT INTO kiwify_pending (email, until, sub_id, order_id, created_at) VALUES (?, ?, ?, ?, ?)
-        ON CONFLICT(email) DO UPDATE SET until = MAX(until, excluded.until), sub_id = excluded.sub_id, order_id = excluded.order_id`).run(k.email, until, k.subId || null, k.orderId, now());
+      db.prepare(`INSERT INTO kiwify_pending (email, until, sub_id, order_id, created_at, name) VALUES (?, ?, ?, ?, ?, ?)
+        ON CONFLICT(email) DO UPDATE SET until = MAX(until, excluded.until), sub_id = excluded.sub_id, order_id = excluded.order_id, name = COALESCE(excluded.name, name)`).run(k.email, until, k.subId || null, k.orderId, now(), k.name.slice(0, 80) || null);
       return console.log(`kiwify: compra de ${k.email} sem conta ainda; libera quando a conta for criada`);
     }
     if (seen && seen.get(payId, 'approved')) return; // aviso repetido
