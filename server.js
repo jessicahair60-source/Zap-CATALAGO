@@ -114,15 +114,17 @@ function adminOnly(req, res, next) {
   req.user = u; next();
 }
 
-// Limite simples de tentativas de login por IP (10 a cada 15 minutos)
+// Limite simples de tentativas de login por IP (10 a cada 5 minutos; zera quando dá certo)
 const tries = new Map();
 function tooMany(ip, kind = 'login') {
   const key = kind + ':' + ip;
   const t = tries.get(key) || { n: 0, at: now() };
-  if (now() - t.at > 15 * 60000) { t.n = 0; t.at = now(); }
+  if (now() - t.at > 5 * 60000) { t.n = 0; t.at = now(); }
   t.n++; tries.set(key, t);
   return t.n > 10;
 }
+// deu certo (entrou, criou ou trocou a senha): zera as tentativas desse aparelho
+const clearTries = (ip, kind = 'login') => tries.delete(kind + ':' + ip);
 
 /* ---------- arquivos ---------- */
 const EXT = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif', 'video/mp4': 'mp4', 'video/quicktime': 'mov', 'video/webm': 'webm' };
@@ -329,11 +331,12 @@ app.post('/api/signup', jsonBody, (req, res) => {
 });
 
 app.post('/api/login', jsonBody, (req, res) => {
-  if (tooMany(req.ip)) return res.status(429).json({ error: 'Muitas tentativas. Espere 15 minutos e tente de novo.' });
+  if (tooMany(req.ip)) return res.status(429).json({ error: 'Muitas tentativas. Espere 5 minutos e tente de novo.' });
   const email = String(req.body.email || '').trim().toLowerCase();
   const u = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
   if (!u || !checkPass(String(req.body.password || ''), u.pass)) return res.status(401).json({ error: 'E-mail ou senha incorretos.' });
   if (req.body.admin && !isAdmin(u)) return res.status(403).json({ error: 'Esta conta não tem acesso à administração.' });
+  clearTries(req.ip);
   startSession(res, u.id);
   if (req.body.admin) return res.json({ ok: true, redirect: '/admin' });
   const hasStore = db.prepare('SELECT 1 FROM stores WHERE user_id = ?').get(u.id);
@@ -349,7 +352,7 @@ function resetLink(userId, hours) {
   return `${CFG.publicUrl}/nova-senha?t=${token}`;
 }
 app.post('/api/password/forgot', jsonBody, async (req, res) => {
-  if (tooMany(req.ip, 'senha')) return res.status(429).json({ error: 'Muitas tentativas. Espere 15 minutos e tente de novo.' });
+  if (tooMany(req.ip, 'senha')) return res.status(429).json({ error: 'Muitas tentativas. Espere 5 minutos e tente de novo.' });
   const email = String(req.body.email || '').trim().toLowerCase();
   const channels = { email: mail.enabled() };
   // a resposta é a mesma com ou sem conta, para ninguém descobrir quais e-mails estão cadastrados
@@ -366,7 +369,7 @@ app.post('/api/password/forgot', jsonBody, async (req, res) => {
 // Como a lojista pode recuperar a senha: pelo robô do WhatsApp (ela manda "Esqueci minha senha"), por e-mail ou com o suporte
 app.get('/api/password/options', (req, res) => res.json({ whatsapp: wa.enabled() ? wa.number() : '', email: mail.enabled(), support: CFG.support }));
 app.post('/api/password/reset', jsonBody, (req, res) => {
-  if (tooMany(req.ip, 'senha')) return res.status(429).json({ error: 'Muitas tentativas. Espere 15 minutos e tente de novo.' });
+  if (tooMany(req.ip, 'senha')) return res.status(429).json({ error: 'Muitas tentativas. Espere 5 minutos e tente de novo.' });
   const pass = String(req.body.password || '');
   const row = db.prepare('SELECT * FROM pw_resets WHERE token_hash = ? AND expires_at > ?').get(tokenHash(req.body.token), now());
   if (!row) return res.status(400).json({ error: 'Este link venceu ou já foi usado. Peça um link novo.' });
@@ -378,6 +381,7 @@ app.post('/api/password/reset', jsonBody, (req, res) => {
     db.prepare('DELETE FROM sessions WHERE user_id = ?').run(row.user_id);
     db.prepare('DELETE FROM pw_resets WHERE user_id = ?').run(row.user_id);
   })();
+  clearTries(req.ip); clearTries(req.ip, 'senha');
   startSession(res, row.user_id);
   const hasStore = db.prepare('SELECT 1 FROM stores WHERE user_id = ?').get(row.user_id);
   res.json({ ok: true, redirect: hasStore ? '/painel' : '/admin' });
@@ -385,7 +389,7 @@ app.post('/api/password/reset', jsonBody, (req, res) => {
 
 // Primeiro acesso da dona: cria a senha sem loja, só para e-mails de ADMIN_EMAILS
 app.post('/api/admin/setup', jsonBody, (req, res) => {
-  if (tooMany(req.ip)) return res.status(429).json({ error: 'Muitas tentativas. Espere 15 minutos e tente de novo.' });
+  if (tooMany(req.ip)) return res.status(429).json({ error: 'Muitas tentativas. Espere 5 minutos e tente de novo.' });
   const name = String(req.body.name || '').trim().slice(0, 80);
   const email = String(req.body.email || '').trim().toLowerCase();
   const pass = String(req.body.password || '');
@@ -394,6 +398,7 @@ app.post('/api/admin/setup', jsonBody, (req, res) => {
   if (pass.length < 10) return res.status(400).json({ error: 'A senha precisa ter pelo menos 10 caracteres.' });
   if (db.prepare('SELECT 1 FROM users WHERE email = ?').get(email)) return res.status(409).json({ error: 'Este e-mail já tem senha. Use "Já tenho senha" para entrar.' });
   const u = db.prepare('INSERT INTO users (name, email, pass, created_at) VALUES (?, ?, ?, ?)').run(name, email, hashPass(pass), now());
+  clearTries(req.ip);
   startSession(res, u.lastInsertRowid);
   res.json({ ok: true, redirect: '/admin' });
 });
