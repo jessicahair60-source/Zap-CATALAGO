@@ -247,3 +247,12 @@ test('painel aberto com dados antigos não apaga o que foi salvo depois', async 
   r = await c('PUT', '/api/store', { state: state(1, { bio: 'computador 2' }), base: first }); assert.strictEqual(r.status, 200);
   assert.ok(r.json.savedAt > first);
 });
+
+test('ativar acesso de quem já pagou na Kiwify', async () => {
+  const c = client();
+  let r = await c('POST', '/api/ativar/check', { email: 'nova@teste.com' }); assert.strictEqual(r.json.status, 'none');
+  r = await c('POST', '/api/ativar', { email: 'nova@teste.com', storeName: 'Nova', password: 'abcd', terms: true }); assert.strictEqual(r.status, 404);
+  r = await c('POST', '/api/ativar/check', { email: 'ana@teste.com' }); assert.strictEqual(r.json.status, 'account');
+  r = await client()('GET', '/ativar'); assert.strictEqual(r.status, 200); assert.match(r.text, /Ative seu acesso/);
+});
+

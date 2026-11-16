@@ -56,6 +56,7 @@ Na tela do webhook da Kiwify, use **Testar webhook**: a Kiwify manda um aviso de
 
 - **Comprou com outro e-mail:** a loja não é liberada sozinha. Libere em `/admin` com **Liberar 30 dias**.
 - **Comprou antes de criar a conta:** a compra fica guardada e a loja é liberada quando ela criar a conta com o mesmo e-mail.
+- **Página para quem já pagou:** `https://zapcatalago.com/ativar`. A cliente coloca o e-mail da compra, o nome da loja e uma senha, e entra já liberada. Coloque esse link na página de obrigado e no e-mail da compra da Kiwify. Se o e-mail não tiver pagamento, a página pede para usar o mesmo e-mail da compra ou falar com o suporte.
 - **Cancelar:** a lojista cancela pela área do cliente da Kiwify (link no e-mail da compra). O botão Cancelar do painel explica isso.
 
 ## Plano anual

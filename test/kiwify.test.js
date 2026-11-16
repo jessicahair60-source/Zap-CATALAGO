@@ -60,3 +60,16 @@ test('Kiwify: compra antes de criar a conta libera quando a conta é criada', as
   const s = require('../lib/db').db.prepare("SELECT s.* FROM stores s JOIN users u ON u.id = s.user_id WHERE u.email = 'bia@kw.com'").get();
   assert.ok(s.pro_until > Date.now() + 29 * 864e5);
 });
+
+test('Kiwify: quem já pagou ativa o acesso só com e-mail, nome da loja e senha', async () => {
+  const body = paid('carla@kw.com', 'o10'); body.Customer.full_name = 'Carla Souza';
+  assert.strictEqual(await hook(body), 200);
+  const post = (url, b) => fetch(base + url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(b) }).then(async x => ({ status: x.status, json: await x.json(), cookie: (x.headers.get('set-cookie') || '').split(';')[0] }));
+  let r = await post('/api/ativar/check', { email: 'CARLA@kw.com ' }); assert.strictEqual(r.json.status, 'paid'); assert.strictEqual(r.json.name, 'Carla');
+  r = await post('/api/ativar', { email: 'carla@kw.com', storeName: 'Carla Doces', password: '12', terms: true }); assert.strictEqual(r.status, 400);
+  r = await post('/api/ativar', { email: 'carla@kw.com', storeName: 'Carla Doces', password: '1234', terms: true }); assert.strictEqual(r.status, 200);
+  const me = await fetch(base + '/api/me', { headers: { Cookie: r.cookie } }).then(x => x.json());
+  assert.strictEqual(me.user.name, 'Carla Souza'); assert.strictEqual(me.store.plan, 'pro');
+  r = await post('/api/ativar/check', { email: 'carla@kw.com' }); assert.strictEqual(r.json.status, 'account');
+  r = await post('/api/ativar', { email: 'carla@kw.com', storeName: 'X', password: '1234', terms: true }); assert.strictEqual(r.status, 409);
+});
