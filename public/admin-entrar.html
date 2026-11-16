@@ -33,7 +33,18 @@
         <div class="field"><label for="ip">Senha</label><input class="in" id="ip" type="password" autocomplete="current-password" required></div>
         <p class="err" id="ierr" hidden></p>
         <button class="btn" type="submit">Entrar</button>
+        <button class="switch" type="button" id="go-fg">Esqueceu a senha?</button>
         <button class="switch" type="button" id="go-up">Primeiro acesso? Criar minha senha</button>
+      </form>
+
+      <form id="f-fg" hidden>
+        <h1>Esqueceu a senha?</h1>
+        <p class="note" style="margin:0">Coloque o e-mail da administração. Vamos mandar um link para você criar uma senha nova. Ele vale por 1 hora.</p>
+        <div class="field"><label for="fe">E-mail</label><input class="in" id="fe" type="email" autocomplete="username" required></div>
+        <p class="err" id="ferr" hidden></p>
+        <p class="note" id="fok" hidden></p>
+        <button class="btn" type="submit">Mandar o link</button>
+        <button class="switch" type="button" id="go-in2">Voltar para entrar</button>
       </form>
 
       <form id="f-up" hidden>
@@ -52,8 +63,9 @@
 </main>
 <script>
 const $ = s => document.querySelector(s);
-const tab = up => { $('#f-in').hidden = up; $('#f-up').hidden = !up; };
-$('#go-up').onclick = () => tab(true); $('#go-in').onclick = () => tab(false);
+const tab = v => { ['in', 'up', 'fg'].forEach(k => { $('#f-' + k).hidden = k !== v; }); };
+$('#go-up').onclick = () => tab('up'); $('#go-in').onclick = $('#go-in2').onclick = () => tab('in');
+$('#go-fg').onclick = () => { $('#fe').value = $('#ie').value; tab('fg'); };
 async function send(url, body, errEl, btn) {
   errEl.hidden = true; btn.disabled = true;
   try {
@@ -65,6 +77,20 @@ async function send(url, body, errEl, btn) {
 }
 $('#f-in').onsubmit = e => { e.preventDefault(); send('/api/login', { email: $('#ie').value, password: $('#ip').value, admin: true }, $('#ierr'), $('#f-in .btn')); };
 $('#f-up').onsubmit = e => { e.preventDefault(); send('/api/admin/setup', { name: $('#un').value, email: $('#ue').value, password: $('#up').value }, $('#uerr'), $('#f-up .btn')); };
+$('#f-fg').onsubmit = async e => {
+  e.preventDefault();
+  const err = $('#ferr'), ok = $('#fok'), btn = $('#f-fg .btn');
+  err.hidden = ok.hidden = true; btn.disabled = true;
+  try {
+    const r = await fetch('/api/password/forgot', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: $('#fe').value }) });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.error || 'Algo deu errado. Tente de novo.');
+    if (j.channels && j.channels.email) ok.textContent = `Se ${$('#fe').value.trim()} for da administração, o link chega em alguns minutos. Olhe também a caixa de spam. A senha da administração precisa ter pelo menos 10 caracteres.`;
+    else ok.textContent = 'O envio por e-mail ainda não está ligado na plataforma. Preencha os dados de SMTP no Dokploy (veja o DOKPLOY.md) e tente de novo.';
+    ok.hidden = false;
+  } catch (x) { err.textContent = x.message; err.hidden = false; }
+  btn.disabled = false;
+};
 </script>
 </body>
 </html>
