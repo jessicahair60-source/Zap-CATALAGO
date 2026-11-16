@@ -689,11 +689,20 @@ details.pcard.need { border-color: #F1A7BF; box-shadow: 0 0 0 3px rgba(224,82,12
 .tlink { font-size: 13px; font-weight: 600; color: var(--p-muted); text-decoration: none; padding: 6px 4px 6px 8px; }
 .m-panel .demo-tag { white-space: nowrap; font-weight: 700; letter-spacing: .06em; }
 .m-panel .demo-tag { display: inline-flex; align-items: center; gap: 7px; } .m-panel .demo-tag img { width: 24px; height: 24px; } .m-panel .demo-tag img.marca { width: auto; height: 40px; filter: drop-shadow(0 3px 8px rgba(185,71,111,.18)); }
-@media (max-width: 480px) { .m-panel .demo-tag img.marca { height: 30px; } .m-panel .seg button, .m-panel .topbar button { white-space: nowrap; } .m-panel .seg button { padding: 7px 9px; font-size: 12.5px; } .m-panel .savest { font-size: 0; } .m-panel .savest::first-letter { font-size: 12px; } }
+@media (max-width: 480px) { .m-panel .demo-tag img.marca { height: 30px; } .m-panel .seg button, .m-panel .topbar button { white-space: nowrap; } .m-panel .seg button { padding: 7px 9px; font-size: 12.5px; } .m-panel .savest { font-size: 10.5px; margin-right: 2px; } }
 @media (max-width: 480px) { .m-panel .demo-tag span { display: none; } }
 .savest { white-space: nowrap; font-size: 11.5px; color: var(--p-muted); margin-right: 6px; }
 .savest[data-st="ok"]::before { content: "✓ "; color: #1FA855; }
-.savest[data-st="err"] { color: #C0392B; font-weight: 700; }
+.savest[data-st="err"], .savest[data-st="stale"] { color: #C0392B; font-weight: 700; }
+/* Botão Salvar de cada cartão do painel */
+.savebar { position: sticky; bottom: calc(84px + env(safe-area-inset-bottom, 0px)); z-index: 3; display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 16px -6px -4px; padding: 10px 10px 10px 14px; background: var(--p-surface); border: 1px solid var(--p-line); border-radius: 14px; box-shadow: 0 6px 18px rgba(36,24,30,.08); }
+.savebar .sb-st { font-size: 12.5px; color: var(--p-muted); line-height: 1.3; }
+.savebar[data-st="ok"] .sb-st { color: #178A45; font-weight: 700; }
+.savebar[data-st="err"] .sb-st, .savebar[data-st="stale"] .sb-st { color: #C0392B; font-weight: 700; }
+.savebar .sb-btn { flex: none; border: 0; border-radius: 999px; padding: 11px 22px; font: inherit; font-weight: 800; font-size: 15px; color: #fff; background: var(--p-acc); cursor: pointer; min-width: 112px; transition: background .2s, transform .1s; }
+.savebar .sb-btn:active { transform: scale(.97); }
+.savebar .sb-btn:disabled { opacity: .7; cursor: default; }
+.savebar .sb-btn.done { background: #1FA855; }
 .madewith { text-align: center; margin: 18px 0 0; font-size: 12px; } .madewith a { color: var(--c-muted); text-decoration: none; }
 .impbar { height: 8px; border-radius: 8px; background: var(--p-soft); overflow: hidden; margin-top: 10px; } .impbar i { display: block; height: 100%; width: 0; background: var(--p-acc); transition: width .3s; }
 .plan { margin-top: 14px; background: var(--p-surface); border: 1px solid var(--p-line); border-radius: 18px; padding: 14px 16px; }
@@ -1102,25 +1111,68 @@ function save() {
   if (MODE === 'panel') return scheduleSync();
   if (MODE === 'demo') try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { toast('Não deu para salvar neste navegador. A imagem do banner pode estar grande demais.'); }
 }
-const sync = { t: 0, busy: false, dirty: false, base: (BOOT.store && BOOT.store.savedAt) || 0 };
-function setSaveState(st) { const el = document.getElementById('savest'); if (!el) return; el.hidden = false; el.dataset.st = st;
-  el.textContent = st === 'ok' ? 'Salvo' : st === 'err' ? 'Não salvou' : 'Salvando...'; }
-function scheduleSync() { sync.dirty = true; setSaveState('pending'); clearTimeout(sync.t); sync.t = setTimeout(runSync, 700); }
+const sync = { t: 0, busy: false, dirty: false, st: 'ok', at: 0, base: (BOOT.store && BOOT.store.savedAt) || 0 };
+const hhmm = t => new Date(t).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+function saveMsg(st) {
+  if (st === 'pending') return 'Salvando suas mudanças...';
+  if (st === 'err') return 'Não salvou. Confira a internet e toque em Salvar de novo.';
+  if (st === 'stale') return 'Painel desatualizado: foi salvo em outro aparelho. Toque em Atualizar.';
+  return sync.at ? `✓ Salvo às ${hhmm(sync.at)}` : '✓ Tudo salvo';
+}
+function setSaveState(st) {
+  if (sync.st === 'stale' && st !== 'stale') return; // só sai desse estado atualizando a página
+  sync.st = st; if (st === 'ok') sync.at = Date.now();
+  const el = document.getElementById('savest');
+  if (el) { el.hidden = false; el.dataset.st = st; el.textContent = st === 'ok' ? 'Salvo' : st === 'err' ? 'Não salvou' : st === 'stale' ? 'Atualize' : 'Salvando...'; }
+  document.querySelectorAll('[data-savebar]').forEach(b => { b.dataset.st = st; b.querySelector('.sb-st').textContent = saveMsg(st);
+    const btn = b.querySelector('.sb-btn'); if (!btn.classList.contains('done')) btn.textContent = st === 'stale' ? 'Atualizar' : 'Salvar'; });
+}
+function scheduleSync() { if (sync.st === 'stale') return; sync.dirty = true; setSaveState('pending'); clearTimeout(sync.t); sync.t = setTimeout(runSync, 700); }
+// Botão Salvar: grava na hora, espera a resposta do servidor e mostra "Salvo!" ou o erro
+async function saveNow(btn) {
+  if (sync.st === 'stale') { location.reload(); return; }
+  btn.disabled = true; btn.textContent = 'Salvando...';
+  let ok = true;
+  if (MODE === 'panel') {
+    clearTimeout(sync.t);
+    while (sync.busy) await new Promise(r => setTimeout(r, 120));
+    sync.dirty = true; ok = await runSync();
+  } else save();
+  btn.disabled = false;
+  if (!ok) { btn.textContent = sync.st === 'stale' ? 'Atualizar' : 'Salvar'; return; }
+  btn.classList.add('done'); btn.textContent = 'Salvo! ✓';
+  const st = b => { const el = btn.closest('[data-savebar]'); if (el) el.querySelector('.sb-st').textContent = b; };
+  if (MODE === 'panel' && !proOk()) { st('✓ Salvo, mas a vitrine está fora do ar até renovar a assinatura.'); toast('Salvo! Mas a vitrine está fora do ar até renovar a assinatura.'); }
+  else if (S.store.online === false) { st('✓ Salvo, mas a vitrine está desligada (Vitrine no ar, em Conta).'); toast('Salvo! Mas a vitrine está desligada.'); }
+  else st(`✓ Salvo às ${hhmm(Date.now())}. Já aparece na sua vitrine.`);
+  setTimeout(() => { btn.classList.remove('done'); btn.textContent = 'Salvar'; }, 2500);
+}
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-savenow]'); if (b) { e.preventDefault(); saveNow(b); } });
 // Troca as imagens enviadas como data: pelos endereços que o servidor guardou
 function swapUrls(a, b) { if (!a || !b || typeof a !== 'object') return;
   for (const k of Object.keys(a)) { const x = a[k], y = b[k];
     if (typeof x === 'string' && x.startsWith('data:') && typeof y === 'string' && y.startsWith('/u/')) a[k] = y; else if (x && typeof x === 'object') swapUrls(x, y); } }
 async function runSync() {
-  if (sync.busy) return scheduleSync();
-  sync.busy = true; sync.dirty = false;
+  if (sync.busy) { scheduleSync(); return false; }
+  if (sync.st === 'stale') return false;
+  sync.busy = true; sync.dirty = false; let ok = false;
   try {
     const r = await fetch('/api/store', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ state: S, base: sync.base }) });
-    if (r.status === 401) { location.href = '/entrar'; return; }
-    const j = await r.json(); if (!r.ok) throw new Error(j.error);
+    if (r.status === 401) { location.href = '/entrar'; return false; }
+    const j = await r.json().catch(() => ({ error: r.status === 413 ? 'Arquivo grande demais.' : '' }));
+    if (r.status === 409 && j.stale) { sync.busy = false; sync.dirty = false; setSaveState('stale'); toast('Não salvou: a loja foi salva em outra aba ou outro aparelho. Toque em Atualizar.'); return false; }
+    if (!r.ok) throw new Error(j.error);
     swapUrls(S, j.state); mergeWa(j.state.products, j.state.cats); sync.base = j.savedAt || sync.base; setSaveState(sync.dirty ? 'pending' : 'ok');
-  } catch (e) { setSaveState('err'); toast('Não deu para salvar. Confira a internet e tente de novo.'); }
+    ok = true;
+  } catch (e) { setSaveState('err'); toast(e && e.message === 'Arquivo grande demais.' ? 'Não salvou: alguma imagem está grande demais. Use uma menor.' : 'Não deu para salvar. Confira a internet e toque em Salvar de novo.'); }
   sync.busy = false; if (sync.dirty) scheduleSync();
+  return ok;
 }
+// Ao voltar para o painel (outra aba, app minimizado), confere se a loja foi salva em outro lugar
+if (MODE === 'panel' && !PV) document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState !== 'visible' || sync.busy || sync.dirty || sync.st === 'stale') return;
+  try { const j = await (await fetch('/api/store/at', { cache: 'no-store' })).json(); if (j.at && j.at > sync.base && !sync.dirty && !sync.busy) setSaveState('stale'); } catch (e) {}
+});
 window.addEventListener('beforeunload', e => { if (MODE === 'panel' && (sync.dirty || sync.busy)) { e.preventDefault(); e.returnValue = ''; } });
 // Métricas da vitrine (visitas, produtos vistos, cliques no Eu quero, pedidos)
 function track(t, p) {
@@ -1651,8 +1703,11 @@ const MEDIDAS_HTML = `<div class="sizes-t">
      ['Foto da categoria', '500 x 500 px', 'Quadrada, o centro aparece na bolinha', 'r11 round'], ['Logo', '600 x 200 px', 'PNG com fundo transparente', 'r31']]
     .map(([t, px, d, r]) => `<div class="szrow"><i class="shape ${r}"></i><div><b>${t}</b><span>${d}</span></div><code>${px}</code></div>`).join('')}</div>
   <p class="note">Use JPG ou PNG de até 2 MB. Imagens maiores são reduzidas automaticamente. Deixe textos e rostos no centro, porque as bordas podem ser cortadas em algumas telas.</p>`;
+// Cartões onde a lojista preenche a vitrine: cada um ganha o botão Salvar com a confirmação
+const SAVE_SECS = new Set(['info', 'banner', 'tema', 'cores', 'layout', 'selos', 'estoque', 'cats', 'lista', 'pix', 'vbub', 'promo', 'kits', 'pedido', 'links', 'depo', 'rodape', 'marketing']);
+function saveBar(id) { return MODE === 'store' || PV ? '' : `<div class="savebar" data-savebar="${id}" data-st="${sync.st || 'ok'}"><span class="sb-st">${saveMsg(sync.st || 'ok')}</span><button type="button" class="sb-btn" data-savenow="${id}">Salvar</button></div>`; }
 function sec(id, title, sub, body) {
-  return `<details class="pcard" data-sec="${id}" ${pui.open.has(id) ? 'open' : ''}><summary><span><h3>${title}</h3><small>${sub}</small></span><span class="chev" aria-hidden="true">›</span></summary><div class="sbody">${body}</div></details>`;
+  return `<details class="pcard" data-sec="${id}" ${pui.open.has(id) ? 'open' : ''}><summary><span><h3>${title}</h3><small>${sub}</small></span><span class="chev" aria-hidden="true">›</span></summary><div class="sbody">${body}${SAVE_SECS.has(id) && !(id === 'kits' && KITS_SOON) ? saveBar(id) : ''}</div></details>`;
 }
 /* Ícones dos cartões do Dashboard */
 const DSVG = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;

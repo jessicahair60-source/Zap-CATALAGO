@@ -213,3 +213,19 @@ test('link do pedido: página com as fotos e prévia do WhatsApp', async () => {
   r = await pub('GET', '/acessorios-da-lu/pedido/zzz'); assert.strictEqual(r.status, 302);
   r = await pub('GET', '/nao-existe/pedido/1'); assert.strictEqual(r.status, 404);
 });
+
+test('painel aberto com dados antigos não apaga o que foi salvo depois', async () => {
+  const c = client();
+  let r = await c('POST', '/api/signup', { name: 'Duda', storeName: 'Loja da Duda', email: 'duda@teste.com', password: '1234', terms: true });
+  assert.strictEqual(r.status, 200);
+  // aba do computador salva
+  r = await c('PUT', '/api/store', { state: state(1, { bio: 'computador' }), base: 0 }); assert.strictEqual(r.status, 200);
+  const first = r.json.savedAt;
+  r = await c('GET', '/api/store/at'); assert.strictEqual(r.json.at, first);
+  // aba do celular, aberta antes, tenta salvar com a base antiga: recusa
+  r = await c('PUT', '/api/store', { state: state(1, { bio: 'celular velho' }), base: first - 1 }); assert.strictEqual(r.status, 409); assert.strictEqual(r.json.stale, true);
+  // a mesma aba que salvou continua salvando normalmente
+  await new Promise(res => setTimeout(res, 5));
+  r = await c('PUT', '/api/store', { state: state(1, { bio: 'computador 2' }), base: first }); assert.strictEqual(r.status, 200);
+  assert.ok(r.json.savedAt > first);
+});
