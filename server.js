@@ -783,15 +783,17 @@ app.get('/api/admin/overview', adminOnly, (req, res) => {
     let products = 0; try { products = (JSON.parse(s.state || '{}').products || []).length; } catch (e) {}
     let online = true; try { online = (JSON.parse(s.state || '{}').store || {}).online !== false; } catch (e) {}
     return { id: s.id, name: s.name, slug: s.slug, owner: s.owner, email: s.email, plan: planOf(s), proUntil: s.pro_until, trialUntil: s.trial_until, subscribed: !!s.mp_preapproval,
-      blocked: !!s.blocked, blockedReason: s.blocked_reason, customDomain: s.custom_domain, products, online, createdAt: s.created_at, url: publicUrlOf(s) };
+      blocked: !!s.blocked, blockedReason: s.blocked_reason, customDomain: s.custom_domain, products, online, createdAt: s.created_at, url: publicUrlOf(s), internal: !!s.internal };
   });
-  const paying = list.filter(s => s.plan === 'pro').length;
-  const revenue30 = db.prepare("SELECT COALESCE(SUM(amount), 0) AS t FROM payments WHERE status = 'approved' AND created_at > ?").get(now() - 30 * DAY).t;
-  const views30 = db.prepare("SELECT COALESCE(SUM(n), 0) AS t FROM events WHERE type = 'view' AND day >= ?").get(new Date(now() - 29 * DAY).toISOString().slice(0, 10)).t;
+  // as lojas marcadas como "minha loja" aparecem na lista, mas não entram nas contas
+  const real = list.filter(s => !s.internal);
+  const paying = real.filter(s => s.plan === 'pro').length;
+  const revenue30 = db.prepare("SELECT COALESCE(SUM(p.amount), 0) AS t FROM payments p JOIN stores s ON s.id = p.store_id WHERE p.status = 'approved' AND p.created_at > ? AND s.internal = 0").get(now() - 30 * DAY).t;
+  const views30 = db.prepare("SELECT COALESCE(SUM(e.n), 0) AS t FROM events e JOIN stores s ON s.id = e.store_id WHERE e.type = 'view' AND e.day >= ? AND s.internal = 0").get(new Date(now() - 29 * DAY).toISOString().slice(0, 10)).t;
   res.json({
     brand: CFG.brand, proPrice: CFG.proPrice,
-    metrics: { total: list.length, paying, open: list.filter(s => s.plan === 'open').length, expired: list.filter(s => s.plan === 'expired').length,
-      blocked: list.filter(s => s.blocked).length, newWeek: stores.filter(s => s.created_at > week).length, mrr: paying * CFG.proPrice, revenue30, views30 },
+    metrics: { total: real.length, paying, open: real.filter(s => s.plan === 'open').length, expired: real.filter(s => s.plan === 'expired').length,
+      blocked: real.filter(s => s.blocked).length, newWeek: real.filter(s => s.createdAt > week).length, mrr: paying * CFG.proPrice, revenue30, views30, mine: list.length - real.length },
     stores: list,
     payments: db.prepare('SELECT p.*, s.name FROM payments p JOIN stores s ON s.id = p.store_id ORDER BY p.created_at DESC LIMIT 30').all()
   });
@@ -874,6 +876,7 @@ app.post('/api/admin/stores/:id', adminOnly, jsonBody, (req, res) => {
     const days = Math.min(3650, Math.max(1, parseInt(req.body.days, 10) || 30));
     db.prepare('UPDATE stores SET pro_until = ?, updated_at = ? WHERE id = ?').run(Math.max(now(), s.pro_until || 0) + days * DAY, now(), s.id);
   } else if (a === 'expire') db.prepare('UPDATE stores SET pro_until = NULL, trial_until = NULL, updated_at = ? WHERE id = ?').run(now(), s.id);
+  else if (a === 'internal') db.prepare('UPDATE stores SET internal = ? WHERE id = ?').run(req.body.value ? 1 : 0, s.id);
   else if (a === 'resetLink') return res.json({ ok: true, link: resetLink(s.user_id, 24) });
   else if (a === 'delete') {
     // Excluir vitrine: apaga a loja, a conta da lojista e as fotos/vídeos dela. Não tem volta.

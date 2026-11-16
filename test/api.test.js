@@ -156,6 +156,14 @@ test('painel da dona da plataforma', async () => {
   r = await client()('POST', '/api/password/forgot', { email: 'ninguem@teste.com' }); assert.strictEqual(r.status, 200); assert.strictEqual(r.json.ok, true);
   r = await client()('GET', '/esqueci'); assert.match(r.text, /Esqueceu a senha/);
   r = await client()('GET', '/manifest.webmanifest'); assert.strictEqual(JSON.parse(r.text).start_url, '/painel');
+  // minha loja: aparece na lista, mas sai das contas
+  r = await dona('GET', '/api/admin/overview'); const antes = r.json.metrics;
+  r = await dona('POST', `/api/admin/stores/${ana.id}`, { action: 'internal', value: true }); assert.strictEqual(r.status, 200);
+  r = await dona('GET', '/api/admin/overview'); assert.strictEqual(r.json.metrics.total, antes.total - 1); assert.strictEqual(r.json.metrics.mine, 1);
+  assert.ok(r.json.stores.find(s => s.id === ana.id).internal);
+  await dona('POST', `/api/admin/stores/${ana.id}`, { action: 'internal', value: false });
+  r = await dona('GET', '/api/admin/overview'); assert.strictEqual(r.json.metrics.total, antes.total);
+
   // excluir vitrine: só com o endereço digitado certo; apaga loja e conta
   const tmp = client();
   await tmp('POST', '/api/signup', { name: 'Bia', storeName: 'Bia Doces', email: 'bia@teste.com', password: 'senha-forte', terms: true });

@@ -90,6 +90,7 @@
   .acts { align-items: center; }
   .acts .sep { flex-basis: 100%; height: 0; }
   .t-pro { background: #E3F6EA; color: #137A3D; } .t-open, .t-trial { background: var(--pink-soft); color: var(--pink-d); }
+  .tags { display: inline-flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; } .t-mine { background: #2A1A22; color: #fff; }
   .modal { position: fixed; inset: 0; background: rgba(42,26,34,.55); display: grid; place-items: center; padding: 16px; z-index: 20; }
   .modal .box { background: #fff; border-radius: 22px; padding: 22px; max-width: 420px; width: 100%; box-shadow: 0 20px 50px rgba(0,0,0,.25); }
   .modal h3 { font-size: 20px; margin: 0 0 8px; color: var(--danger); }
@@ -125,7 +126,7 @@
 </nav></div></div>
 <main class="container">
   <section class="sec" id="sec-resumo" data-sec="resumo">
-    <div class="sec-h"><div><h2>Resumo da plataforma</h2><p>Como estão as vendas e as lojistas hoje.</p></div></div>
+    <div class="sec-h"><div><h2>Resumo da plataforma</h2><p>Como estão as vendas e as lojistas hoje. <span id="mineNote"></span></p></div></div>
     <div class="kpis" id="kpis"></div>
     <div class="shorts">
       <button class="short" data-go="lojistas" data-gf="all"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16l-1.5 12a2 2 0 0 1-2 2h-9a2 2 0 0 1-2-2z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg></i><b>Lojistas</b><span>Ver todas as vitrines, buscar e liberar acesso</span></button>
@@ -185,17 +186,17 @@ function render() {
     ['hl', brl(m.mrr), 'Receita mensal recorrente'], ['', m.total, 'Lojas cadastradas'], ['', m.paying, 'Lojas pagando'], ['', m.newWeek, 'Novas nos últimos 7 dias'],
     ['', m.open, 'Liberadas (sem cobrança)'], ['', m.expired, 'Vencidas (fora do ar)'], ['', brl(m.revenue30), 'Recebido em 30 dias'], ['', m.views30.toLocaleString('pt-BR'), 'Visitas nas vitrines (30 dias)']
   ].map(([c, v, l]) => `<div class="kpi ${c}"><b>${v}</b><span>${l}</span></div>`).join('');
-  const chips = [['all', `Todas (${m.total})`], ['pro', `Pagas (${m.paying})`], ['open', `Liberadas (${m.open})`], ['expired', `Vencidas (${m.expired})`], ['blocked', `Bloqueadas (${m.blocked})`]];
+  const chips = [['all', `Clientes (${m.total})`], ['pro', `Pagas (${m.paying})`], ['open', `Liberadas (${m.open})`], ['expired', `Vencidas (${m.expired})`], ['blocked', `Bloqueadas (${m.blocked})`], ['mine', `Minhas lojas (${m.mine || 0})`]];
   $('#chips').innerHTML = chips.map(([k, l]) => `<button class="chip" data-f="${k}" aria-pressed="${filter === k}">${l}</button>`).join('');
   document.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { filter = b.dataset.f; render(); });
   const q = $('#q').value.trim().toLowerCase();
-  const list = data.stores.filter(s => (filter === 'all' || (filter === 'blocked' ? s.blocked : s.plan === filter && !s.blocked)) && (!q || `${s.name} ${s.owner} ${s.email} ${s.slug}`.toLowerCase().includes(q)));
+  const list = data.stores.filter(s => (filter === 'mine' ? s.internal : !s.internal && (filter === 'all' || (filter === 'blocked' ? s.blocked : s.plan === filter && !s.blocked))) && (!q || `${s.name} ${s.owner} ${s.email} ${s.slug}`.toLowerCase().includes(q)));
   $('#list').innerHTML = list.length ? list.map(s => `<div class="row">
     <div class="row-top"><div><b>${esc(s.name)}</b>
       <div class="meta">${esc(s.owner)} · ${esc(s.email)}</div>
       <div class="meta"><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.url.replace(/^https?:\/\//, ''))}</a> · ${s.products} produtos · ${s.online ? 'no ar' : 'fora do ar'} · desde ${date(s.createdAt)}</div>
       <div class="meta">${s.plan === 'pro' ? `Paga até ${date(s.proUntil)}${s.subscribed ? ' · assinatura ativa' : ''}` : s.plan === 'open' ? 'Liberada · cobrança ainda não ligada' : 'Vencida · vitrine fora do ar'}${s.blocked ? ` · bloqueada${s.blockedReason ? ': ' + esc(s.blockedReason) : ''}` : ''}</div></div>
-      <span class="tag ${s.blocked ? 't-blocked' : 't-' + s.plan}">${s.blocked ? 'Bloqueada' : PLAN[s.plan]}</span></div>
+      <span class="tags">${s.internal ? '<span class="tag t-mine">Minha loja</span>' : ''}<span class="tag ${s.blocked ? 't-blocked' : 't-' + s.plan}">${s.blocked ? 'Bloqueada' : PLAN[s.plan]}</span></span></div>
     <div class="acts">
       <a href="${esc(s.url)}" target="_blank" rel="noopener">Ver vitrine</a>
       <button data-a="givePro" data-id="${s.id}">Liberar 30 dias</button>
@@ -203,14 +204,20 @@ function render() {
       ${s.plan !== 'expired' ? `<button data-a="expire" data-id="${s.id}">Encerrar acesso</button>` : ''}
       <button data-a="resetLink" data-id="${s.id}">Link de senha nova</button>
       ${s.blocked ? `<button data-a="unblock" data-id="${s.id}">Desbloquear</button>` : `<button class="danger" data-a="block" data-id="${s.id}">Bloquear</button>`}
+      <button data-mine="${s.id}">${s.internal ? 'Contar como cliente' : 'É minha loja (não contar)'}</button>
       <button class="del" data-del="${s.id}">Excluir vitrine</button>
     </div></div>`).join('') : '<div class="empty">Nenhuma loja aqui.</div>';
   document.querySelectorAll('[data-a]').forEach(b => b.onclick = () => act(+b.dataset.id, b.dataset.a));
   document.querySelectorAll('[data-del]').forEach(b => b.onclick = () => askDelete(+b.dataset.del));
+  document.querySelectorAll('[data-mine]').forEach(b => b.onclick = async () => { const s = data.stores.find(x => x.id === +b.dataset.mine);
+    const r = await fetch(`/api/admin/stores/${s.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'internal', value: !s.internal }) });
+    if (!r.ok) return toast('Não deu certo.'); toast(s.internal ? `${s.name} volta a contar como cliente` : `${s.name} marcada como sua loja: não entra mais nas contas`); load(); });
   $('#n-loj').textContent = m.total;
   const tagOf = s => `<span class="tag ${s.blocked ? 't-blocked' : 't-' + s.plan}">${s.blocked ? 'Bloqueada' : PLAN[s.plan]}</span>`;
-  $('#recent').innerHTML = data.stores.length ? data.stores.slice(0, 5).map(s => `<div class="row"><div class="row-top"><div><b>${esc(s.name)}</b>
+  const clientes = data.stores.filter(s => !s.internal);
+  $('#recent').innerHTML = clientes.length ? clientes.slice(0, 5).map(s => `<div class="row"><div class="row-top"><div><b>${esc(s.name)}</b>
     <div class="meta">${esc(s.owner)} · desde ${date(s.createdAt)} · ${s.products} produtos</div></div>${tagOf(s)}</div></div>`).join('') : '<div class="empty">Nenhuma lojista ainda.</div>';
+  $('#mineNote').textContent = m.mine ? `${m.mine} ${m.mine > 1 ? 'lojas suas não entram' : 'loja sua não entra'} nessas contas (veja em Lojistas > Minhas lojas).` : 'Dica: marque suas próprias lojas em Lojistas para elas não entrarem nas contas.';
   $('#pays').innerHTML = data.payments.length ? `<table><thead><tr><th>Data</th><th>Loja</th><th>Situação</th><th class="num">Valor</th></tr></thead><tbody>
     ${data.payments.map(p => `<tr><td>${date(p.created_at)}</td><td>${esc(p.name)}</td><td>${p.status === 'approved' ? 'Aprovado' : esc(p.status)}</td><td class="num">${brl(p.amount)}</td></tr>`).join('')}</tbody></table>`
     : '<div class="empty">Nenhum pagamento ainda.</div>';
