@@ -121,6 +121,7 @@
 <div class="tabs-wrap"><div class="container"><nav class="tabs" role="tablist" aria-label="Seções da administração">
   <button class="tab" role="tab" data-tab="resumo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Resumo</button>
   <button class="tab" role="tab" data-tab="lojistas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16l-1.5 12a2 2 0 0 1-2 2h-9a2 2 0 0 1-2-2z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg>Lojistas <span class="n" id="n-loj"></span></button>
+  <button class="tab" role="tab" data-tab="minhas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg><span>Minhas<span class="lbl-l"> lojas</span></span> <span class="n" id="n-mine"></span></button>
   <button class="tab" role="tab" data-tab="pagamentos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/></svg>Pagamentos</button>
   <button class="tab" role="tab" data-tab="tutoriais"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9l5 3-5 3z"/></svg><span>Vídeos<span class="lbl-l"> tutoriais</span></span></button>
 </nav></div></div>
@@ -144,6 +145,11 @@
       <div class="chips" id="chips"></div>
     </div>
     <div class="list" id="list"><div class="empty">Carregando...</div></div>
+  </section>
+
+  <section class="sec" id="sec-minhas" data-sec="minhas" hidden>
+    <div class="sec-h"><div><h2>Minhas lojas</h2><p>Suas próprias vitrines. Elas aparecem aqui, mas não entram nas contas do Resumo.</p></div></div>
+    <div class="list" id="mine"><div class="empty">Carregando...</div></div>
   </section>
 
   <section class="sec" id="sec-pagamentos" data-sec="pagamentos" hidden>
@@ -180,18 +186,7 @@ async function load() {
   if (r.status === 403 || r.status === 401) { location.href = '/entrar'; return; }
   data = await r.json(); render();
 }
-function render() {
-  const m = data.metrics; $('#brand').textContent = data.brand;
-  $('#kpis').innerHTML = [
-    ['hl', brl(m.mrr), 'Receita mensal recorrente'], ['', m.total, 'Lojas cadastradas'], ['', m.paying, 'Lojas pagando'], ['', m.newWeek, 'Novas nos últimos 7 dias'],
-    ['', m.open, 'Liberadas (sem cobrança)'], ['', m.expired, 'Vencidas (fora do ar)'], ['', brl(m.revenue30), 'Recebido em 30 dias'], ['', m.views30.toLocaleString('pt-BR'), 'Visitas nas vitrines (30 dias)']
-  ].map(([c, v, l]) => `<div class="kpi ${c}"><b>${v}</b><span>${l}</span></div>`).join('');
-  const chips = [['all', `Clientes (${m.total})`], ['pro', `Pagas (${m.paying})`], ['open', `Liberadas (${m.open})`], ['expired', `Vencidas (${m.expired})`], ['blocked', `Bloqueadas (${m.blocked})`], ['mine', `Minhas lojas (${m.mine || 0})`]];
-  $('#chips').innerHTML = chips.map(([k, l]) => `<button class="chip" data-f="${k}" aria-pressed="${filter === k}">${l}</button>`).join('');
-  document.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { filter = b.dataset.f; render(); });
-  const q = $('#q').value.trim().toLowerCase();
-  const list = data.stores.filter(s => (filter === 'mine' ? s.internal : !s.internal && (filter === 'all' || (filter === 'blocked' ? s.blocked : s.plan === filter && !s.blocked))) && (!q || `${s.name} ${s.owner} ${s.email} ${s.slug}`.toLowerCase().includes(q)));
-  $('#list').innerHTML = list.length ? list.map(s => `<div class="row">
+const rowHtml = s => `<div class="row">
     <div class="row-top"><div><b>${esc(s.name)}</b>
       <div class="meta">${esc(s.owner)} · ${esc(s.email)}</div>
       <div class="meta"><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.url.replace(/^https?:\/\//, ''))}</a> · ${s.products} produtos · ${s.online ? 'no ar' : 'fora do ar'} · desde ${date(s.createdAt)}</div>
@@ -206,7 +201,22 @@ function render() {
       ${s.blocked ? `<button data-a="unblock" data-id="${s.id}">Desbloquear</button>` : `<button class="danger" data-a="block" data-id="${s.id}">Bloquear</button>`}
       <button data-mine="${s.id}">${s.internal ? 'Contar como cliente' : 'É minha loja (não contar)'}</button>
       <button class="del" data-del="${s.id}">Excluir vitrine</button>
-    </div></div>`).join('') : '<div class="empty">Nenhuma loja aqui.</div>';
+    </div></div>`;
+function render() {
+  const m = data.metrics; $('#brand').textContent = data.brand;
+  $('#kpis').innerHTML = [
+    ['hl', brl(m.mrr), 'Receita mensal recorrente'], ['', m.total, 'Lojas cadastradas'], ['', m.paying, 'Lojas pagando'], ['', m.newWeek, 'Novas nos últimos 7 dias'],
+    ['', m.open, 'Liberadas (sem cobrança)'], ['', m.expired, 'Vencidas (fora do ar)'], ['', brl(m.revenue30), 'Recebido em 30 dias'], ['', m.views30.toLocaleString('pt-BR'), 'Visitas nas vitrines (30 dias)']
+  ].map(([c, v, l]) => `<div class="kpi ${c}"><b>${v}</b><span>${l}</span></div>`).join('');
+  const chips = [['all', `Clientes (${m.total})`], ['pro', `Pagas (${m.paying})`], ['open', `Liberadas (${m.open})`], ['expired', `Vencidas (${m.expired})`], ['blocked', `Bloqueadas (${m.blocked})`]];
+  $('#chips').innerHTML = chips.map(([k, l]) => `<button class="chip" data-f="${k}" aria-pressed="${filter === k}">${l}</button>`).join('');
+  document.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { filter = b.dataset.f; render(); });
+  const q = $('#q').value.trim().toLowerCase();
+  const list = data.stores.filter(s => !s.internal && (filter === 'all' || (filter === 'blocked' ? s.blocked : s.plan === filter && !s.blocked)) && (!q || `${s.name} ${s.owner} ${s.email} ${s.slug}`.toLowerCase().includes(q)));
+  const mine = data.stores.filter(s => s.internal);
+  $('#mine').innerHTML = mine.length ? mine.map(rowHtml).join('') : '<div class="empty">Nenhuma loja sua marcada ainda. Em Lojistas, toque em "É minha loja (não contar)" nas suas vitrines e elas passam a aparecer aqui.</div>';
+  $('#n-mine').textContent = mine.length || '';
+  $('#list').innerHTML = list.length ? list.map(rowHtml).join('') : '<div class="empty">Nenhuma loja aqui.</div>';
   document.querySelectorAll('[data-a]').forEach(b => b.onclick = () => act(+b.dataset.id, b.dataset.a));
   document.querySelectorAll('[data-del]').forEach(b => b.onclick = () => askDelete(+b.dataset.del));
   document.querySelectorAll('[data-mine]').forEach(b => b.onclick = async () => { const s = data.stores.find(x => x.id === +b.dataset.mine);
@@ -217,7 +227,7 @@ function render() {
   const clientes = data.stores.filter(s => !s.internal);
   $('#recent').innerHTML = clientes.length ? clientes.slice(0, 5).map(s => `<div class="row"><div class="row-top"><div><b>${esc(s.name)}</b>
     <div class="meta">${esc(s.owner)} · desde ${date(s.createdAt)} · ${s.products} produtos</div></div>${tagOf(s)}</div></div>`).join('') : '<div class="empty">Nenhuma lojista ainda.</div>';
-  $('#mineNote').textContent = m.mine ? `${m.mine} ${m.mine > 1 ? 'lojas suas não entram' : 'loja sua não entra'} nessas contas (veja em Lojistas > Minhas lojas).` : 'Dica: marque suas próprias lojas em Lojistas para elas não entrarem nas contas.';
+  $('#mineNote').textContent = m.mine ? `${m.mine} ${m.mine > 1 ? 'lojas suas não entram' : 'loja sua não entra'} nessas contas (veja na aba Minhas lojas).` : 'Dica: marque suas próprias lojas em Lojistas para elas não entrarem nas contas.';
   $('#pays').innerHTML = data.payments.length ? `<table><thead><tr><th>Data</th><th>Loja</th><th>Situação</th><th class="num">Valor</th></tr></thead><tbody>
     ${data.payments.map(p => `<tr><td>${date(p.created_at)}</td><td>${esc(p.name)}</td><td>${p.status === 'approved' ? 'Aprovado' : esc(p.status)}</td><td class="num">${brl(p.amount)}</td></tr>`).join('')}</tbody></table>`
     : '<div class="empty">Nenhum pagamento ainda.</div>';
@@ -240,7 +250,7 @@ $('#q').oninput = () => data && render();
 load();
 
 /* Abas: Resumo, Lojistas, Pagamentos, Vídeos tutoriais */
-const TABS = ['resumo', 'lojistas', 'pagamentos', 'tutoriais'];
+const TABS = ['resumo', 'lojistas', 'minhas', 'pagamentos', 'tutoriais'];
 function showTab(t, push) {
   if (!TABS.includes(t)) t = 'resumo';
   document.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t));
