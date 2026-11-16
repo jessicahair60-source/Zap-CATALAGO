@@ -859,7 +859,24 @@ app.use((err, req, res, next) => {
   console.error(err); res.status(500).json({ error: 'Algo deu errado. Tente de novo.' });
 });
 
+// Senha da administração pelo Dokploy (Environment): ADMIN_PASSWORD=... coloca essa senha na conta do
+// primeiro e-mail de ADMIN_EMAILS ao ligar o site. Só troca quando é diferente da atual. A senha nunca vai para o log.
+function applyAdminPassword() {
+  const pass = String(process.env.ADMIN_PASSWORD || '').trim();
+  const email = CFG.admins[0];
+  if (!pass || !email) return;
+  const u = db.prepare('SELECT * FROM users WHERE email = ?').get(email);
+  if (u && checkPass(pass, u.pass)) return;
+  if (u) {
+    db.prepare('UPDATE users SET pass = ? WHERE id = ?').run(hashPass(pass), u.id);
+    db.prepare('DELETE FROM sessions WHERE user_id = ?').run(u.id);
+  } else db.prepare('INSERT INTO users (name, email, pass, created_at) VALUES (?, ?, ?, ?)').run('Administração', email, hashPass(pass), now());
+  tries.clear();
+  console.log('Senha da administração atualizada pelo ADMIN_PASSWORD. Depois de entrar, pode apagar essa linha do Environment.');
+}
+
 if (require.main === module) {
+  applyAdminPassword();
   const port = parseInt(process.env.PORT || '3000', 10);
   app.listen(port, () => console.log(`${CFG.brand} rodando em ${CFG.publicUrl} (porta ${port})${CFG.fakePayments ? ' · pagamentos em modo de teste' : ''}`));
 }
