@@ -209,6 +209,8 @@ test('link do pedido: página com as fotos e prévia do WhatsApp', async () => {
   assert.match(r.text, new RegExp(`/u/${foto.replace('.', '\\.')}`));
   const og = /property="og:image" content="([^"]+)"/.exec(r.text)[1].replace('http://localhost', '');
   r = await fetch(base + og); assert.strictEqual(r.status, 200); assert.strictEqual(r.headers.get('content-type'), 'image/png');
+  // um produto só: a prévia é a própria foto do produto, no tamanho original
+  r = await pub('GET', '/acessorios-da-lu/pedido/1'); assert.match(r.text, new RegExp(`property="og:image" content="http://localhost/u/${foto.replace('.', '\\.')}"`));
   // pedido sem produto válido volta para a vitrine; loja que não existe dá 404
   r = await pub('GET', '/acessorios-da-lu/pedido/zzz'); assert.strictEqual(r.status, 302);
   r = await pub('GET', '/nao-existe/pedido/1'); assert.strictEqual(r.status, 404);

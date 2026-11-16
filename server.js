@@ -947,28 +947,31 @@ app.get('/:slug/pedido/:code', (req, res) => {
   const name = escHtml(st.name || store.name);
   const n = o.items.reduce((a, x) => a + x.qty, 0);
   const desc = `Pedido com ${n} ${n === 1 ? 'produto' : 'produtos'} · Vitrine Digital`;
-  const og = `${CFG.publicUrl}/og/pedido/${encodeURIComponent(store.slug)}/${encodeURIComponent(req.params.code)}.png?v=${store.updated_at || 0}`;
+  let og = `${CFG.publicUrl}/og/pedido/${encodeURIComponent(store.slug)}/${encodeURIComponent(req.params.code)}.png?v=${store.updated_at || 0}`;
   const pic = p => { const m = (p.media || []).find(m => m && m.type !== 'video' && m.id && m.id !== 'demo'); return m ? (m.id.startsWith('ex-') ? '/static/exemplo/' + m.id.slice(3) : '/u/' + String(m.id).replace(/^\/u\//, '')) : ''; };
+  // um produto só: a prévia usa a própria foto do produto (tamanho original, sem corte), se for JPG/PNG leve
+  if (o.items.length === 1) { const u = pic(o.items[0].p); const f = u.startsWith('/u/') ? path.join(UPLOADS, u.slice(3)) : '';
+    try { if (f && /\.(jpe?g|png)$/i.test(f) && fs.statSync(f).size <= 600 * 1024) og = CFG.publicUrl + u; } catch (e) {} }
   const bg = col(c.bg, '#FBF3F5'), ink = col(c.title, '#2A1A22'), muted = col(c.muted, '#8C7480'), acc = col(c.buyBg, '#B9476F'), accText = col(c.buyText, '#FFFFFF');
-  // a foto aparece inteira (sem corte); atrás dela, a mesma foto desfocada preenche o espaço que sobra
+  // a foto aparece no tamanho e na proporção originais, sem corte
   const cards = o.items.map(x => { const u = escHtml(pic(x.p));
-    return `<li><div class="ph">${u ? `<img class="bk" src="${u}" alt="" aria-hidden="true"><img class="fg" src="${u}" alt="${escHtml(x.p.name)}">` : ''}${x.qty > 1 ? `<span class="q">${x.qty}x</span>` : ''}</div>
+    return `<li><div class="ph">${u ? `<img src="${u}" alt="${escHtml(x.p.name)}">` : '<span class="none"></span>'}${x.qty > 1 ? `<span class="q">${x.qty}x</span>` : ''}</div>
       <div class="tx"><b>${escHtml(x.p.name)}</b><small>${x.qty} ${x.qty === 1 ? 'unidade' : 'unidades'}</small></div></li>`; }).join('');
   const one = o.items.length === 1;
   res.set('Cache-Control', 'no-cache').type('html').send(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Pedido · ${name}</title><meta name="robots" content="noindex"><meta name="theme-color" content="${bg}">
 <meta property="og:type" content="website"><meta property="og:site_name" content="${name}"><meta property="og:title" content="${name}"><meta property="og:description" content="${escHtml(desc)}">
-<meta property="og:url" content="${escHtml(CFG.publicUrl + req.path)}"><meta property="og:image" content="${escHtml(og)}"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="400"><meta property="og:image:height" content="400">
+<meta property="og:url" content="${escHtml(CFG.publicUrl + req.path)}"><meta property="og:image" content="${escHtml(og)}">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap">
 <style>*{box-sizing:border-box}body{margin:0;font-family:'DM Sans',system-ui,-apple-system,sans-serif;background:${bg};color:${ink};-webkit-font-smoothing:antialiased}
 main{max-width:560px;margin:0 auto;padding:32px 16px 120px}
 .kick{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:${acc};background:#fff;border-radius:999px;padding:7px 14px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
 .kick svg{width:15px;height:15px}
 h1{font-size:28px;line-height:1.15;margin:14px 0 6px;letter-spacing:-.01em}.sub{margin:0 0 24px;color:${muted};font-size:16px}
-ul{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:${one ? 'minmax(0,320px)' : 'repeat(2,minmax(0,1fr))'};gap:14px;justify-content:center}
+ul{list-style:none;margin:0;padding:0;display:grid;align-items:start;grid-template-columns:${one ? 'minmax(0,320px)' : 'repeat(2,minmax(0,1fr))'};gap:14px;justify-content:center}
 li{background:#fff;border-radius:22px;padding:8px;box-shadow:0 6px 24px rgba(0,0,0,.06)}
-.ph{position:relative;aspect-ratio:9/16;border-radius:16px;overflow:hidden;background:${bg}}
-.ph img{position:absolute;inset:0;width:100%;height:100%}.ph .bk{object-fit:cover;filter:blur(18px) saturate(1.1);transform:scale(1.15);opacity:.75}.ph .fg{object-fit:contain}
+.ph{position:relative;border-radius:16px;overflow:hidden;background:${bg}}
+.ph img{display:block;width:100%;height:auto}.ph .none{display:block;aspect-ratio:3/4}
 .q{position:absolute;top:10px;right:10px;background:${acc};color:${accText};font-weight:700;font-size:13px;border-radius:999px;padding:4px 10px}
 .tx{padding:12px 6px 6px}.tx b{display:block;font-size:15px;line-height:1.3}.tx small{display:block;margin-top:4px;color:${muted};font-size:13px}
 .bar{position:fixed;left:0;right:0;bottom:0;padding:14px 16px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(to top,${bg} 70%,transparent)}
