@@ -70,7 +70,7 @@
   <div class="list" id="list"><div class="empty">Carregando...</div></div>
 
   <h2>Vídeos tutoriais do painel</h2>
-  <p class="tnote">Aqui você cria, muda o nome, reordena e apaga as aulas. As 7 primeiras também aparecem sozinhas no lugar certo do painel; as novas ficam na lista de Tutoriais (Conta > Ajuda). A ordem daqui é a ordem da lista. Uma aula só aparece para as lojistas depois de ter vídeo. Envie em pé (9:16), MP4.</p>
+  <p class="tnote">Aqui você cria, muda o nome, reordena e apaga as aulas. As 7 primeiras também aparecem sozinhas no lugar certo do painel; as novas ficam na lista de Tutoriais (Conta > Ajuda). A ordem daqui é a ordem da lista. Toda aula aparece para as lojistas na hora, mesmo só com nome ou texto. Envie em pé (9:16), MP4.</p>
   <div class="list" id="tuts"><div class="empty">Carregando...</div></div>
 
   <h2>Pagamentos recentes</h2>
@@ -156,11 +156,11 @@ async function loadTuts() {
 }
 function renderTuts() {
   const WHERE = Object.fromEntries(TUTS.map(([k, , w]) => [k, w]));
-  $('#tuts').innerHTML = tutList.map((a, i) => { const k = a.key, v = tutData[k], aula = !a.fixed;
+  $('#tuts').innerHTML = tutList.map((a, i) => { const k = a.key, v = tutData[k] && tutData[k].url ? tutData[k] : null, aula = !a.fixed;
     const t = `${i + 1}. ${a.title}`, where = `${a.sub ? a.sub + ' · ' : ''}${WHERE[k] ? WHERE[k] + ' e na lista' : 'Na lista de Tutoriais (Conta > Ajuda)'}`; return `<div class="trow">
     ${v ? `<video src="${esc(v.url)}" muted playsinline preload="metadata"></video>` : '<div class="ph">▶</div>'}
     <div class="tinfo"><b>${esc(t)}</b><small>${esc(where)}</small>
-      <small><span class="tag ${v ? 't-ok' : 't-no'}">${v ? 'No ar' : 'Sem vídeo'}</span>${v && v.dur ? ' · ' + mmss(v.dur) : ''}</small>
+      <small><span class="tag ${v ? 't-ok' : 't-no'}">${v ? 'Com vídeo' : 'Sem vídeo'}</span>${v && v.dur ? ' · ' + mmss(v.dur) : ''}</small>
       <div class="acts"><button data-tup="${k}">${v ? 'Trocar vídeo' : 'Enviar vídeo'}</button>${v ? `<a href="${esc(v.url)}" target="_blank" rel="noopener">Assistir</a><button class="danger" data-tdel="${k}">Tirar</button>` : ''}<button data-aed="${k}">Mudar nome</button>${i > 0 ? `<button data-amv="${k}" data-d="up" aria-label="Subir na lista">↑ Subir</button>` : ''}${i < tutList.length - 1 ? `<button data-amv="${k}" data-d="down" aria-label="Descer na lista">↓ Descer</button>` : ''}${aula ? `<button class="danger" data-adel="${k}">Apagar aula</button>` : ''}</div>
       <div class="ttexts"><span class="tlab">Textos da aula (aparecem embaixo do vídeo)</span>
         ${(tutTexts[k] || []).map((t, i) => `<div class="tblk"><textarea data-tk="${k}" data-ti="${i}" placeholder="Escreva aqui uma dica ou explicação">${esc(t)}</textarea><button data-trm="${k}" data-ti="${i}" title="Apagar este texto" aria-label="Apagar este texto">×</button></div>`).join('')}
@@ -188,7 +188,7 @@ function renderTuts() {
     tutTexts[k] = j.texts; tutData = j.tutorials; delete tutDirty[k]; renderTuts(); toast('Textos salvos'); });
   document.querySelectorAll('[data-tup]').forEach(b => b.onclick = () => pickTut(b.dataset.tup, b));
   document.querySelectorAll('[data-tdel]').forEach(b => b.onclick = async () => {
-    if (!confirm('Tirar este vídeo? O botão do tutorial some do painel das lojistas.')) return;
+    if (!confirm('Tirar este vídeo? A aula continua no painel, só sem o vídeo.')) return;
     const r = await fetch('/api/admin/tutoriais/' + b.dataset.tdel, { method: 'DELETE' }); const j = await r.json().catch(() => ({}));
     if (!r.ok) return toast(j.error || 'Não deu certo.'); tutData = j.tutorials; renderTuts(); toast('Vídeo tirado');
   });
