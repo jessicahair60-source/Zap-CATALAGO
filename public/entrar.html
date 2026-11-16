@@ -30,6 +30,7 @@
   .sub { margin: 0 0 6px; color: var(--muted); font-size: 14.5px; }
   .f { margin-top: 14px; display: grid; gap: 6px; }
   .f label { font-size: 13px; font-weight: 700; }
+  .hint { margin: 2px 0 0; font-size: 12.5px; line-height: 1.4; color: #8A1460; background: #FFE6F4; border-radius: 10px; padding: 8px 10px; }
   .inp { position: relative; }
   .inp svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--muted); pointer-events: none; }
   .inp input { width: 100%; border: 1.5px solid var(--line); background: var(--bg); border-radius: 14px; padding: 14px 14px 14px 42px; font: 500 16px var(--f-body); color: var(--fg); }
@@ -112,7 +113,8 @@
           <p class="sub">Leva 1 minuto.</p>
           <div class="f"><label for="un">Seu nome</label><div class="inp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4.5-6 8-6s7 2 8 6"/></svg><input id="un" autocomplete="name" required placeholder="Como você se chama"></div></div>
           <div class="f"><label for="us">Nome da loja</label><div class="inp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9l1.5-5h13L20 9M4 9h16v11H4zM9 20v-6h6v6"/></svg><input id="us" required placeholder="Ex.: Jessica Hair"></div></div>
-          <div class="f"><label for="ue">E-mail</label><div class="inp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></svg><input id="ue" type="email" autocomplete="email" inputmode="email" required placeholder="voce@email.com"></div></div>
+          <div class="f"><label for="ue">E-mail</label><div class="inp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M4 7l8 6 8-6"/></svg><input id="ue" type="email" autocomplete="email" inputmode="email" required placeholder="voce@email.com"></div>
+            <p class="hint"><b>Já pagou?</b> Use o mesmo e-mail que você usou no pagamento. Assim sua vitrine é liberada na hora.</p></div>
           <div class="f"><label for="up">Senha</label><div class="inp"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="10" width="16" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg><input id="up" type="password" autocomplete="new-password" minlength="4" required placeholder="4 caracteres ou mais"><button type="button" class="eye" data-eye="up" aria-label="Mostrar senha"></button></div></div>
           <label class="chk"><input type="checkbox" id="ut"> <span>Li e aceito os <a href="/termos" target="_blank">termos de uso</a> e a <a href="/privacidade" target="_blank">política de privacidade</a>.</span></label>
           <p class="err" id="uerr" hidden></p>
