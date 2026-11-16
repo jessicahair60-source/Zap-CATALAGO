@@ -922,6 +922,10 @@ body.painel.pv-on .pv { display: block; animation: pvIn .25s cubic-bezier(.2,.7,
 .tbox video { width: 100%; height: 100%; object-fit: contain; display: block; background: #2B1520; }
 .tbox .ttexts { margin: 12px 2px 0; display: grid; gap: 8px; }
 .tbox .ttexts p { margin: 0; background: var(--p-soft); border-radius: 12px; padding: 10px 12px; font-size: 14px; line-height: 1.45; white-space: pre-line; }
+.tbox .tsoon { display: grid; justify-items: center; gap: 4px; text-align: center; background: var(--p-soft); border-radius: 16px; padding: 22px 14px; }
+.tbox .tsoon .tth { width: 52px; height: 72px; border-radius: 10px; background: linear-gradient(160deg, #E0457B, #7a1f48); display: grid; place-items: center; opacity: .55; margin-bottom: 6px; }
+.tbox .tsoon .tth::after { content: ""; border-left: 12px solid #fff; border-top: 8px solid transparent; border-bottom: 8px solid transparent; margin-left: 3px; }
+.tbox .tsoon small { color: var(--p-muted); font-size: 13px; }
 .tbox .tbtns { display: flex; gap: 8px; margin-top: 12px; }
 .tbox .tok { flex: 1.6; background: #E0457B; color: #fff; border: 0; border-radius: 12px; padding: 12px; font-weight: 700; font-size: 15px; }
 .tbox .tclose { flex: 1; border: 1px solid var(--p-line); background: #fff; color: var(--p-fg); border-radius: 12px; padding: 12px; font-weight: 700; font-size: 15px; }
@@ -2510,7 +2514,7 @@ function openTut(k, auto) {
   const m = document.createElement('div'); m.className = 'tmodal';
   m.innerHTML = `<div class="tbox" role="dialog" aria-modal="true" aria-label="${esc(title)}"><button class="tx" aria-label="Fechar">×</button>
     <div class="tk">${bonus ? 'Bônus' : 'Tutorial'}${tutDur(k) ? ' · ' + tutDur(k) : ''}</div><h4>${esc(title.replace('Bônus: ', ''))}</h4>
-    <div class="tv"><video src="${esc(TUTS[k].url)}" controls playsinline preload="metadata"></video></div>
+    ${TUTS[k].url ? `<div class="tv"><video src="${esc(TUTS[k].url)}" controls playsinline preload="metadata"></video></div>` : '<div class="tsoon"><span class="tth"></span><b>Vídeo em breve</b><small>Esta aula vai ganhar um vídeo logo, logo.</small></div>'}
     ${(TUTS[k].texts || []).length ? `<div class="ttexts">${TUTS[k].texts.map(t => `<p>${esc(t)}</p>`).join('')}</div>` : ''}
     <div class="tbtns"><button class="tok">Entendi, vou fazer</button><button class="tclose">Fechar</button></div>
     ${auto ? '<p class="tauto">Este vídeo abre sozinho só na primeira vez. Depois ele fica no botão rosa desta aba.</p>' : ''}</div>`;
@@ -2518,7 +2522,7 @@ function openTut(k, auto) {
   m.onclick = e => { if (e.target === m) close(); };
   m.querySelector('.tx').onclick = close; m.querySelector('.tok').onclick = close; m.querySelector('.tclose').onclick = close;
   document.body.appendChild(m);
-  const v = m.querySelector('video'); const p = v.play(); if (p && p.catch) p.catch(() => {});
+  const v = m.querySelector('video'); if (v) { const p = v.play(); if (p && p.catch) p.catch(() => {}); }
 }
 function tutPill(k) {
   const [t] = tutInfo(k); const bonus = t.startsWith('Bônus'); const seen = tutSeen.has(k);
@@ -2570,7 +2574,7 @@ function tutDecorate(force) {
 { const rp1 = renderPainel; renderPainel = function () { rp1.apply(this, arguments); tutDecorate(); };
   const st0 = setTab; setTab = function (t, top) { st0(t, top);
     if (!tutOn()) return;
-    const k = TUT_AUTO[t]; if (k && TUTS[k] && !tutSeen.has(k)) setTimeout(() => { if (pui.tab === t && !$('#view-painel').hidden) openTut(k, true); }, 400); }; }
+    const k = TUT_AUTO[t]; if (k && TUTS[k] && TUTS[k].url && !tutSeen.has(k)) setTimeout(() => { if (pui.tab === t && !$('#view-painel').hidden) openTut(k, true); }, 400); }; }
 
 /* Prévia ao vivo: a mesma página roda num mini celular e recebe os dados a cada mudança */
 const pv = { frame: null, t: 0 };

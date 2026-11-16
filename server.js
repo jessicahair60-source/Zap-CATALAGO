@@ -154,7 +154,7 @@ app.use('/static', express.static(path.join(PUB, 'static'), { maxAge: '1h' }));
 /* ---------- vídeos tutoriais do painel ----------
    A dona sobe um vídeo para cada passo no /admin. O vídeo fica em data/tutoriais/<passo>.mp4.
    Se não tiver, vale o vídeo que veio com o site (public/static/tutoriais/<passo>.mp4).
-   O botão do tutorial só aparece no painel quando o passo tem vídeo. */
+   Toda aula aparece no painel, com ou sem vídeo; o vídeo só abre sozinho quando existe. */
 const TUTORIAIS = ['tour', 'p1', 'p2', 'p3', 'link', 'banner', 'vender'];
 const TUT_DIR = path.join(DATA_DIR, 'tutoriais');
 const TUT_DEF_DUR = { p1: 233 }; // duração (segundos) dos vídeos que vêm com o site
@@ -187,9 +187,10 @@ function tutFile(key) {
 function tutorials() {
   const meta = tutMeta(), out = {};
   for (const { key: k, title, sub } of tutList(meta)) {
-    const f = tutFile(k); if (!f) continue;
-    let v = 0; try { v = Math.round(fs.statSync(f).mtimeMs); } catch (e) {}
-    out[k] = { url: `/tutoriais/${k}.mp4?v=${v}`, dur: (meta[k] && meta[k].dur) || (f.startsWith(PUB) && TUT_DEF_DUR[k]) || 0, texts: (meta[k] && meta[k].texts) || [], title, sub };
+    // toda aula criada aparece no painel, mesmo sem vídeo (só com nome ou texto)
+    const f = tutFile(k);
+    let v = 0; try { v = f ? Math.round(fs.statSync(f).mtimeMs) : 0; } catch (e) {}
+    out[k] = { url: f ? `/tutoriais/${k}.mp4?v=${v}` : '', dur: f ? (meta[k] && meta[k].dur) || (f.startsWith(PUB) && TUT_DEF_DUR[k]) || 0 : 0, texts: (meta[k] && meta[k].texts) || [], title, sub };
   }
   return out;
 }
