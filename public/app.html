@@ -891,6 +891,44 @@ body.painel.pv-on .pv { display: block; animation: pvIn .25s cubic-bezier(.2,.7,
 @media (min-width: 1100px) and (max-height: 760px) { .pv:not(.big) { --k: .62; } }
 
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+/* Vídeos tutoriais do painel */
+.tprow { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.hero .tprow { margin-top: 10px; }
+.tpill { display: inline-flex; align-items: center; gap: 5px; background: #FCE4EC; color: #B0306A; border: 1px solid #F5C6D6; border-radius: 999px; padding: 4px 10px 4px 5px; font-size: 12px; font-weight: 700; line-height: 1.1; cursor: pointer; }
+.tpill:hover { background: #F9D3E1; }
+.tpill i { flex: none; width: 18px; height: 18px; border-radius: 50%; background: #E0457B; display: grid; place-items: center; }
+.tpill i::after { content: ""; border-left: 6px solid #fff; border-top: 4px solid transparent; border-bottom: 4px solid transparent; margin-left: 2px; }
+.tpill em { font-style: normal; font-weight: 500; color: #94707F; }
+.tpill.bonus i { background: #E0A100; }
+.tpill.seen { background: #fff; }
+.tpill.seen i { background: #1FA855; }
+.tpill.seen i::after { content: "✓"; border: 0; margin: 0; color: #fff; font-size: 11px; font-weight: 700; }
+.ttab { display: flex; gap: 12px; align-items: center; background: var(--p-surface); border: 1px solid var(--p-line); border-left: 4px solid #E0457B; border-radius: 16px; padding: 12px 14px; margin: 14px 0 6px; cursor: pointer; text-align: left; width: 100%; color: var(--p-fg); }
+.ttab.bonus { border-left-color: #E0A100; }
+.ttab .tth { flex: none; width: 52px; height: 72px; border-radius: 10px; background: linear-gradient(160deg, #E0457B, #7a1f48); display: grid; place-items: center; box-shadow: 0 4px 14px rgba(176,48,106,.3); }
+.ttab.bonus .tth { background: linear-gradient(160deg, #F2B33D, #B0306A); }
+.ttab .tth::after { content: ""; border-left: 12px solid #fff; border-top: 8px solid transparent; border-bottom: 8px solid transparent; margin-left: 3px; }
+.ttab b { display: block; font-family: var(--f-display); font-size: 15px; }
+.ttab small { display: block; color: var(--p-muted); font-size: 12.5px; margin-top: 2px; }
+.ttab .tgo { margin-left: auto; color: #B0306A; font-weight: 700; font-size: 13px; white-space: nowrap; }
+.tmodal { position: fixed; inset: 0; z-index: 90; background: rgba(36,24,30,.6); display: grid; place-items: center; padding: 16px; }
+.tbox { background: #fff; color: var(--p-fg); border-radius: 22px; width: min(380px, 100%); max-height: calc(100vh - 32px); max-height: calc(100dvh - 32px); overflow: auto; padding: 14px; box-shadow: var(--shadow); position: relative; }
+.tbox .tx { position: absolute; right: 10px; top: 10px; width: 32px; height: 32px; border-radius: 50%; border: 0; background: var(--p-soft); font-size: 18px; z-index: 2; }
+.tbox .tk { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #B0306A; font-weight: 700; margin: 4px 40px 2px 4px; }
+.tbox h4 { font-family: var(--f-display); font-size: 18px; margin: 0 40px 10px 4px; }
+.tbox .tv { border-radius: 16px; overflow: hidden; background: #2B1520; aspect-ratio: 9/16; max-height: 62vh; max-height: 62dvh; margin: 0 auto; }
+.tbox video { width: 100%; height: 100%; object-fit: contain; display: block; background: #2B1520; }
+.tbox .tbtns { display: flex; gap: 8px; margin-top: 12px; }
+.tbox .tok { flex: 1.6; background: #E0457B; color: #fff; border: 0; border-radius: 12px; padding: 12px; font-weight: 700; font-size: 15px; }
+.tbox .tclose { flex: 1; border: 1px solid var(--p-line); background: #fff; color: var(--p-fg); border-radius: 12px; padding: 12px; font-weight: 700; font-size: 15px; }
+.tbox .tauto { margin: 8px 4px 0; text-align: center; color: var(--p-muted); font-size: 12px; }
+.tlist { display: grid; gap: 8px; }
+.tli { display: flex; gap: 10px; align-items: center; border: 1px solid var(--p-line); border-radius: 12px; padding: 8px 10px; background: #fff; cursor: pointer; text-align: left; width: 100%; color: var(--p-fg); }
+.tli .tth { flex: none; width: 30px; height: 42px; border-radius: 7px; background: linear-gradient(160deg, #E0457B, #7a1f48); display: grid; place-items: center; }
+.tli .tth::after { content: ""; border-left: 8px solid #fff; border-top: 5px solid transparent; border-bottom: 5px solid transparent; margin-left: 2px; }
+.tli b { display: block; font-size: 13.5px; }
+.tli small { color: var(--p-muted); font-size: 12px; }
+.tgrp { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #B0306A; font-weight: 700; margin: 10px 2px 2px; }
 </style>
 </head>
 <body>
@@ -2441,6 +2479,92 @@ function guide() {
   const nx = box.querySelector('.fsteps .fs-item:not(.ok)'); if (nx) { nx.classList.add('next'); nx.querySelector('.fs-t small').insertAdjacentHTML('beforeend', ' <span class="req">Comece aqui</span>'); }
 }
 { const rp0 = renderPainel; renderPainel = function () { rp0.apply(this, arguments); applySimple(); if (!PV) { guide(); applyTabs(); } }; }
+
+/* Vídeos tutoriais: a dona sobe no /admin; cada um aparece no lugar certo do painel, só se tiver vídeo.
+   O vídeo do passo abre sozinho na 1ª vez que a lojista entra na aba (fica guardado neste aparelho). */
+const TUTS = BOOT.tutorials || {};
+const TUT = {
+  tour:   ['Conheça o painel', 'Um tour rápido: onde fica cada coisa'],
+  p1:     ['Passo 1 · Informações da loja', 'Nome, WhatsApp e como o pedido chega'],
+  p2:     ['Passo 2 · Visual', 'Banner, logo e cores da sua marca'],
+  p3:     ['Passo 3 · Cadastrar produto', 'Como subir os produtos do jeito certo'],
+  link:   ['Como pegar o link da sua vitrine', 'Copie e coloque na bio e no WhatsApp'],
+  banner: ['Bônus: Como criar o seu banner', 'Faça um banner bonito do zero'],
+  vender: ['Bônus: Como vender mais usando a sua vitrine', 'Dicas para receber mais pedidos']};
+const TUT_ORDER = ['tour', 'p1', 'p2', 'p3', 'link', 'banner', 'vender'];
+const TUT_PILLS = { info: ['p1'], banner: ['p2', 'banner'], prod: ['p3'] };
+const TUT_CARDS = [['tour', 'inicio', 'dacts'], ['p1', 'loja'], ['p2', 'visual'], ['p3', 'produtos'], ['vender', 'inicio', 'dsum']];
+const TUT_AUTO = { inicio: 'tour', loja: 'p1', visual: 'p2', produtos: 'p3' };
+const tutOn = () => MODE === 'panel' && !PV && TUT_ORDER.some(k => TUTS[k]);
+const tutSeen = (() => { try { return new Set(JSON.parse(localStorage.getItem('zc_tut_seen') || '[]')); } catch (e) { return new Set(); } })();
+const tutMark = k => { tutSeen.add(k); try { localStorage.setItem('zc_tut_seen', JSON.stringify([...tutSeen])); } catch (e) {} };
+const tutDur = k => { const d = (TUTS[k] || {}).dur || 0; return !d ? '' : d < 60 ? `${d} s` : `${Math.round(d / 60)} min`; };
+function openTut(k, auto) {
+  if (!TUTS[k] || $('.tmodal') || (auto && $('#paywall'))) return; tutMark(k);
+  const [title] = TUT[k]; const bonus = title.startsWith('Bônus');
+  const m = document.createElement('div'); m.className = 'tmodal';
+  m.innerHTML = `<div class="tbox" role="dialog" aria-modal="true" aria-label="${esc(title)}"><button class="tx" aria-label="Fechar">×</button>
+    <div class="tk">${bonus ? 'Bônus' : 'Tutorial'}${tutDur(k) ? ' · ' + tutDur(k) : ''}</div><h4>${esc(title.replace('Bônus: ', ''))}</h4>
+    <div class="tv"><video src="${esc(TUTS[k].url)}" controls playsinline preload="metadata"></video></div>
+    <div class="tbtns"><button class="tok">Entendi, vou fazer</button><button class="tclose">Fechar</button></div>
+    ${auto ? '<p class="tauto">Este vídeo abre sozinho só na primeira vez. Depois ele fica no botão rosa desta aba.</p>' : ''}</div>`;
+  const close = () => { const v = m.querySelector('video'); if (v) v.pause(); m.remove(); tutDecorate(true); };
+  m.onclick = e => { if (e.target === m) close(); };
+  m.querySelector('.tx').onclick = close; m.querySelector('.tok').onclick = close; m.querySelector('.tclose').onclick = close;
+  document.body.appendChild(m);
+  const v = m.querySelector('video'); const p = v.play(); if (p && p.catch) p.catch(() => {});
+}
+function tutPill(k) {
+  const [t] = TUT[k]; const bonus = t.startsWith('Bônus'); const seen = tutSeen.has(k);
+  const b = document.createElement('span'); b.className = 'tpill' + (seen ? ' seen' : '') + (bonus ? ' bonus' : ''); b.setAttribute('role', 'button'); b.tabIndex = 0;
+  b.innerHTML = `<i></i>${seen ? 'Assistido' : bonus ? esc(t) : k === 'link' ? 'Como pegar o link' : 'Ver tutorial'}${tutDur(k) ? ` <em>${tutDur(k)}</em>` : ''}`;
+  b.onclick = e => { e.preventDefault(); e.stopPropagation(); openTut(k); };
+  b.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') b.onclick(e); };
+  return b;
+}
+function tutDecorate(force) {
+  if (!tutOn()) return;
+  const box = $('#view-painel'); if (!box) return;
+  if (force) box.querySelectorAll('.tpill, .tprow, .ttab').forEach(x => x.remove());
+  box.querySelectorAll(':scope > details[data-sec]').forEach(d => {
+    const ks = (TUT_PILLS[d.dataset.sec] || []).filter(k => TUTS[k]); if (!ks.length || d.querySelector('.tprow')) return;
+    const span = d.querySelector('summary > span'); if (!span) return;
+    const row = document.createElement('span'); row.className = 'tprow'; ks.forEach(k => row.appendChild(tutPill(k))); span.appendChild(row);
+  });
+  const hero = box.querySelector(':scope > section.hero');
+  if (hero && TUTS.link && !hero.querySelector('.tprow')) { const r = document.createElement('div'); r.className = 'tprow'; r.appendChild(tutPill('link')); hero.appendChild(r); }
+  TUT_CARDS.forEach(([k, tab, after]) => {
+    if (!TUTS[k] || box.querySelector(`.ttab[data-k="${k}"]`)) return;
+    const anchor = after ? box.querySelector(`:scope > .${after}`) : box.querySelector(`:scope > h3.pgroup[data-ptab="${tab}"]`);
+    if (!anchor) return;
+    const [t, sub] = TUT[k];
+    const c = document.createElement('button'); c.className = 'ttab' + (t.startsWith('Bônus') ? ' bonus' : ''); c.dataset.k = k; c.dataset.tab = tab;
+    if (pui.tab !== tab) c.classList.add('offtab');
+    c.innerHTML = `<span class="tth"></span><span class="ttx"><b>${tutSeen.has(k) ? '✓ ' : ''}${esc(t)}</b><small>${esc(sub)}${tutDur(k) ? ' · ' + tutDur(k) : ''}</small></span><span class="tgo">Assistir ›</span>`;
+    c.onclick = () => openTut(k);
+    after ? anchor.after(c) : anchor.before(c);
+  });
+  const tsec = box.querySelector('details[data-sec="tutoriais"]');
+  if (tsec && !tsec.dataset.tdone) {
+    tsec.dataset.tdone = 1;
+    tsec.querySelector('summary h3').textContent = 'Tutoriais';
+    tsec.querySelector('summary small').textContent = 'Todos os vídeos em um só lugar';
+    const body = tsec.querySelector('.sbody'); body.innerHTML = '<div class="tlist"></div>'; const list = body.firstChild;
+    let n = 1;
+    [['Comece por aqui', ['tour', 'p1', 'p2', 'p3']], ['Tutoriais extras', ['link', 'banner', 'vender']]].forEach(([g, ks]) => {
+      ks = ks.filter(k => TUTS[k]); if (!ks.length) return;
+      const h = document.createElement('div'); h.className = 'tgrp'; h.textContent = g; list.appendChild(h);
+      ks.forEach(k => { const [t, sub] = TUT[k];
+        const b = document.createElement('button'); b.className = 'tli';
+        b.innerHTML = `<span class="tth"></span><span><b>${n++}. ${esc(t)}</b><small>${esc(sub)}${tutDur(k) ? ' · ' + tutDur(k) : ''}</small></span>`;
+        b.onclick = () => openTut(k); list.appendChild(b); });
+    });
+  }
+}
+{ const rp1 = renderPainel; renderPainel = function () { rp1.apply(this, arguments); tutDecorate(); };
+  const st0 = setTab; setTab = function (t, top) { st0(t, top);
+    if (!tutOn()) return;
+    const k = TUT_AUTO[t]; if (k && TUTS[k] && !tutSeen.has(k)) setTimeout(() => { if (pui.tab === t && !$('#view-painel').hidden) openTut(k, true); }, 400); }; }
 
 /* Prévia ao vivo: a mesma página roda num mini celular e recebe os dados a cada mudança */
 const pv = { frame: null, t: 0 };

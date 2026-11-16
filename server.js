@@ -30,7 +30,7 @@ const UPLOADS = path.join(DATA_DIR, 'uploads');
 const DAY = 86400000;
 const now = () => Date.now();
 const PUB = path.join(__dirname, 'public');
-const RESERVED = new Set(['painel', 'entrar', 'cadastro', 'sair', 'api', 'u', 'admin', 'termos', 'privacidade', 'static', 'assets', 'www', 'app', 'planos', 'ajuda', 'suporte', 'login']);
+const RESERVED = new Set(['painel', 'entrar', 'cadastro', 'sair', 'api', 'u', 'admin', 'termos', 'privacidade', 'static', 'assets', 'www', 'app', 'planos', 'ajuda', 'suporte', 'login', 'tutoriais']);
 
 const app = express();
 app.set('trust proxy', true);
@@ -150,6 +150,37 @@ function externalize(storeId, value) {
 
 app.use('/u', express.static(UPLOADS, { maxAge: '30d', immutable: true, fallthrough: false }));
 app.use('/static', express.static(path.join(PUB, 'static'), { maxAge: '1h' }));
+
+/* ---------- vídeos tutoriais do painel ----------
+   A dona sobe um vídeo para cada passo no /admin. O vídeo fica em data/tutoriais/<passo>.mp4.
+   Se não tiver, vale o vídeo que veio com o site (public/static/tutoriais/<passo>.mp4).
+   O botão do tutorial só aparece no painel quando o passo tem vídeo. */
+const TUTORIAIS = ['tour', 'p1', 'p2', 'p3', 'link', 'banner', 'vender'];
+const TUT_DIR = path.join(DATA_DIR, 'tutoriais');
+const TUT_DEF_DUR = { p1: 233 }; // duração (segundos) dos vídeos que vêm com o site
+const TUT_META = path.join(TUT_DIR, 'meta.json');
+const tutMeta = () => { try { return JSON.parse(fs.readFileSync(TUT_META, 'utf8')); } catch (e) { return {}; } };
+function tutFile(key) {
+  const own = path.join(TUT_DIR, key + '.mp4');
+  if (fs.existsSync(own)) return own;
+  if (tutMeta()[key] && tutMeta()[key].off) return null; // a dona tirou o vídeo que veio com o site
+  const def = path.join(PUB, 'static', 'tutoriais', key + '.mp4');
+  return fs.existsSync(def) ? def : null;
+}
+function tutorials() {
+  const meta = tutMeta(), out = {};
+  for (const k of TUTORIAIS) {
+    const f = tutFile(k); if (!f) continue;
+    let v = 0; try { v = Math.round(fs.statSync(f).mtimeMs); } catch (e) {}
+    out[k] = { url: `/tutoriais/${k}.mp4?v=${v}`, dur: (meta[k] && meta[k].dur) || (f.startsWith(PUB) && TUT_DEF_DUR[k]) || 0 };
+  }
+  return out;
+}
+app.get('/tutoriais/:key.mp4', (req, res) => {
+  const f = TUTORIAIS.includes(req.params.key) && tutFile(req.params.key);
+  if (!f) return res.status(404).end();
+  res.set('Cache-Control', 'public, max-age=86400').type('video/mp4').sendFile(f);
+});
 
 /* ---------- páginas da vitrine ---------- */
 const APP_HTML = () => fs.readFileSync(path.join(PUB, 'app.html'), 'utf8');
@@ -292,7 +323,7 @@ app.get('/painel', (req, res) => {
   const store = db.prepare('SELECT * FROM stores WHERE user_id = ?').get(u.id);
   if (!store) return res.redirect('/admin');
   let state = null; try { state = JSON.parse(store.state || 'null'); } catch (e) {}
-  const boot = { mode: 'panel', state, store: storeInfo(store), user: { name: u.name, email: u.email, admin: isAdmin(u) }, brand: CFG.brand, home: CFG.publicUrl, wa: wa.enabled() || CFG.fakePayments };
+  const boot = { mode: 'panel', state, store: storeInfo(store), user: { name: u.name, email: u.email, admin: isAdmin(u) }, brand: CFG.brand, home: CFG.publicUrl, wa: wa.enabled() || CFG.fakePayments, tutorials: tutorials() };
   const html = APP_HTML().replace('<!--HEAD-->', `<title>Painel · ${escHtml(store.name)}</title><meta name="robots" content="noindex">${APP_HEAD}`).replace('<!--BOOT-->', `<script>window.__BOOT__=${jsonForScript(boot)}</script>`);
   res.set('Cache-Control', 'no-store');
   sendApp(res, html);
@@ -746,6 +777,31 @@ app.get('/api/admin/overview', adminOnly, (req, res) => {
     stores: list,
     payments: db.prepare('SELECT p.*, s.name FROM payments p JOIN stores s ON s.id = p.store_id ORDER BY p.created_at DESC LIMIT 30').all()
   });
+});
+
+// Tutoriais: a dona vê os 7 lugares, sobe ou tira o vídeo de cada um
+app.get('/api/admin/tutoriais', adminOnly, (req, res) => res.json({ tutorials: tutorials() }));
+app.post('/api/admin/tutoriais/:key', adminOnly, express.raw({ type: 'video/*', limit: '500mb' }), (req, res) => {
+  const key = req.params.key;
+  if (!TUTORIAIS.includes(key)) return res.status(404).json({ error: 'Passo não encontrado.' });
+  const mime = String(req.headers['content-type'] || '').split(';')[0].toLowerCase();
+  if (!/^video\/(mp4|quicktime|webm)$/.test(mime)) return res.status(400).json({ error: 'Envie um vídeo MP4 (ou MOV).' });
+  if (!Buffer.isBuffer(req.body) || !req.body.length) return res.status(400).json({ error: 'Arquivo vazio.' });
+  fs.mkdirSync(TUT_DIR, { recursive: true });
+  const tmp = path.join(TUT_DIR, key + '.tmp');
+  fs.writeFileSync(tmp, req.body); fs.renameSync(tmp, path.join(TUT_DIR, key + '.mp4'));
+  const meta = tutMeta(); meta[key] = { dur: Math.max(0, Math.round(Number(req.query.dur) || 0)), at: now() };
+  fs.writeFileSync(TUT_META, JSON.stringify(meta));
+  res.json({ ok: true, tutorials: tutorials() });
+});
+app.delete('/api/admin/tutoriais/:key', adminOnly, (req, res) => {
+  const key = req.params.key;
+  if (!TUTORIAIS.includes(key)) return res.status(404).json({ error: 'Passo não encontrado.' });
+  try { fs.unlinkSync(path.join(TUT_DIR, key + '.mp4')); } catch (e) {}
+  fs.mkdirSync(TUT_DIR, { recursive: true });
+  const meta = tutMeta(); meta[key] = { off: true, at: now() };
+  fs.writeFileSync(TUT_META, JSON.stringify(meta));
+  res.json({ ok: true, tutorials: tutorials() });
 });
 
 app.post('/api/admin/stores/:id', adminOnly, jsonBody, (req, res) => {
