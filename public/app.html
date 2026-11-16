@@ -824,6 +824,14 @@ body.painel #view-painel { padding-bottom: 86px; }
 .ptabs button { flex: 1; border: 0; background: none; display: grid; justify-items: center; gap: 3px; padding: 6px 2px; border-radius: 12px; font-size: 11px; font-weight: 600; color: var(--p-muted); font-family: inherit; }
 .ptabs svg { width: 22px; height: 22px; }
 .ptabs button[aria-current="page"] { color: var(--p-acc); background: var(--p-soft); }
+/* Vitrine sem pagamento: faixa fixa lembrando de ativar (em cima das abas) */
+.ptabs.has-pay { flex-wrap: wrap; }
+.paybar { order: -1; flex: 0 0 calc(100% + 12px); display: flex; align-items: center; gap: 10px; margin: -6px -6px 6px; padding: 9px 12px; background: linear-gradient(90deg, #F921A3, #C8157F); color: #fff; font-size: 12.5px; line-height: 1.25; text-decoration: none; cursor: pointer; }
+.paybar span { flex: 1; } .paybar b { display: block; font-size: 13.5px; }
+.paybar i { font-style: normal; background: #fff; color: #C8157F; font-weight: 800; border-radius: 99px; padding: 7px 12px; white-space: nowrap; font-size: 12.5px; }
+body.painel.pay-on #view-painel { padding-bottom: 140px; }
+@media (min-width: 1100px) { .paybar { margin: -6px -6px 6px; border-radius: 20px 20px 0 0; } }
+.hpay { display: flex; width: 100%; justify-content: center; margin-top: 12px; border: 0; border-radius: 12px; padding: 13px; background: linear-gradient(90deg, #F921A3, #C8157F); color: #fff; font: inherit; font-weight: 800; font-size: 14.5px; cursor: pointer; box-shadow: 0 8px 18px rgba(249,33,163,.28); }
 /* No celular o botão flutuante "Ver prévia" saiu: para ver a loja use "Ver como cliente" no topo */
 @media (max-width: 1099px) { body.painel .pv-tab { display: none !important; } }
 @media (min-width: 1100px) { .ptabs { left: 50%; right: auto; bottom: 16px; transform: translateX(-50%); width: 520px; border: 1px solid var(--p-line); border-radius: 20px; padding: 6px; }
@@ -1805,8 +1813,9 @@ function renderPainel() {
     </div>
     <h3 class="dtitle">Sua vitrine</h3>
     <section class="hero ${s.online === false || expired() ? 'is-off' : ''}">
-      <div class="hrow"><span class="dot"></span><div class="hst"><b>${expired() ? 'Vitrine fora do ar' : s.online === false ? 'Vitrine fora do ar' : 'Vitrine no ar'}</b><small>${expired() ? 'Assinatura vencida: assine para voltar' : s.online === false ? 'As clientes veem um aviso de pausa' : 'Suas clientes já podem ver e pedir'}</small></div>
+      <div class="hrow"><span class="dot"></span><div class="hst"><b>${expired() ? 'Vitrine fora do ar' : s.online === false ? 'Vitrine fora do ar' : 'Vitrine no ar'}</b><small>${expired() ? 'Finalize o pagamento para colocar no ar' : s.online === false ? 'As clientes veem um aviso de pausa' : 'Suas clientes já podem ver e pedir'}</small></div>
         <label class="sw" title="Ligar ou desligar a vitrine"><input type="checkbox" id="sonline" ${s.online === false ? '' : 'checked'} aria-label="Vitrine no ar"><i></i></label></div>
+      ${expired() ? '<button class="hpay" id="hpay">Escolher meu plano e colocar no ar</button>' : ''}
       <div class="hlink"><span class="url" id="surl">${esc(storeUrl())}</span><button class="hcopy" id="copylink">${ICONS.copy}Copiar</button></div>
       <div class="hacts"><button id="sharelink">${ICONS.share}Compartilhar</button><button id="openstore">${ICONS.eye}Ver vitrine</button><button id="editslug">${ICONS.pen}Editar link</button></div>
       <div class="slugbox" id="slugbox" hidden><label for="sslug">Nome no link (só letras minúsculas, números e hífen)</label>
@@ -2019,6 +2028,7 @@ function renderPainel() {
 
   $('#sonline').onchange = e => { s.online = e.target.checked; save(); renderPainel(); toast(s.online ? 'Vitrine no ar' : 'Vitrine fora do ar'); };
   if ($('#soffmsg')) $('#soffmsg').oninput = e => { s.offMsg = e.target.value; save(); };
+  if ($('#hpay')) $('#hpay').onclick = () => payWall(true);
   $('#copylink').onclick = async () => { const ok = await copyText(fullUrl()); toast(ok ? 'Link copiado' : 'Não deu para copiar. Segure o link para copiar.'); };
   $('#sharelink').onclick = async () => { const url = fullUrl(); const text = `Confira a vitrine da ${s.name}: ${url}`;
     if (navigator.share) { try { await navigator.share({ title: s.name, text, url }); } catch (e) {} } else window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank', 'noopener'); };
@@ -2674,10 +2684,10 @@ if (MODE === 'panel' && !PV) {
   addInstall();
 }
 // Ainda não pagou: abre a tela para escolher o plano (pode fechar e montar a vitrine antes)
-function payWall() {
+function payWall(force) {
   const st = BOOT.store; if (MODE !== 'panel' || PV || st.plan !== 'expired' || $('#paywall')) return;
   let closed = false; try { closed = sessionStorage.getItem('vz-pw') === '1'; } catch (e) {}
-  if (closed && !/plano=/.test(location.search)) return;
+  if (closed && !force && !/plano=/.test(location.search)) return;
   const d = document.createElement('div'); d.id = 'paywall'; d.className = 'pw';
   const year = st.yearPrice ? `<div class="pw-plan best"><span class="pw-badge">Mais vantajoso</span><b>Plano anual</b><div class="pw-price">${brl(st.yearPrice)}<small>/ano</small></div>
     <p>Equivale a ${brl(st.yearPrice / 12)} por mês. Economize ${brl(st.proPrice * 12 - st.yearPrice)}.</p><button class="pw-go" data-plan="anual">Quero o plano anual</button></div>` : '';
@@ -2694,7 +2704,26 @@ function payWall() {
     try { const j = await api('POST', '/api/billing/checkout', { plan: b.dataset.plan }); if (j.url) { location.href = j.url; return; } if (j.store) { BOOT.store = { ...BOOT.store, ...j.store }; d.remove(); renderPainel(); toast('Assinatura ativada'); } }
     catch (e) { toast(e.message); b.disabled = false; } });
   $('#pwpaid').onclick = () => location.reload();
-  $('#pwlater').onclick = () => { try { sessionStorage.setItem('vz-pw', '1'); } catch (e) {} d.remove(); };
+  $('#pwlater').onclick = () => { try { sessionStorage.setItem('vz-pw', '1'); } catch (e) {} pwClosedAt = Date.now(); d.remove(); };
+}
+// Lembretes enquanto ela monta a vitrine sem pagar: faixa fixa em cima das abas e o aviso volta
+// ao trocar de aba depois de alguns minutos (nunca no meio de uma digitação)
+let pwClosedAt = Date.now();
+const PW_AGAIN = 4 * 60 * 1000;
+function payBar() {
+  const bar = $('.ptabs'); if (!bar || MODE !== 'panel' || PV) return;
+  const on = BOOT.store.plan === 'expired'; let el = bar.querySelector('.paybar');
+  bar.classList.toggle('has-pay', on); document.body.classList.toggle('pay-on', on);
+  if (!on) { if (el) el.remove(); return; }
+  if (!el) { el = document.createElement('a'); el.className = 'paybar'; el.setAttribute('role', 'button'); el.tabIndex = 0;
+    el.innerHTML = '<span><b>🔒 Sua vitrine está fora do ar</b>Finalize o pagamento para suas clientes verem a loja.</span><i>Ativar agora</i>';
+    el.onclick = () => payWall(true); el.onkeydown = e => { if (e.key === 'Enter') payWall(true); }; bar.prepend(el); }
+}
+if (MODE === 'panel') {
+  payBar();
+  const rp2 = renderPainel; renderPainel = function () { rp2.apply(this, arguments); payBar(); };
+  const st0 = setTab; setTab = function () { st0.apply(this, arguments);
+    if (BOOT.store.plan === 'expired' && !$('#paywall') && Date.now() - pwClosedAt > PW_AGAIN) payWall(true); };
 }
 if (!/plano=/.test(location.search)) payWall();
 // Vitrine dentro da página de vendas com ?abrir=video: já mostra um produto aberto com a bolinha do vídeo
