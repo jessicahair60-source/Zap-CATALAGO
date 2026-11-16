@@ -172,7 +172,7 @@ function tutorials() {
   for (const k of TUTORIAIS) {
     const f = tutFile(k); if (!f) continue;
     let v = 0; try { v = Math.round(fs.statSync(f).mtimeMs); } catch (e) {}
-    out[k] = { url: `/tutoriais/${k}.mp4?v=${v}`, dur: (meta[k] && meta[k].dur) || (f.startsWith(PUB) && TUT_DEF_DUR[k]) || 0 };
+    out[k] = { url: `/tutoriais/${k}.mp4?v=${v}`, dur: (meta[k] && meta[k].dur) || (f.startsWith(PUB) && TUT_DEF_DUR[k]) || 0, texts: (meta[k] && meta[k].texts) || [] };
   }
   return out;
 }
@@ -790,16 +790,27 @@ app.post('/api/admin/tutoriais/:key', adminOnly, express.raw({ type: 'video/*', 
   fs.mkdirSync(TUT_DIR, { recursive: true });
   const tmp = path.join(TUT_DIR, key + '.tmp');
   fs.writeFileSync(tmp, req.body); fs.renameSync(tmp, path.join(TUT_DIR, key + '.mp4'));
-  const meta = tutMeta(); meta[key] = { dur: Math.max(0, Math.round(Number(req.query.dur) || 0)), at: now() };
+  const meta = tutMeta(); meta[key] = { dur: Math.max(0, Math.round(Number(req.query.dur) || 0)), at: now(), texts: (meta[key] && meta[key].texts) || [] };
   fs.writeFileSync(TUT_META, JSON.stringify(meta));
   res.json({ ok: true, tutorials: tutorials() });
 });
+// Textos da aula: quantos blocos a dona quiser, aparecem embaixo do vídeo
+app.put('/api/admin/tutoriais/:key/textos', adminOnly, jsonBody, (req, res) => {
+  const key = req.params.key;
+  if (!TUTORIAIS.includes(key)) return res.status(404).json({ error: 'Passo não encontrado.' });
+  const texts = (Array.isArray(req.body.texts) ? req.body.texts : []).map(t => String(t || '').trim().slice(0, 3000)).filter(Boolean).slice(0, 50);
+  fs.mkdirSync(TUT_DIR, { recursive: true });
+  const meta = tutMeta(); meta[key] = { ...(meta[key] || {}), texts };
+  fs.writeFileSync(TUT_META, JSON.stringify(meta));
+  res.json({ ok: true, tutorials: tutorials(), texts });
+});
+app.get('/api/admin/tutoriais/textos', adminOnly, (req, res) => { const meta = tutMeta(); const o = {}; TUTORIAIS.forEach(k => { o[k] = (meta[k] && meta[k].texts) || []; }); res.json({ texts: o }); });
 app.delete('/api/admin/tutoriais/:key', adminOnly, (req, res) => {
   const key = req.params.key;
   if (!TUTORIAIS.includes(key)) return res.status(404).json({ error: 'Passo não encontrado.' });
   try { fs.unlinkSync(path.join(TUT_DIR, key + '.mp4')); } catch (e) {}
   fs.mkdirSync(TUT_DIR, { recursive: true });
-  const meta = tutMeta(); meta[key] = { off: true, at: now() };
+  const meta = tutMeta(); meta[key] = { off: true, at: now(), texts: (meta[key] && meta[key].texts) || [] };
   fs.writeFileSync(TUT_META, JSON.stringify(meta));
   res.json({ ok: true, tutorials: tutorials() });
 });
