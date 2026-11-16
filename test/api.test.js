@@ -156,6 +156,35 @@ test('painel da dona da plataforma', async () => {
   r = await client()('POST', '/api/password/forgot', { email: 'ninguem@teste.com' }); assert.strictEqual(r.status, 200); assert.strictEqual(r.json.ok, true);
   r = await client()('GET', '/esqueci'); assert.match(r.text, /Esqueceu a senha/);
   r = await client()('GET', '/manifest.webmanifest'); assert.strictEqual(JSON.parse(r.text).start_url, '/painel');
+
+  // "minha loja": a loja com e-mail da administração já sai das contas; a caixinha tira e devolve qualquer loja
+  r = await dona('GET', '/api/admin/overview');
+  const donaLoja = r.json.stores.find(s => s.email === 'dona@teste.com'); assert.strictEqual(donaLoja.own, true);
+  assert.ok(!r.json.stores.find(s => s.slug === 'ana-modas').own);
+  const total0 = r.json.metrics.total, mrr0 = r.json.metrics.mrr, rev0 = r.json.metrics.revenue30;
+  assert.strictEqual(total0, r.json.stores.length - r.json.metrics.own);
+  r = await dona('POST', `/api/admin/stores/${ana.id}`, { action: 'setOwn', own: true }); assert.strictEqual(r.status, 200);
+  r = await dona('GET', '/api/admin/overview');
+  assert.strictEqual(r.json.metrics.total, total0 - 1); assert.strictEqual(r.json.metrics.mrr, mrr0 - 47); assert.ok(r.json.metrics.revenue30 < rev0);
+  assert.ok(r.json.payments.every(p => p.own));
+  r = await dona('POST', `/api/admin/stores/${ana.id}`, { action: 'setOwn', own: false });
+  r = await dona('GET', '/api/admin/overview'); assert.strictEqual(r.json.metrics.total, total0); assert.strictEqual(r.json.metrics.mrr, mrr0);
+
+  // excluir vitrine e cliente: precisa digitar EXCLUIR; a conta da administração nunca é apagada
+  const bia = client();
+  await bia('POST', '/api/signup', { name: 'Bia Excluir', storeName: 'Loja Excluir', email: 'excluir@teste.com', password: 'senha-forte', terms: true });
+  r = await bia('POST', '/api/media', PNG, { 'Content-Type': 'image/png' }); assert.strictEqual(r.status, 200);
+  r = await dona('GET', '/api/admin/overview'); const ex = r.json.stores.find(s => s.email === 'excluir@teste.com');
+  const files = () => fs.readdirSync(path.join(process.env.DATA_DIR, 'uploads')).filter(f => f.startsWith(ex.id + '-'));
+  assert.ok(files().length > 0);
+  r = await dona('POST', `/api/admin/stores/${ex.id}`, { action: 'delete' }); assert.strictEqual(r.status, 400);
+  r = await dona('POST', `/api/admin/stores/${ex.id}`, { action: 'delete', confirm: 'excluir' }); assert.strictEqual(r.status, 200); assert.strictEqual(r.json.userDeleted, true);
+  assert.strictEqual(files().length, 0);
+  r = await dona('GET', '/api/admin/overview'); assert.ok(!r.json.stores.some(s => s.email === 'excluir@teste.com'));
+  r = await client()('POST', '/api/login', { email: 'excluir@teste.com', password: 'senha-forte' }); assert.strictEqual(r.status, 401);
+  r = await bia('GET', '/api/me'); assert.notStrictEqual(r.status, 200);
+  r = await dona('POST', `/api/admin/stores/${donaLoja.id}`, { action: 'delete', confirm: 'EXCLUIR' }); assert.strictEqual(r.json.userDeleted, false);
+  r = await dona('GET', '/api/admin/overview'); assert.strictEqual(r.status, 200);
 });
 
 test('primeiro acesso da administração, sem loja, e endereço só da administração', async () => {

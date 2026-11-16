@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const express = require('express');
+const compression = require('compression');
 const QRCode = require('qrcode');
 const { db, DATA_DIR } = require('./lib/db');
 const { pixPayload } = require('./lib/pix');
@@ -35,6 +36,8 @@ const RESERVED = new Set(['painel', 'entrar', 'cadastro', 'sair', 'api', 'u', 'a
 const app = express();
 app.set('trust proxy', true);
 app.disable('x-powered-by');
+// Compacta páginas e respostas (o painel cai de ~320 KB para ~70 KB): abre bem mais rápido no 4G
+app.use(compression({ threshold: 1024 }));
 app.use((req, res, next) => { res.set('X-Content-Type-Options', 'nosniff'); res.set('Referrer-Policy', 'strict-origin-when-cross-origin'); next(); });
 
 /* ---------- utilidades ---------- */
@@ -102,6 +105,8 @@ function currentUser(req) {
   return row || null;
 }
 const isAdmin = u => !!u && CFG.admins.includes(u.email.toLowerCase());
+// Loja da dona: marcada na caixinha do /admin; sem marcação, vale para as contas com e-mail da administração
+const isOwnStore = s => s.own === 1 || (s.own == null && CFG.admins.includes(String(s.email || '').toLowerCase()));
 function auth(req, res, next) {
   const u = currentUser(req);
   if (!u) return res.status(401).json({ error: 'Entre na sua conta para continuar.' });
@@ -201,7 +206,9 @@ app.get('/tutoriais/:key.mp4', (req, res) => {
 });
 
 /* ---------- páginas da vitrine ---------- */
-const APP_HTML = () => fs.readFileSync(path.join(PUB, 'app.html'), 'utf8');
+// No ar, a página do painel/vitrine fica guardada na memória (não lê o disco a cada visita)
+let appHtmlCache = null;
+const APP_HTML = () => process.env.NODE_ENV === 'production' ? (appHtmlCache ??= fs.readFileSync(path.join(PUB, 'app.html'), 'utf8')) : fs.readFileSync(path.join(PUB, 'app.html'), 'utf8');
 
 // Política de segurança: só roda script com a marca (nonce) desta resposta, o que barra links "javascript:" e scripts injetados
 function sendApp(res, html, extraScriptHosts = '') {
@@ -780,20 +787,27 @@ app.get('/api/admin/overview', adminOnly, (req, res) => {
   const stores = db.prepare('SELECT s.*, u.name AS owner, u.email FROM stores s JOIN users u ON u.id = s.user_id ORDER BY s.created_at DESC').all();
   const week = now() - 7 * DAY;
   const list = stores.map(s => {
-    let products = 0; try { products = (JSON.parse(s.state || '{}').products || []).length; } catch (e) {}
-    let online = true; try { online = (JSON.parse(s.state || '{}').store || {}).online !== false; } catch (e) {}
+    let st = {}; try { st = JSON.parse(s.state || '{}') || {}; } catch (e) {}
     return { id: s.id, name: s.name, slug: s.slug, owner: s.owner, email: s.email, plan: planOf(s), proUntil: s.pro_until, trialUntil: s.trial_until, subscribed: !!s.mp_preapproval,
-      blocked: !!s.blocked, blockedReason: s.blocked_reason, customDomain: s.custom_domain, products, online, createdAt: s.created_at, url: publicUrlOf(s) };
+      blocked: !!s.blocked, blockedReason: s.blocked_reason, customDomain: s.custom_domain, products: (st.products || []).length, online: (st.store || {}).online !== false,
+      createdAt: s.created_at, url: publicUrlOf(s), own: isOwnStore(s), adminEmail: CFG.admins.includes(String(s.email).toLowerCase()) };
   });
-  const paying = list.filter(s => s.plan === 'pro').length;
-  const revenue30 = db.prepare("SELECT COALESCE(SUM(amount), 0) AS t FROM payments WHERE status = 'approved' AND created_at > ?").get(now() - 30 * DAY).t;
-  const views30 = db.prepare("SELECT COALESCE(SUM(n), 0) AS t FROM events WHERE type = 'view' AND day >= ?").get(new Date(now() - 29 * DAY).toISOString().slice(0, 10)).t;
+  // As lojas da dona (marcadas como "minha loja") não entram no faturamento nem na contagem de clientes
+  const ownIds = new Set(list.filter(s => s.own).map(s => s.id));
+  const clients = list.filter(s => !s.own);
+  const paying = clients.filter(s => s.plan === 'pro').length;
+  const payments = db.prepare('SELECT p.*, s.name FROM payments p JOIN stores s ON s.id = p.store_id ORDER BY p.created_at DESC LIMIT 50').all().map(p => ({ ...p, own: ownIds.has(p.store_id) }));
+  const revenue30 = db.prepare("SELECT store_id, amount FROM payments WHERE status = 'approved' AND created_at > ?").all(now() - 30 * DAY)
+    .filter(p => !ownIds.has(p.store_id)).reduce((t, p) => t + p.amount, 0);
+  const day30 = new Date(now() - 29 * DAY).toISOString().slice(0, 10);
+  const views30 = db.prepare("SELECT store_id, COALESCE(SUM(n), 0) AS t FROM events WHERE type = 'view' AND day >= ? GROUP BY store_id").all(day30)
+    .filter(v => !ownIds.has(v.store_id)).reduce((t, v) => t + v.t, 0);
   res.json({
     brand: CFG.brand, proPrice: CFG.proPrice,
-    metrics: { total: list.length, paying, open: list.filter(s => s.plan === 'open').length, expired: list.filter(s => s.plan === 'expired').length,
-      blocked: list.filter(s => s.blocked).length, newWeek: stores.filter(s => s.created_at > week).length, mrr: paying * CFG.proPrice, revenue30, views30 },
+    metrics: { total: clients.length, paying, open: clients.filter(s => s.plan === 'open').length, expired: clients.filter(s => s.plan === 'expired').length,
+      blocked: clients.filter(s => s.blocked).length, newWeek: clients.filter(s => s.createdAt > week).length, mrr: paying * CFG.proPrice, revenue30, views30, own: ownIds.size },
     stores: list,
-    payments: db.prepare('SELECT p.*, s.name FROM payments p JOIN stores s ON s.id = p.store_id ORDER BY p.created_at DESC LIMIT 30').all()
+    payments
   });
 });
 
@@ -874,6 +888,20 @@ app.post('/api/admin/stores/:id', adminOnly, jsonBody, (req, res) => {
     const days = Math.min(3650, Math.max(1, parseInt(req.body.days, 10) || 30));
     db.prepare('UPDATE stores SET pro_until = ?, updated_at = ? WHERE id = ?').run(Math.max(now(), s.pro_until || 0) + days * DAY, now(), s.id);
   } else if (a === 'expire') db.prepare('UPDATE stores SET pro_until = NULL, trial_until = NULL, updated_at = ? WHERE id = ?').run(now(), s.id);
+  else if (a === 'setOwn') db.prepare('UPDATE stores SET own = ? WHERE id = ?').run(req.body.own ? 1 : 0, s.id);
+  else if (a === 'delete') {
+    // Exclui a vitrine, as fotos e vídeos dela e a conta da cliente (o nome e o e-mail somem do sistema).
+    // A conta da administração nunca é apagada: nesse caso só a vitrine sai.
+    if (String(req.body.confirm || '').trim().toUpperCase() !== 'EXCLUIR') return res.status(400).json({ error: 'Para excluir, digite EXCLUIR.' });
+    const owner = db.prepare('SELECT * FROM users WHERE id = ?').get(s.user_id);
+    const keepUser = !owner || isAdmin(owner);
+    db.transaction(() => {
+      db.prepare('DELETE FROM stores WHERE id = ?').run(s.id);
+      if (!keepUser) db.prepare('DELETE FROM users WHERE id = ?').run(s.user_id);
+    })();
+    try { for (const f of fs.readdirSync(UPLOADS)) if (f.startsWith(s.id + '-')) fs.unlinkSync(path.join(UPLOADS, f)); } catch (e) { console.error('apagar fotos da loja', s.id, e.message); }
+    return res.json({ ok: true, deleted: true, userDeleted: !keepUser });
+  }
   else if (a === 'resetLink') return res.json({ ok: true, link: resetLink(s.user_id, 24) });
   else if (a === 'resetPassword') {
     const temp = crypto.randomBytes(5).toString('hex');

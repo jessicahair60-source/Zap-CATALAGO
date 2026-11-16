@@ -7,7 +7,7 @@ Plataforma de vitrines para o link da bio: catálogo com fotos e vídeos, pedido
 - **Página de vendas** (`/`), **cadastro e login** (`/cadastro`, `/entrar`), **termos** e **privacidade**.
 - **Vitrine de cada loja** em `/nome-da-loja`, em `nome-da-loja.SEU_DOMINIO` (com `BASE_DOMAIN`) ou no domínio próprio da lojista.
 - **Painel da lojista** (`/painel`): link da vitrine com copiar e compartilhar, chave no ar e fora do ar, produtos, fotos e vídeos, banner, cores, Pix, relatórios, Pixel do Meta, Google Analytics, domínio próprio, assinatura e troca de senha.
-- **Painel da plataforma** (`/admin`, só para os e-mails em `ADMIN_EMAILS`): receita mensal, lojas pagas, em teste e vencidas, busca, ver vitrine, liberar 30 dias, encerrar acesso, gerar senha nova, bloquear e desbloquear, e pagamentos recentes.
+- **Painel da plataforma** (`/admin`, só para os e-mails em `ADMIN_EMAILS`), em abas: Resumo (faturamento e números só das clientes), Clientes (busca, ver vitrine, liberar 30 dias ou 1 ano, encerrar acesso, link de senha nova, bloquear, excluir vitrine e cliente), Minhas lojas (caixinha "É minha loja": não conta no faturamento nem no número de clientes; lojas com e-mail da administração já vêm marcadas), Pagamentos e Tutoriais.
 - **Cadastro pelo WhatsApp**: a lojista liga o celular dela no painel e manda foto + texto no modelo para o número do robô. O produto entra no catálogo na hora. Configuração em [WHATSAPP.md](WHATSAPP.md).
 - **Assinatura**: um plano só, mensal pelo Mercado Pago (R$ 47 por padrão), com dias de teste para contas novas. Quando vence ou não é pago, a vitrine sai do ar para as clientes até o pagamento. A lojista continua entrando no painel e não perde nada.
 

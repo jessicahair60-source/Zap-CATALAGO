@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <!--HEAD-->
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@600;700&family=Cormorant+Garamond:wght@600;700&family=Montserrat:wght@500;600;700;800&display=swap">
 <style>
 /* Layout: coluna de celular (max 480px). A vitrine usa as cores da lojista (--c-*), o painel usa uma paleta neutra fixa (--p-*). Tema claro por escolha. */
@@ -1355,6 +1356,9 @@ const ph = p => { const a = artSrc(p); if (a) return `<img src="${a}" alt="" ari
 const img = p => { const m = media(p)[0]; if (!m || (m.id === 'demo' && artSrc(p))) return ph(p);
   return m.type === 'video' ? `<video src="${MEDIA[m.id]}" muted autoplay loop playsinline preload="metadata" aria-label="${esc(p.name)}"></video><span class="vplay" aria-hidden="true">▶</span>`
     : `<img src="${MEDIA[m.id]}" alt="${esc(p.name)}" loading="lazy">${media(p).some(x => x.type === 'video') ? '<span class="vplay" title="Tem vídeo" aria-label="Este produto tem vídeo">▶</span>' : ''}`; };
+// Miniatura leve para o painel: foto com carregamento sob demanda e vídeo parado no 1º quadro
+const miniImg = p => { const m = media(p)[0]; if (!m || m.type !== 'video') return img(p);
+  return `<video src="${MEDIA[m.id]}#t=0.1" muted playsinline preload="metadata" aria-label="${esc(p.name)}"></video><span class="vplay" aria-hidden="true">▶</span>`; };
 const zeroMode = p => p.zero && p.zero !== 'default' ? p.zero : S.store.zeroStock;
 const visible = p => p.active && !(soldOut(p) && zeroMode(p) === 'hide');
 const soldOut = p => p.track && p.stock <= 0;
@@ -1858,7 +1862,7 @@ function renderPainel() {
       <button class="pbtn" id="padd">${ed ? 'Salvar alterações' : 'PUBLICAR PRODUTO'}</button>
       ${ed ? '<button class="pbtn ghost" style="margin-top:8px" id="pcancel">Cancelar edição</button>' : ''}`)}
     ${sec('lista', 'Seus produtos e serviços', `${S.products.length} itens · ${active} ativos`, `
-      <div class="plist">${S.products.map(p => `<div class="pli ${visible(p) ? '' : 'off-item'}"><div class="mini">${img(p)}</div>
+      <div class="plist">${S.products.map(p => `<div class="pli ${visible(p) ? '' : 'off-item'}"><div class="mini">${miniImg(p)}</div>
         <div style="min-width:0">${esc(p.name)}<small>${KINDS[p.kind]} · ${brl(p.price)}${!p.active ? ' · desativado' : soldOut(p) ? (zeroMode(p) === 'hide' ? ' · zerado, oculto' : ' · esgotado') : ''}${firstVid(p) ? ' · com vídeo' : ''}</small></div>
         <span class="lact"><label class="chk" style="padding:0"><input type="checkbox" data-act="${p.id}" ${p.active ? 'checked' : ''}> Ativo</label>
           ${p.track ? `<label class="chk" style="padding:0">${p.kind === 'fisico' ? 'Estoque' : 'Vagas'} <input class="in stockin" data-stock="${p.id}" value="${p.stock}" inputmode="numeric" aria-label="Estoque de ${esc(p.name)}"></label>` : ''}
@@ -2640,8 +2644,9 @@ if (PV) {
   document.addEventListener('focusout', () => setTimeout(() => { const t = typing(); if (t !== $('#pv').classList.contains('typing')) { $('#pv').classList.toggle('typing', t); pvFit(); } }, 120));
   document.addEventListener('input', e => { if (e.target.closest('#view-painel')) pvPush(); });
   document.addEventListener('change', e => { if (e.target.closest('#view-painel')) pvPush(); });
-  let pref = '1'; try { pref = localStorage.getItem('vz-pv') ?? pref; } catch (e) {}
-  if (pref === '1') pvOpen(true);
+  let pref = innerWidth >= 1100 ? '1' : '0'; try { pref = localStorage.getItem('vz-pv') ?? pref; } catch (e) {}
+  // abre a prévia só depois que o painel já apareceu, para não disputar a internet com ele
+  if (pref === '1') { const go = () => pvOpen(true); window.requestIdleCallback ? requestIdleCallback(go, { timeout: 1500 }) : setTimeout(go, 600); }
 }
 
 $('#tab-loja').onclick = () => show('loja');

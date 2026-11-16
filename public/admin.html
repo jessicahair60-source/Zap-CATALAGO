@@ -4,44 +4,80 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
+<meta name="theme-color" content="#FDEEF4">
 <title>Administração · Zap Catálogo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="/static/site.css">
 <style>
-  body { background: #F7F4F6; }
-  .top { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; gap: 10px; }
-  .top small { display: block; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
-  h1 { font-size: 26px; }
+  :root { --pink: #E0457B; --pink-d: #B9356A; --pink-s: #FDEEF4; --pink-l: #F8D3E1; --ink: #3A1E2B; --line: #F3D9E3; --muted: #8E6A7A; }
+  body { background: linear-gradient(180deg, #FDEEF4 0, #FFF7FA 340px, #FFF7FA 100%); color: var(--ink); }
+  .container { max-width: 960px; padding-bottom: 60px; }
+  .top { display: flex; align-items: center; justify-content: space-between; padding: 18px 0 12px; gap: 10px; }
+  .top small { display: block; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--pink-d); font-weight: 700; }
+  h1 { font-size: 26px; color: var(--ink); }
+  .toplinks { display: flex; gap: 6px; }
+  .toplinks a { white-space: nowrap; border: 1px solid var(--pink-l); background: #fff; border-radius: 99px; padding: 8px 13px; font: 600 13px var(--f-body); color: var(--pink-d); text-decoration: none; }
+
+  /* Abas (categorias) */
+  .tabs { position: sticky; top: 0; z-index: 5; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 10px 0; margin: 0 -20px; padding-inline: 20px; background: rgba(253,238,244,.92); backdrop-filter: blur(8px); }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { flex: none; border: 1px solid var(--pink-l); background: #fff; color: var(--ink); border-radius: 99px; padding: 9px 15px; font: 700 13.5px var(--f-body); cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+  .tab[aria-selected="true"] { background: var(--pink); border-color: var(--pink); color: #fff; box-shadow: 0 6px 16px rgba(224,69,123,.28); }
+  .tab .n { background: rgba(0,0,0,.08); border-radius: 99px; padding: 1px 7px; font-size: 11.5px; }
+  .tab[aria-selected="true"] .n { background: rgba(255,255,255,.25); }
+  section[data-panel] { animation: fade .2s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+  h2 { font-size: 19px; margin: 22px 0 10px; }
+  .sub { margin: -4px 0 12px; color: var(--muted); font-size: 13.5px; }
   .kpis { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 8px; }
-  .kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; }
-  .kpi b { display: block; font: 800 26px var(--f-display); font-variant-numeric: tabular-nums; }
+  .kpi { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 14px 16px; }
+  .kpi b { display: block; font: 800 26px var(--f-display); font-variant-numeric: tabular-nums; color: var(--ink); }
   .kpi span { font-size: 12.5px; color: var(--muted); }
-  .kpi.hl { background: #2A1A22; color: #fff; border-color: #2A1A22; } .kpi.hl span { color: #E7CFD9; }
-  h2 { font-size: 18px; margin: 30px 0 10px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-  .tools { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
-  .tools .in { max-width: 320px; padding: 10px 12px; }
-  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
-  .chip { border: 1px solid var(--line); background: var(--surface); border-radius: 99px; padding: 7px 12px; font: 600 13px var(--f-body); cursor: pointer; color: var(--fg); }
-  .chip[aria-pressed="true"] { background: var(--fg); color: #fff; border-color: var(--fg); }
-  .list { display: grid; gap: 8px; }
-  .row { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; display: grid; gap: 10px; }
+  .kpi.hl { background: linear-gradient(135deg, #E0457B, #C2185B); color: #fff; border: 0; grid-column: span 2; box-shadow: 0 10px 26px rgba(224,69,123,.3); }
+  .kpi.hl b { color: #fff; font-size: 32px; } .kpi.hl span { color: #FFE1EC; }
+  .hint { margin-top: 12px; background: #fff; border: 1px dashed var(--pink-l); border-radius: 14px; padding: 11px 14px; font-size: 13px; color: var(--muted); }
+
+  .tools { display: grid; gap: 8px; margin-bottom: 12px; }
+  .tools .in { background: #fff; border-color: var(--line); padding: 11px 14px; }
+  .chips { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; }
+  .chips::-webkit-scrollbar { display: none; }
+  .chip { flex: none; border: 1px solid var(--line); background: #fff; border-radius: 99px; padding: 7px 12px; font: 600 12.5px var(--f-body); cursor: pointer; color: var(--ink); }
+  .chip[aria-pressed="true"] { background: var(--pink-s); color: var(--pink-d); border-color: var(--pink); }
+
+  .list { display: grid; gap: 10px; }
+  .row { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 14px 16px; display: grid; gap: 10px; }
+  .row.own { border-color: var(--pink-l); background: linear-gradient(180deg, #fff, #FFF6F9); }
   .row-top { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
   .row b { font-size: 15.5px; } .row .meta { font-size: 12.5px; color: var(--muted); margin-top: 2px; word-break: break-word; }
-  .tag { font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 99px; white-space: nowrap; letter-spacing: .04em; text-transform: uppercase; }
-  .t-pro { background: #E3F6EA; color: #137A3D; } .t-open, .t-trial { background: #EEE8FB; color: #5B3FA8; } .t-expired { background: #FFF4E5; color: var(--warn); } .t-blocked { background: #FDE7E4; color: var(--danger); }
+  .row .meta a { color: var(--pink-d); }
+  .tag { font-size: 10.5px; font-weight: 700; padding: 3px 9px; border-radius: 99px; white-space: nowrap; letter-spacing: .04em; text-transform: uppercase; }
+  .t-pro { background: #E3F6EA; color: #137A3D; } .t-open, .t-trial { background: #EEE8FB; color: #5B3FA8; } .t-expired { background: #FFF4E5; color: var(--warn); } .t-blocked { background: #FDE7E4; color: var(--danger); } .t-own { background: var(--pink-s); color: var(--pink-d); }
+  .ownbox { display: flex; gap: 9px; align-items: center; background: var(--pink-s); border-radius: 12px; padding: 9px 12px; font-size: 13px; cursor: pointer; }
+  .ownbox input { width: 19px; height: 19px; accent-color: var(--pink); flex: none; }
+  .ownbox small { display: block; color: var(--muted); font-size: 11.5px; }
   .acts { display: flex; gap: 6px; flex-wrap: wrap; }
-  .acts button, .acts a { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 7px 11px; font: 600 12.5px var(--f-body); cursor: pointer; color: var(--fg); text-decoration: none; }
+  .acts button, .acts a { border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 8px 11px; font: 600 12.5px var(--f-body); cursor: pointer; color: var(--ink); text-decoration: none; }
+  .acts .pri { background: var(--pink); border-color: var(--pink); color: #fff; }
   .acts .danger { color: var(--danger); }
-  table { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; font-size: 13.5px; }
-  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); } th { font-size: 12px; color: var(--muted); font-weight: 700; } tr:last-child td { border-bottom: 0; }
+  .acts .del { color: #fff; background: var(--danger); border-color: var(--danger); }
+  details.more summary { list-style: none; cursor: pointer; font: 600 12.5px var(--f-body); color: var(--pink-d); padding: 2px 0; }
+  details.more summary::-webkit-details-marker { display: none; }
+  details.more[open] summary { margin-bottom: 8px; }
+
+  table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; font-size: 13.5px; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--line); } th { font-size: 12px; color: var(--muted); font-weight: 700; background: var(--pink-s); } tr:last-child td { border-bottom: 0; }
   td.num { font-variant-numeric: tabular-nums; text-align: right; } th.num { text-align: right; }
-  .empty { padding: 24px; text-align: center; color: var(--muted); background: var(--surface); border-radius: 16px; border: 1px dashed var(--line); }
-  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: #2A1A22; color: #fff; padding: 10px 16px; border-radius: 10px; font-size: 14px; z-index: 9; max-width: 90vw; }
+  tr.own td { color: var(--muted); } tr.own td:first-child::after { content: " · minha"; color: var(--pink-d); font-size: 11px; }
+  .empty { padding: 24px; text-align: center; color: var(--muted); background: #fff; border-radius: 18px; border: 1px dashed var(--pink-l); }
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: var(--ink); color: #fff; padding: 10px 16px; border-radius: 12px; font-size: 14px; z-index: 9; max-width: 90vw; }
+
   .tnote { margin: -4px 0 12px; color: var(--muted); font-size: 13.5px; }
-  .trow { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; display: flex; gap: 12px; align-items: center; }
-  .trow video { width: 54px; height: 96px; border-radius: 10px; object-fit: cover; background: #2A1A22; flex: none; }
-  .trow .ph { width: 54px; height: 96px; border-radius: 10px; border: 1px dashed var(--line); display: grid; place-items: center; color: var(--muted); font-size: 22px; flex: none; }
+  .trow { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 12px 14px; display: flex; gap: 12px; align-items: center; }
+  .trow video { width: 54px; height: 96px; border-radius: 10px; object-fit: cover; background: var(--ink); flex: none; }
+  .trow .ph { width: 54px; height: 96px; border-radius: 10px; border: 1px dashed var(--pink-l); display: grid; place-items: center; color: var(--pink); font-size: 22px; flex: none; }
   .trow .tinfo { flex: 1; min-width: 0; }
   .trow .tinfo b { display: block; font-size: 15px; }
   .trow .tinfo small { display: block; color: var(--muted); font-size: 12.5px; margin-top: 2px; }
@@ -49,32 +85,58 @@
   .ttexts { margin-top: 10px; display: grid; gap: 8px; }
   .ttexts .tlab { font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: .04em; text-transform: uppercase; }
   .tblk { display: flex; gap: 6px; align-items: flex-start; }
-  .tblk textarea { flex: 1; min-height: 64px; resize: vertical; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; font: 400 14px var(--f-body); color: var(--fg); background: #fff; }
-  .tblk button { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; width: 34px; height: 34px; cursor: pointer; color: var(--danger); font-size: 16px; }
-  .t-ok { background: #E3F6EA; color: #137A3D; } .t-no { background: #F2ECEF; color: var(--muted); }
-  @media (min-width: 760px) { .kpis { grid-template-columns: repeat(4, 1fr); } }
+  .tblk textarea { flex: 1; min-height: 64px; resize: vertical; border: 1px solid var(--line); border-radius: 10px; padding: 8px 10px; font: 400 14px var(--f-body); color: var(--ink); background: #fff; }
+  .tblk button { border: 1px solid var(--line); background: #fff; border-radius: 10px; width: 34px; height: 34px; cursor: pointer; color: var(--danger); font-size: 16px; }
+  .t-ok { background: #E3F6EA; color: #137A3D; } .t-no { background: #F6EEF1; color: var(--muted); }
+  @media (min-width: 760px) { .kpis { grid-template-columns: repeat(4, 1fr); } .kpi.hl { grid-column: span 2; } .tools { grid-template-columns: 320px 1fr; align-items: center; } }
 </style>
 </head>
 <body>
 <div class="container">
   <div class="top"><div><small>Administração da plataforma</small><h1 id="brand">Zap Catálogo</h1></div>
-    <div class="acts"><a href="/">Ver o site</a><a href="/sair?para=admin">Sair</a></div></div>
+    <div class="toplinks"><a href="/">Ver o site</a><a href="/sair?para=admin">Sair</a></div></div>
 
-  <div class="kpis" id="kpis"></div>
+  <nav class="tabs" role="tablist" id="tabs">
+    <button class="tab" role="tab" data-tab="resumo">📊 Resumo</button>
+    <button class="tab" role="tab" data-tab="clientes">👩 Clientes <span class="n" id="n-clientes"></span></button>
+    <button class="tab" role="tab" data-tab="minhas">💗 Minhas lojas <span class="n" id="n-minhas"></span></button>
+    <button class="tab" role="tab" data-tab="pagamentos">💳 Pagamentos</button>
+    <button class="tab" role="tab" data-tab="tutoriais">🎬 Tutoriais</button>
+  </nav>
 
-  <h2>Lojas</h2>
-  <div class="tools">
-    <input class="in" id="q" type="search" placeholder="Buscar por loja, dona ou e-mail" aria-label="Buscar lojas">
-    <div class="chips" id="chips"></div>
-  </div>
-  <div class="list" id="list"><div class="empty">Carregando...</div></div>
+  <section data-panel="resumo">
+    <h2>Resumo das clientes</h2>
+    <p class="sub">Só clientes. As suas lojas (marcadas como "minha loja") não entram nessas contas.</p>
+    <div class="kpis" id="kpis"></div>
+    <div class="hint">💡 Para tirar uma loja das contas, abra <b>Clientes</b> e marque a caixinha <b>"É minha loja"</b>. Ela passa para a aba Minhas lojas.</div>
+  </section>
 
-  <h2>Vídeos tutoriais do painel</h2>
-  <p class="tnote">Aqui você cria, muda o nome, reordena e apaga as aulas. As 7 primeiras também aparecem sozinhas no lugar certo do painel; as novas ficam na lista de Tutoriais (Conta > Ajuda). A ordem daqui é a ordem da lista. Toda aula aparece para as lojistas na hora, mesmo só com nome ou texto. Envie em pé (9:16), MP4.</p>
-  <div class="list" id="tuts"><div class="empty">Carregando...</div></div>
+  <section data-panel="clientes" hidden>
+    <h2>Clientes</h2>
+    <div class="tools">
+      <input class="in" id="q" type="search" placeholder="Buscar por loja, dona ou e-mail" aria-label="Buscar lojas">
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="list" id="list"><div class="empty">Carregando...</div></div>
+  </section>
 
-  <h2>Pagamentos recentes</h2>
-  <div id="pays"></div>
+  <section data-panel="minhas" hidden>
+    <h2>Minhas lojas</h2>
+    <p class="sub">Lojas suas, de teste ou demonstração. Não contam no faturamento nem no número de clientes.</p>
+    <div class="list" id="mine"><div class="empty">Carregando...</div></div>
+  </section>
+
+  <section data-panel="pagamentos" hidden>
+    <h2>Pagamentos recentes</h2>
+    <p class="sub">Pagamentos das suas lojas aparecem em cinza e não somam no faturamento.</p>
+    <div id="pays"></div>
+  </section>
+
+  <section data-panel="tutoriais" hidden>
+    <h2>Vídeos tutoriais do painel</h2>
+    <p class="tnote">Aqui você cria, muda o nome, reordena e apaga as aulas. As 7 primeiras também aparecem sozinhas no lugar certo do painel; as novas ficam na lista de Tutoriais (Conta > Ajuda). A ordem daqui é a ordem da lista. Toda aula aparece para as lojistas na hora, mesmo só com nome ou texto. Envie em pé (9:16), MP4.</p>
+    <div class="list" id="tuts"><div class="empty">Carregando...</div></div>
+  </section>
 </div>
 <div class="toast" id="toast" hidden></div>
 <script>
@@ -83,55 +145,93 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': 
 const brl = v => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 const date = t => t ? new Date(t).toLocaleDateString('pt-BR') : '';
 const PLAN = { pro: 'Paga', open: 'Liberada', trial: 'Teste', expired: 'Vencida' };
-let data = null, filter = 'all';
+let data = null, filter = 'all', tab = 'resumo';
 function toast(t) { const el = $('#toast'); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 3000); }
+
+/* Abas */
+function setTab(t) {
+  tab = t; try { localStorage.setItem('vz-admtab', t); } catch (e) {}
+  document.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t));
+  document.querySelectorAll('[data-panel]').forEach(p => p.hidden = p.dataset.panel !== t);
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => setTab(b.dataset.tab));
+try { const saved = localStorage.getItem('vz-admtab'); if (saved && document.querySelector(`[data-panel="${saved}"]`)) tab = saved; } catch (e) {}
+setTab(tab);
 
 async function load() {
   const r = await fetch('/api/admin/overview');
   if (r.status === 403 || r.status === 401) { location.href = '/entrar'; return; }
   data = await r.json(); render();
 }
+function card(s) {
+  const status = s.plan === 'pro' ? `Paga até ${date(s.proUntil)}${s.subscribed ? ' · assinatura ativa' : ''}` : s.plan === 'open' ? 'Liberada · cobrança ainda não ligada' : 'Vencida · vitrine fora do ar';
+  return `<div class="row ${s.own ? 'own' : ''}">
+    <div class="row-top"><div><b>${esc(s.name)}</b>
+      <div class="meta">${esc(s.owner)} · ${esc(s.email)}</div>
+      <div class="meta"><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.url.replace(/^https?:\/\//, ''))}</a> · ${s.products} produtos · ${s.online ? 'no ar' : 'fora do ar'} · desde ${date(s.createdAt)}</div>
+      <div class="meta">${status}${s.blocked ? ` · bloqueada${s.blockedReason ? ': ' + esc(s.blockedReason) : ''}` : ''}</div></div>
+      <span class="tag ${s.blocked ? 't-blocked' : 't-' + s.plan}">${s.blocked ? 'Bloqueada' : PLAN[s.plan]}</span></div>
+    <label class="ownbox"><input type="checkbox" data-own="${s.id}" ${s.own ? 'checked' : ''}><span><b style="font-size:13px">É minha loja</b><small>Não conta no faturamento nem no número de clientes</small></span></label>
+    <div class="acts">
+      <a href="${esc(s.url)}" target="_blank" rel="noopener">Ver vitrine</a>
+      <button class="pri" data-a="givePro" data-id="${s.id}">Liberar 30 dias</button>
+      <button data-a="giveYear" data-id="${s.id}">Liberar 1 ano</button>
+    </div>
+    <details class="more"><summary>Mais ações ›</summary><div class="acts">
+      ${s.plan !== 'expired' ? `<button data-a="expire" data-id="${s.id}">Encerrar acesso</button>` : ''}
+      <button data-a="resetLink" data-id="${s.id}">Link de senha nova</button>
+      ${s.blocked ? `<button data-a="unblock" data-id="${s.id}">Desbloquear</button>` : `<button class="danger" data-a="block" data-id="${s.id}">Bloquear</button>`}
+      <button class="del" data-a="delete" data-id="${s.id}">🗑 Excluir vitrine e cliente</button>
+    </div></details></div>`;
+}
 function render() {
   const m = data.metrics; $('#brand').textContent = data.brand;
+  const clients = data.stores.filter(s => !s.own), mine = data.stores.filter(s => s.own);
+  $('#n-clientes').textContent = clients.length; $('#n-minhas').textContent = mine.length;
   $('#kpis').innerHTML = [
-    ['hl', brl(m.mrr), 'Receita mensal recorrente'], ['', m.total, 'Lojas cadastradas'], ['', m.paying, 'Lojas pagando'], ['', m.newWeek, 'Novas nos últimos 7 dias'],
-    ['', m.open, 'Liberadas (sem cobrança)'], ['', m.expired, 'Vencidas (fora do ar)'], ['', brl(m.revenue30), 'Recebido em 30 dias'], ['', m.views30.toLocaleString('pt-BR'), 'Visitas nas vitrines (30 dias)']
+    ['hl', brl(m.mrr), 'Faturamento mensal (clientes pagando)'], ['', m.total, 'Clientes'], ['', m.paying, 'Clientes pagando'], ['', m.newWeek, 'Novas nos últimos 7 dias'],
+    ['', brl(m.revenue30), 'Recebido em 30 dias'], ['', m.open, 'Liberadas (sem cobrança)'], ['', m.expired, 'Vencidas (fora do ar)'], ['', m.views30.toLocaleString('pt-BR'), 'Visitas nas vitrines (30 dias)']
   ].map(([c, v, l]) => `<div class="kpi ${c}"><b>${v}</b><span>${l}</span></div>`).join('');
   const chips = [['all', `Todas (${m.total})`], ['pro', `Pagas (${m.paying})`], ['open', `Liberadas (${m.open})`], ['expired', `Vencidas (${m.expired})`], ['blocked', `Bloqueadas (${m.blocked})`]];
   $('#chips').innerHTML = chips.map(([k, l]) => `<button class="chip" data-f="${k}" aria-pressed="${filter === k}">${l}</button>`).join('');
   document.querySelectorAll('[data-f]').forEach(b => b.onclick = () => { filter = b.dataset.f; render(); });
   const q = $('#q').value.trim().toLowerCase();
-  const list = data.stores.filter(s => (filter === 'all' || (filter === 'blocked' ? s.blocked : s.plan === filter && !s.blocked)) && (!q || `${s.name} ${s.owner} ${s.email} ${s.slug}`.toLowerCase().includes(q)));
-  $('#list').innerHTML = list.length ? list.map(s => `<div class="row">
-    <div class="row-top"><div><b>${esc(s.name)}</b>
-      <div class="meta">${esc(s.owner)} · ${esc(s.email)}</div>
-      <div class="meta"><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.url.replace(/^https?:\/\//, ''))}</a> · ${s.products} produtos · ${s.online ? 'no ar' : 'fora do ar'} · desde ${date(s.createdAt)}</div>
-      <div class="meta">${s.plan === 'pro' ? `Paga até ${date(s.proUntil)}${s.subscribed ? ' · assinatura ativa' : ''}` : s.plan === 'open' ? 'Liberada · cobrança ainda não ligada' : 'Vencida · vitrine fora do ar'}${s.blocked ? ` · bloqueada${s.blockedReason ? ': ' + esc(s.blockedReason) : ''}` : ''}</div></div>
-      <span class="tag ${s.blocked ? 't-blocked' : 't-' + s.plan}">${s.blocked ? 'Bloqueada' : PLAN[s.plan]}</span></div>
-    <div class="acts">
-      <a href="${esc(s.url)}" target="_blank" rel="noopener">Ver vitrine</a>
-      <button data-a="givePro" data-id="${s.id}">Liberar 30 dias</button>
-      <button data-a="giveYear" data-id="${s.id}">Liberar 1 ano</button>
-      ${s.plan !== 'expired' ? `<button data-a="expire" data-id="${s.id}">Encerrar acesso</button>` : ''}
-      <button data-a="resetLink" data-id="${s.id}">Link de senha nova</button>
-      ${s.blocked ? `<button data-a="unblock" data-id="${s.id}">Desbloquear</button>` : `<button class="danger" data-a="block" data-id="${s.id}">Bloquear</button>`}
-    </div></div>`).join('') : '<div class="empty">Nenhuma loja aqui.</div>';
+  const list = clients.filter(s => (filter === 'all' || (filter === 'blocked' ? s.blocked : s.plan === filter && !s.blocked)) && (!q || `${s.name} ${s.owner} ${s.email} ${s.slug}`.toLowerCase().includes(q)));
+  $('#list').innerHTML = list.length ? list.map(card).join('') : '<div class="empty">Nenhuma cliente aqui.</div>';
+  $('#mine').innerHTML = mine.length ? mine.map(card).join('') : '<div class="empty">Nenhuma loja marcada como sua. Marque a caixinha "É minha loja" na aba Clientes.</div>';
   document.querySelectorAll('[data-a]').forEach(b => b.onclick = () => act(+b.dataset.id, b.dataset.a));
+  document.querySelectorAll('[data-own]').forEach(c => c.onchange = () => setOwn(+c.dataset.own, c.checked, c));
   $('#pays').innerHTML = data.payments.length ? `<table><thead><tr><th>Data</th><th>Loja</th><th>Situação</th><th class="num">Valor</th></tr></thead><tbody>
-    ${data.payments.map(p => `<tr><td>${date(p.created_at)}</td><td>${esc(p.name)}</td><td>${p.status === 'approved' ? 'Aprovado' : esc(p.status)}</td><td class="num">${brl(p.amount)}</td></tr>`).join('')}</tbody></table>`
+    ${data.payments.map(p => `<tr class="${p.own ? 'own' : ''}"><td>${date(p.created_at)}</td><td>${esc(p.name)}</td><td>${p.status === 'approved' ? 'Aprovado' : esc(p.status)}</td><td class="num">${brl(p.amount)}</td></tr>`).join('')}</tbody></table>`
     : '<div class="empty">Nenhum pagamento ainda.</div>';
+}
+async function post(id, body) {
+  const r = await fetch(`/api/admin/stores/${id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const j = await r.json().catch(() => ({})); return { ok: r.ok, j };
+}
+async function setOwn(id, own, box) {
+  box.disabled = true;
+  const { ok, j } = await post(id, { action: 'setOwn', own });
+  if (!ok) { box.checked = !own; box.disabled = false; return toast(j.error || 'Não deu certo.'); }
+  toast(own ? 'Marcada como sua: saiu das contas' : 'Voltou para Clientes'); load();
 }
 async function act(id, action) {
   const s = data.stores.find(x => x.id === id); const body = { action };
   if (action === 'block') { const reason = prompt(`Bloquear ${s.name}? A vitrine sai do ar para as clientes. Motivo (opcional):`); if (reason === null) return; body.reason = reason; }
   if (action === 'expire' && !confirm(`Encerrar o acesso de ${s.name} agora? A vitrine sai do ar até ela assinar.`)) return;
+  if (action === 'delete') {
+    const w = prompt(`Excluir de vez a vitrine "${s.name}" e a conta de ${s.owner} (${s.email})?\n\nSomem os produtos, fotos, vídeos, pagamentos e o cadastro da cliente. Não dá para desfazer.\n\nPara confirmar, digite EXCLUIR:`);
+    if (w === null) return; if (w.trim().toUpperCase() !== 'EXCLUIR') return toast('Não excluí: precisa digitar EXCLUIR.');
+    body.confirm = 'EXCLUIR';
+  }
   if (action === 'givePro') body.days = 30;
   if (action === 'giveYear') { body.action = 'givePro'; body.days = 366; }
-  const r = await fetch(`/api/admin/stores/${id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
-  const j = await r.json().catch(() => ({}));
-  if (!r.ok) return toast(j.error || 'Não deu certo.');
+  const { ok, j } = await post(id, body);
+  if (!ok) return toast(j.error || 'Não deu certo.');
   if (j.link) prompt(`Link para ${s.owner} criar uma senha nova (vale 24 horas). Copie e mande para ela no WhatsApp:`, j.link);
   else if (j.tempPassword) prompt(`Senha nova de ${s.owner}. Envie para ela e peça para trocar no painel:`, j.tempPassword);
+  else if (j.deleted) toast(j.userDeleted ? 'Vitrine e cliente excluídas' : 'Vitrine excluída (sua conta de administração continua)');
   else toast('Feito');
   load();
 }
@@ -164,7 +264,7 @@ function renderTuts() {
       <div class="acts"><button data-tup="${k}">${v ? 'Trocar vídeo' : 'Enviar vídeo'}</button>${v ? `<a href="${esc(v.url)}" target="_blank" rel="noopener">Assistir</a><button class="danger" data-tdel="${k}">Tirar</button>` : ''}<button data-aed="${k}">Mudar nome</button>${i > 0 ? `<button data-amv="${k}" data-d="up" aria-label="Subir na lista">↑ Subir</button>` : ''}${i < tutList.length - 1 ? `<button data-amv="${k}" data-d="down" aria-label="Descer na lista">↓ Descer</button>` : ''}${aula ? `<button class="danger" data-adel="${k}">Apagar aula</button>` : ''}</div>
       <div class="ttexts"><span class="tlab">Textos da aula (aparecem embaixo do vídeo)</span>
         ${(tutTexts[k] || []).map((t, i) => `<div class="tblk"><textarea data-tk="${k}" data-ti="${i}" placeholder="Escreva aqui uma dica ou explicação">${esc(t)}</textarea><button data-trm="${k}" data-ti="${i}" title="Apagar este texto" aria-label="Apagar este texto">×</button></div>`).join('')}
-        <div class="acts"><button data-tadd="${k}">+ Adicionar texto</button>${tutDirty[k] ? `<button data-tsave="${k}" style="background:#2A1A22;color:#fff;border-color:#2A1A22">Salvar textos</button>` : ''}</div></div></div></div>`; }).join('') + `<div class="acts" style="margin-top:4px"><button id="anew" style="background:#2A1A22;color:#fff;border-color:#2A1A22">+ Nova aula</button></div>`;
+        <div class="acts"><button data-tadd="${k}">+ Adicionar texto</button>${tutDirty[k] ? `<button data-tsave="${k}" style="background:#E0457B;color:#fff;border-color:#E0457B">Salvar textos</button>` : ''}</div></div></div></div>`; }).join('') + `<div class="acts" style="margin-top:4px"><button id="anew" style="background:#E0457B;color:#fff;border-color:#E0457B">+ Nova aula</button></div>`;
   $('#anew').onclick = async () => {
     const title = prompt('Nome da nova aula (ex.: Como usar o cupom de desconto):'); if (!title || !title.trim()) return;
     const sub = prompt('Uma frase curta explicando a aula (opcional):') || '';
