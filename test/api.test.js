@@ -156,6 +156,16 @@ test('painel da dona da plataforma', async () => {
   r = await client()('POST', '/api/password/forgot', { email: 'ninguem@teste.com' }); assert.strictEqual(r.status, 200); assert.strictEqual(r.json.ok, true);
   r = await client()('GET', '/esqueci'); assert.match(r.text, /Esqueceu a senha/);
   r = await client()('GET', '/manifest.webmanifest'); assert.strictEqual(JSON.parse(r.text).start_url, '/painel');
+  // excluir vitrine: só com o endereço digitado certo; apaga loja e conta
+  const tmp = client();
+  await tmp('POST', '/api/signup', { name: 'Bia', storeName: 'Bia Doces', email: 'bia@teste.com', password: 'senha-forte', terms: true });
+  r = await dona('GET', '/api/admin/overview'); const bia = r.json.stores.find(s => s.email === 'bia@teste.com'); assert.ok(bia);
+  r = await dona('POST', `/api/admin/stores/${bia.id}`, { action: 'delete', confirm: 'errado' }); assert.strictEqual(r.status, 400);
+  r = await tmp('POST', `/api/admin/stores/${bia.id}`, { action: 'delete', confirm: bia.slug }); assert.strictEqual(r.status, 403);
+  r = await dona('POST', `/api/admin/stores/${bia.id}`, { action: 'delete', confirm: bia.slug }); assert.strictEqual(r.status, 200);
+  r = await dona('GET', '/api/admin/overview'); assert.ok(!r.json.stores.find(s => s.id === bia.id)); assert.ok(r.json.stores.find(s => s.slug === 'ana-modas'));
+  r = await client()('GET', '/' + bia.slug); assert.strictEqual(r.status, 404);
+  r = await client()('POST', '/api/login', { email: 'bia@teste.com', password: 'senha-forte' }); assert.strictEqual(r.status, 401);
 });
 
 test('primeiro acesso da administração, sem loja, e endereço só da administração', async () => {

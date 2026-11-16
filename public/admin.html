@@ -9,16 +9,14 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=DM+Sans:wght@400;500;700&display=swap">
 <link rel="stylesheet" href="/static/site.css">
 <style>
-  body { background: #F7F4F6; }
-  .top { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; gap: 10px; }
+  .top-old { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; gap: 10px; }
   .top small { display: block; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
-  h1 { font-size: 26px; }
   .kpis { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 8px; }
   .kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; }
   .kpi b { display: block; font: 800 26px var(--f-display); font-variant-numeric: tabular-nums; }
   .kpi span { font-size: 12.5px; color: var(--muted); }
   .kpi.hl { background: #2A1A22; color: #fff; border-color: #2A1A22; } .kpi.hl span { color: #E7CFD9; }
-  h2 { font-size: 18px; margin: 30px 0 10px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  h2.old { font-size: 18px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
   .tools { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
   .tools .in { max-width: 320px; padding: 10px 12px; }
   .chips { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -53,29 +51,119 @@
   .tblk button { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; width: 34px; height: 34px; cursor: pointer; color: var(--danger); font-size: 16px; }
   .t-ok { background: #E3F6EA; color: #137A3D; } .t-no { background: #F2ECEF; color: var(--muted); }
   @media (min-width: 760px) { .kpis { grid-template-columns: repeat(4, 1fr); } }
+
+  :root { --pink: #F921A3; --pink-d: #C8157F; --pink-soft: #FFE6F4; --pink-bg: #FFF5FA; --line: #F6D5E7; }
+  body { background: var(--pink-bg); }
+  .hdr { background: linear-gradient(135deg, #F921A3 0%, #D9168C 60%, #B9126F 100%); color: #fff; padding: 18px 0 64px; }
+  .hdr .container { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .hdr .who { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .hdr .who img { width: 46px; height: 46px; border-radius: 14px; box-shadow: 0 6px 16px rgba(80,0,40,.25); flex: none; }
+  .hdr small { display: block; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; opacity: .85; }
+  .hdr h1 { font-size: 24px; color: #fff; }
+  .hdr .acts a { background: rgba(255,255,255,.16); border-color: rgba(255,255,255,.35); color: #fff; }
+  .tabs-wrap { position: sticky; top: 0; z-index: 5; margin-top: -46px; padding-top: 8px; }
+  .tabs { display: flex; gap: 6px; background: #fff; border-radius: 18px; padding: 6px; box-shadow: 0 10px 30px rgba(185,18,111,.14); overflow-x: auto; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { flex: 1 0 auto; border: 0; background: transparent; border-radius: 13px; padding: 11px 14px; font: 700 14px var(--f-body); color: var(--muted); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 7px; white-space: nowrap; }
+  .tab svg { width: 18px; height: 18px; flex: none; }
+  .tab[aria-selected="true"] { background: var(--pink); color: #fff; box-shadow: 0 6px 14px rgba(249,33,163,.35); }
+  .tab .n { font-size: 11px; background: var(--pink-soft); color: var(--pink-d); border-radius: 99px; padding: 1px 7px; }
+  .tab[aria-selected="true"] .n { background: rgba(255,255,255,.25); color: #fff; }
+  .sec { padding: 22px 0 60px; }
+  .sec-h { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; margin-bottom: 12px; }
+  .sec-h h2 { margin: 0; font-size: 21px; }
+  .sec-h p { margin: 3px 0 0; color: var(--muted); font-size: 13.5px; }
+  .kpi { border-radius: 18px; }
+  .kpi.hl { background: linear-gradient(135deg, #F921A3, #C8157F); color: #fff; border: 0; box-shadow: 0 10px 24px rgba(249,33,163,.3); } .kpi.hl span { color: #FFE0F1; }
+  .kpi b { color: var(--pink-d); } .kpi.hl b { color: #fff; }
+  .shorts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 18px; }
+  .short { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 16px; text-align: left; cursor: pointer; font: inherit; color: var(--fg); display: grid; gap: 8px; }
+  .short i { width: 40px; height: 40px; border-radius: 12px; background: var(--pink-soft); color: var(--pink); display: grid; place-items: center; }
+  .short i svg { width: 22px; height: 22px; }
+  .short b { font-size: 15px; } .short span { font-size: 12.5px; color: var(--muted); line-height: 1.35; }
+  .mini { margin-top: 22px; } .mini h3 { font-size: 16px; margin: 0 0 10px; }
+  .mini .row { padding: 12px 14px; }
+  .chip[aria-pressed="true"] { background: var(--pink); border-color: var(--pink); }
+  .row { border-radius: 18px; }
+  .acts .pri { background: var(--pink); border-color: var(--pink); color: #fff; }
+  .acts .del { border-color: #F3C2BC; background: #FFF4F2; color: var(--danger); }
+  .acts { align-items: center; }
+  .acts .sep { flex-basis: 100%; height: 0; }
+  .t-pro { background: #E3F6EA; color: #137A3D; } .t-open, .t-trial { background: var(--pink-soft); color: var(--pink-d); }
+  .modal { position: fixed; inset: 0; background: rgba(42,26,34,.55); display: grid; place-items: center; padding: 16px; z-index: 20; }
+  .modal .box { background: #fff; border-radius: 22px; padding: 22px; max-width: 420px; width: 100%; box-shadow: 0 20px 50px rgba(0,0,0,.25); }
+  .modal h3 { font-size: 20px; margin: 0 0 8px; color: var(--danger); }
+  .modal p { margin: 0 0 10px; font-size: 14.5px; } .modal ul { margin: 0 0 12px; padding-left: 18px; font-size: 14px; color: var(--muted); }
+  .modal code { background: var(--pink-soft); color: var(--pink-d); padding: 2px 6px; border-radius: 6px; font-weight: 700; }
+  .modal .in { margin: 4px 0 14px; background: #fff; }
+  .modal .btns { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+  .modal .btns button { border: 1px solid var(--line); background: #fff; border-radius: 12px; padding: 11px 16px; font: 700 14px var(--f-body); cursor: pointer; }
+  .modal .btns .go { background: var(--danger); border-color: var(--danger); color: #fff; } .modal .btns .go:disabled { opacity: .4; cursor: default; }
+  @media (min-width: 760px) { .shorts { grid-template-columns: repeat(4, 1fr); } .hdr h1 { font-size: 28px; } }
+  .kpi span { display: block; line-height: 1.3; margin-top: 4px; }
+  .tab { position: relative; }
+  @media (max-width: 520px) {
+    .tabs { gap: 2px; padding: 5px; overflow: visible; }
+    .tab { flex: 1 1 0; min-width: 0; flex-direction: column; gap: 3px; padding: 8px 2px; font-size: 11.5px; border-radius: 12px; }
+    .tab svg { width: 21px; height: 21px; }
+    .tab .n { position: absolute; top: 3px; right: 6px; font-size: 10px; padding: 0 5px; }
+    .tab .lbl-l { display: none; } .hdr .acts a.site { display: none; }
+    .hdr { padding-bottom: 70px; } .tabs-wrap { margin-top: -54px; }
+  }
 </style>
 </head>
 <body>
-<div class="container">
-  <div class="top"><div><small>Administração da plataforma</small><h1 id="brand">Zap Catálogo</h1></div>
-    <div class="acts"><a href="/">Ver o site</a><a href="/sair?para=admin">Sair</a></div></div>
+<header class="hdr"><div class="container">
+  <div class="who"><img src="/static/icon-192.png" alt=""><div><small>Administração</small><h1 id="brand">Zap Catálogo</h1></div></div>
+  <div class="acts"><a class="site" href="/">Ver o site</a><a href="/sair?para=admin">Sair</a></div>
+</div></header>
+<div class="tabs-wrap"><div class="container"><nav class="tabs" role="tablist" aria-label="Seções da administração">
+  <button class="tab" role="tab" data-tab="resumo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Resumo</button>
+  <button class="tab" role="tab" data-tab="lojistas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16l-1.5 12a2 2 0 0 1-2 2h-9a2 2 0 0 1-2-2z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg>Lojistas <span class="n" id="n-loj"></span></button>
+  <button class="tab" role="tab" data-tab="pagamentos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/></svg>Pagamentos</button>
+  <button class="tab" role="tab" data-tab="tutoriais"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9l5 3-5 3z"/></svg><span>Vídeos<span class="lbl-l"> tutoriais</span></span></button>
+</nav></div></div>
+<main class="container">
+  <section class="sec" id="sec-resumo" data-sec="resumo">
+    <div class="sec-h"><div><h2>Resumo da plataforma</h2><p>Como estão as vendas e as lojistas hoje.</p></div></div>
+    <div class="kpis" id="kpis"></div>
+    <div class="shorts">
+      <button class="short" data-go="lojistas" data-gf="all"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16l-1.5 12a2 2 0 0 1-2 2h-9a2 2 0 0 1-2-2z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg></i><b>Lojistas</b><span>Ver todas as vitrines, buscar e liberar acesso</span></button>
+      <button class="short" data-go="lojistas" data-gf="expired"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M16 7l3 3"/></svg></i><b>Planos e liberações</b><span>Quem está vencida, liberada ou bloqueada</span></button>
+      <button class="short" data-go="pagamentos"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/></svg></i><b>Pagamentos</b><span>Últimos pagamentos recebidos</span></button>
+      <button class="short" data-go="tutoriais"><i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9l5 3-5 3z"/></svg></i><b>Vídeos tutoriais</b><span>Aulas que aparecem no painel das lojistas</span></button>
+    </div>
+    <div class="mini"><h3>Lojistas mais recentes</h3><div class="list" id="recent"></div></div>
+  </section>
 
-  <div class="kpis" id="kpis"></div>
+  <section class="sec" id="sec-lojistas" data-sec="lojistas" hidden>
+    <div class="sec-h"><div><h2>Lojistas</h2><p>Busque, filtre pelo plano e libere, bloqueie ou exclua uma vitrine.</p></div></div>
+    <div class="tools">
+      <input class="in" id="q" type="search" placeholder="Buscar por loja, dona ou e-mail" aria-label="Buscar lojas">
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="list" id="list"><div class="empty">Carregando...</div></div>
+  </section>
 
-  <h2>Lojas</h2>
-  <div class="tools">
-    <input class="in" id="q" type="search" placeholder="Buscar por loja, dona ou e-mail" aria-label="Buscar lojas">
-    <div class="chips" id="chips"></div>
-  </div>
-  <div class="list" id="list"><div class="empty">Carregando...</div></div>
+  <section class="sec" id="sec-pagamentos" data-sec="pagamentos" hidden>
+    <div class="sec-h"><div><h2>Pagamentos recentes</h2><p>Os últimos 30 pagamentos das lojistas.</p></div></div>
+    <div id="pays"></div>
+  </section>
 
-  <h2>Vídeos tutoriais do painel</h2>
-  <p class="tnote">Aqui você cria, muda o nome, reordena e apaga as aulas. As 7 primeiras também aparecem sozinhas no lugar certo do painel; as novas ficam na lista de Tutoriais (Conta > Ajuda). A ordem daqui é a ordem da lista. Toda aula aparece para as lojistas na hora, mesmo só com nome ou texto. Envie em pé (9:16), MP4.</p>
-  <div class="list" id="tuts"><div class="empty">Carregando...</div></div>
-
-  <h2>Pagamentos recentes</h2>
-  <div id="pays"></div>
-</div>
+  <section class="sec" id="sec-tutoriais" data-sec="tutoriais" hidden>
+    <div class="sec-h"><div><h2>Vídeos tutoriais do painel</h2></div></div>
+    <p class="tnote">Aqui você cria, muda o nome, reordena e apaga as aulas. As 7 primeiras também aparecem sozinhas no lugar certo do painel; as novas ficam na lista de Tutoriais (Conta > Ajuda). A ordem daqui é a ordem da lista. Toda aula aparece para as lojistas na hora, mesmo só com nome ou texto. Envie em pé (9:16), MP4.</p>
+    <div class="list" id="tuts"><div class="empty">Carregando...</div></div>
+  </section>
+</main>
+<div class="modal" id="delModal" hidden><div class="box" role="dialog" aria-modal="true" aria-labelledby="delT">
+  <h3 id="delT">Excluir vitrine</h3>
+  <p id="delName"></p>
+  <ul><li>A vitrine sai do ar e o link para de funcionar.</li><li>Produtos, fotos, vídeos e a conta da lojista são apagados.</li><li>Isso <b>não tem volta</b>.</li></ul>
+  <p>Para confirmar, digite o endereço da vitrine: <code id="delSlug"></code></p>
+  <input class="in" id="delIn" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Endereço da vitrine">
+  <div class="btns"><button id="delNo">Cancelar</button><button class="go" id="delGo" disabled>Excluir para sempre</button></div>
+</div></div>
 <div class="toast" id="toast" hidden></div>
 <script>
 const $ = s => document.querySelector(s);
@@ -115,8 +203,14 @@ function render() {
       ${s.plan !== 'expired' ? `<button data-a="expire" data-id="${s.id}">Encerrar acesso</button>` : ''}
       <button data-a="resetLink" data-id="${s.id}">Link de senha nova</button>
       ${s.blocked ? `<button data-a="unblock" data-id="${s.id}">Desbloquear</button>` : `<button class="danger" data-a="block" data-id="${s.id}">Bloquear</button>`}
+      <button class="del" data-del="${s.id}">Excluir vitrine</button>
     </div></div>`).join('') : '<div class="empty">Nenhuma loja aqui.</div>';
   document.querySelectorAll('[data-a]').forEach(b => b.onclick = () => act(+b.dataset.id, b.dataset.a));
+  document.querySelectorAll('[data-del]').forEach(b => b.onclick = () => askDelete(+b.dataset.del));
+  $('#n-loj').textContent = m.total;
+  const tagOf = s => `<span class="tag ${s.blocked ? 't-blocked' : 't-' + s.plan}">${s.blocked ? 'Bloqueada' : PLAN[s.plan]}</span>`;
+  $('#recent').innerHTML = data.stores.length ? data.stores.slice(0, 5).map(s => `<div class="row"><div class="row-top"><div><b>${esc(s.name)}</b>
+    <div class="meta">${esc(s.owner)} · desde ${date(s.createdAt)} · ${s.products} produtos</div></div>${tagOf(s)}</div></div>`).join('') : '<div class="empty">Nenhuma lojista ainda.</div>';
   $('#pays').innerHTML = data.payments.length ? `<table><thead><tr><th>Data</th><th>Loja</th><th>Situação</th><th class="num">Valor</th></tr></thead><tbody>
     ${data.payments.map(p => `<tr><td>${date(p.created_at)}</td><td>${esc(p.name)}</td><td>${p.status === 'approved' ? 'Aprovado' : esc(p.status)}</td><td class="num">${brl(p.amount)}</td></tr>`).join('')}</tbody></table>`
     : '<div class="empty">Nenhum pagamento ainda.</div>';
@@ -137,6 +231,41 @@ async function act(id, action) {
 }
 $('#q').oninput = () => data && render();
 load();
+
+/* Abas: Resumo, Lojistas, Pagamentos, Vídeos tutoriais */
+const TABS = ['resumo', 'lojistas', 'pagamentos', 'tutoriais'];
+function showTab(t, push) {
+  if (!TABS.includes(t)) t = 'resumo';
+  document.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t));
+  document.querySelectorAll('[data-sec]').forEach(x => x.hidden = x.dataset.sec !== t);
+  if (push) { history.replaceState(null, '', '#' + t); window.scrollTo({ top: 0 }); }
+}
+document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => showTab(b.dataset.tab, true));
+document.querySelectorAll('[data-go]').forEach(b => b.onclick = () => { if (b.dataset.gf) { filter = b.dataset.gf; if (data) render(); } showTab(b.dataset.go, true); });
+window.addEventListener('hashchange', () => showTab(location.hash.slice(1)));
+showTab(location.hash.slice(1));
+
+/* Excluir vitrine: só depois de digitar o endereço dela */
+let delId = null;
+function askDelete(id) {
+  const s = data.stores.find(x => x.id === id); if (!s) return; delId = id;
+  $('#delName').innerHTML = `Você vai apagar a vitrine <b>${esc(s.name)}</b> de ${esc(s.owner)} (${esc(s.email)}).`;
+  $('#delSlug').textContent = s.slug; $('#delIn').value = ''; $('#delGo').disabled = true; $('#delGo').textContent = 'Excluir para sempre';
+  $('#delModal').hidden = false; setTimeout(() => $('#delIn').focus(), 50);
+}
+const closeDel = () => { $('#delModal').hidden = true; delId = null; };
+$('#delNo').onclick = closeDel;
+$('#delModal').onclick = e => { if (e.target.id === 'delModal') closeDel(); };
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#delModal').hidden) closeDel(); });
+$('#delIn').oninput = () => { const s = data.stores.find(x => x.id === delId); $('#delGo').disabled = !s || $('#delIn').value.trim().toLowerCase() !== s.slug; };
+$('#delGo').onclick = async () => {
+  const s = data.stores.find(x => x.id === delId); if (!s) return;
+  $('#delGo').disabled = true; $('#delGo').textContent = 'Excluindo...';
+  const r = await fetch(`/api/admin/stores/${s.id}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'delete', confirm: $('#delIn').value.trim() }) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) { toast(j.error || 'Não deu certo.'); $('#delGo').disabled = false; $('#delGo').textContent = 'Excluir para sempre'; return; }
+  closeDel(); toast(`Vitrine ${s.name} excluída`); load();
+};
 
 /* Vídeos tutoriais: um lugar para cada passo do painel */
 const TUTS = [['tour', 'Conheça o painel', 'Abre sozinho na 1ª vez que a lojista entra no painel'],

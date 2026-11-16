@@ -875,6 +875,16 @@ app.post('/api/admin/stores/:id', adminOnly, jsonBody, (req, res) => {
     db.prepare('UPDATE stores SET pro_until = ?, updated_at = ? WHERE id = ?').run(Math.max(now(), s.pro_until || 0) + days * DAY, now(), s.id);
   } else if (a === 'expire') db.prepare('UPDATE stores SET pro_until = NULL, trial_until = NULL, updated_at = ? WHERE id = ?').run(now(), s.id);
   else if (a === 'resetLink') return res.json({ ok: true, link: resetLink(s.user_id, 24) });
+  else if (a === 'delete') {
+    // Excluir vitrine: apaga a loja, a conta da lojista e as fotos/vídeos dela. Não tem volta.
+    if (String(req.body.confirm || '').trim().toLowerCase() !== s.slug) return res.status(400).json({ error: 'Para excluir, digite o endereço da vitrine exatamente igual.' });
+    const owner = db.prepare('SELECT * FROM users WHERE id = ?').get(s.user_id);
+    if (owner && isAdmin(owner)) db.prepare('DELETE FROM stores WHERE id = ?').run(s.id);
+    else db.prepare('DELETE FROM users WHERE id = ?').run(s.user_id);
+    try { for (const f of fs.readdirSync(UPLOADS)) if (f.startsWith(s.id + '-')) fs.unlinkSync(path.join(UPLOADS, f)); } catch (e) {}
+    ogCache.clear();
+    return res.json({ ok: true, deleted: true });
+  }
   else if (a === 'resetPassword') {
     const temp = crypto.randomBytes(5).toString('hex');
     db.prepare('UPDATE users SET pass = ? WHERE id = ?').run(hashPass(temp), s.user_id);
