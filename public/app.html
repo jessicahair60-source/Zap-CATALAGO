@@ -821,7 +821,8 @@ body.painel #view-painel { padding-bottom: 86px; }
 .ptabs button { flex: 1; border: 0; background: none; display: grid; justify-items: center; gap: 3px; padding: 6px 2px; border-radius: 12px; font-size: 11px; font-weight: 600; color: var(--p-muted); font-family: inherit; }
 .ptabs svg { width: 22px; height: 22px; }
 .ptabs button[aria-current="page"] { color: var(--p-acc); background: var(--p-soft); }
-@media (max-width: 1099px) { body.painel .pv-tab { bottom: 84px; } }
+/* No celular o botão flutuante "Ver prévia" saiu: para ver a loja use "Ver como cliente" no topo */
+@media (max-width: 1099px) { body.painel .pv-tab { display: none !important; } }
 @media (min-width: 1100px) { .ptabs { left: 50%; right: auto; bottom: 16px; transform: translateX(-50%); width: 520px; border: 1px solid var(--p-line); border-radius: 20px; padding: 6px; }
   body.painel.pv-on .ptabs { left: calc(50% - 190px); } }
 
