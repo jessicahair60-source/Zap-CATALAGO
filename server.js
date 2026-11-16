@@ -160,6 +160,23 @@ const TUT_DIR = path.join(DATA_DIR, 'tutoriais');
 const TUT_DEF_DUR = { p1: 233 }; // duração (segundos) dos vídeos que vêm com o site
 const TUT_META = path.join(TUT_DIR, 'meta.json');
 const tutMeta = () => { try { return JSON.parse(fs.readFileSync(TUT_META, 'utf8')); } catch (e) { return {}; } };
+const tutSave = meta => { fs.mkdirSync(TUT_DIR, { recursive: true }); fs.writeFileSync(TUT_META, JSON.stringify(meta)); };
+// Aulas novas que a dona cria (além das 7 fixas): ficam na lista de Tutoriais do painel
+const tutAulas = (meta = tutMeta()) => Array.isArray(meta._aulas) ? meta._aulas : [];
+const TUT_DEF = { tour: ['Conheça o painel', 'Um tour rápido: onde fica cada coisa'], p1: ['Passo 1 · Informações da loja', 'Nome, WhatsApp e como o pedido chega'],
+  p2: ['Passo 2 · Visual', 'Banner, logo e cores da sua marca'], p3: ['Passo 3 · Cadastrar produto', 'Como subir os produtos do jeito certo'],
+  link: ['Como pegar o link da sua vitrine', 'Copie e coloque na bio e no WhatsApp'], banner: ['Bônus: Como criar o seu banner', 'Faça um banner bonito do zero'],
+  vender: ['Bônus: Como vender mais usando a sua vitrine', 'Dicas para receber mais pedidos'] };
+// ordem da lista de Tutoriais: a que a dona escolheu; o que faltar entra no fim
+const tutKeys = (meta = tutMeta()) => { const all = [...TUTORIAIS, ...tutAulas(meta).map(a => a.id)]; const ord = (Array.isArray(meta._order) ? meta._order : []).filter(k => all.includes(k));
+  return [...ord, ...all.filter(k => !ord.includes(k))]; };
+// lista completa para o admin (com e sem vídeo)
+function tutList(meta = tutMeta()) {
+  const aulas = {}; tutAulas(meta).forEach(a => { aulas[a.id] = a; });
+  return tutKeys(meta).map(k => { const m = meta[k] || {}, a = aulas[k], d = TUT_DEF[k] || [];
+    return { key: k, fixed: !a, title: (a ? a.title : m.title) || d[0] || 'Aula', sub: (a ? a.sub : m.sub ?? d[1]) || '' }; });
+}
+const validTut = k => tutKeys().includes(k);
 function tutFile(key) {
   const own = path.join(TUT_DIR, key + '.mp4');
   if (fs.existsSync(own)) return own;
@@ -169,15 +186,15 @@ function tutFile(key) {
 }
 function tutorials() {
   const meta = tutMeta(), out = {};
-  for (const k of TUTORIAIS) {
+  for (const { key: k, title, sub } of tutList(meta)) {
     const f = tutFile(k); if (!f) continue;
     let v = 0; try { v = Math.round(fs.statSync(f).mtimeMs); } catch (e) {}
-    out[k] = { url: `/tutoriais/${k}.mp4?v=${v}`, dur: (meta[k] && meta[k].dur) || (f.startsWith(PUB) && TUT_DEF_DUR[k]) || 0, texts: (meta[k] && meta[k].texts) || [] };
+    out[k] = { url: `/tutoriais/${k}.mp4?v=${v}`, dur: (meta[k] && meta[k].dur) || (f.startsWith(PUB) && TUT_DEF_DUR[k]) || 0, texts: (meta[k] && meta[k].texts) || [], title, sub };
   }
   return out;
 }
 app.get('/tutoriais/:key.mp4', (req, res) => {
-  const f = TUTORIAIS.includes(req.params.key) && tutFile(req.params.key);
+  const f = validTut(req.params.key) && tutFile(req.params.key);
   if (!f) return res.status(404).end();
   res.set('Cache-Control', 'public, max-age=86400').type('video/mp4').sendFile(f);
 });
@@ -780,37 +797,68 @@ app.get('/api/admin/overview', adminOnly, (req, res) => {
 });
 
 // Tutoriais: a dona vê os 7 lugares, sobe ou tira o vídeo de cada um
-app.get('/api/admin/tutoriais', adminOnly, (req, res) => res.json({ tutorials: tutorials() }));
+app.get('/api/admin/tutoriais', adminOnly, (req, res) => res.json({ tutorials: tutorials(), list: tutList() }));
+const aulaBody = b => ({ title: String(b.title || '').trim().slice(0, 80), sub: String(b.sub || '').trim().slice(0, 140) });
+app.post('/api/admin/tutoriais-aulas', adminOnly, jsonBody, (req, res) => {
+  const a = aulaBody(req.body); if (!a.title) return res.status(400).json({ error: 'Escreva o nome da aula.' });
+  const meta = tutMeta(); const list = tutAulas(meta); if (list.length >= 200) return res.status(400).json({ error: 'Limite de aulas atingido.' });
+  const id = 'a' + now().toString(36) + crypto.randomBytes(2).toString('hex');
+  meta._aulas = [...list, { id, ...a }]; tutSave(meta);
+  res.json({ ok: true, id, list: tutList(meta), tutorials: tutorials() });
+});
+// mudar nome (qualquer aula, inclusive as 7 fixas) ou mudar de lugar na lista
+app.put('/api/admin/tutoriais-aulas/:id', adminOnly, jsonBody, (req, res) => {
+  const meta = tutMeta(); const id = req.params.id;
+  if (!tutKeys(meta).includes(id)) return res.status(404).json({ error: 'Aula não encontrada.' });
+  if (req.body.move === 'up' || req.body.move === 'down') {
+    const ord = tutKeys(meta); const i = ord.indexOf(id), j = req.body.move === 'up' ? i - 1 : i + 1;
+    if (j >= 0 && j < ord.length) [ord[i], ord[j]] = [ord[j], ord[i]];
+    meta._order = ord;
+  } else {
+    const a = aulaBody(req.body); if (!a.title) return res.status(400).json({ error: 'Escreva o nome da aula.' });
+    const list = tutAulas(meta); const i = list.findIndex(x => x.id === id);
+    if (i >= 0) { list[i] = { id, ...a }; meta._aulas = list; } else meta[id] = { ...(meta[id] || {}), title: a.title, sub: a.sub };
+  }
+  tutSave(meta);
+  res.json({ ok: true, list: tutList(meta), tutorials: tutorials() });
+});
+app.delete('/api/admin/tutoriais-aulas/:id', adminOnly, (req, res) => {
+  const meta = tutMeta(); const list = tutAulas(meta); const id = req.params.id;
+  if (!list.some(x => x.id === id)) return res.status(404).json({ error: 'Aula não encontrada.' });
+  try { fs.unlinkSync(path.join(TUT_DIR, id + '.mp4')); } catch (e) {}
+  meta._aulas = list.filter(x => x.id !== id); delete meta[id]; if (Array.isArray(meta._order)) meta._order = meta._order.filter(k => k !== id); tutSave(meta);
+  res.json({ ok: true, list: tutList(meta), tutorials: tutorials() });
+});
 app.post('/api/admin/tutoriais/:key', adminOnly, express.raw({ type: 'video/*', limit: '500mb' }), (req, res) => {
   const key = req.params.key;
-  if (!TUTORIAIS.includes(key)) return res.status(404).json({ error: 'Passo não encontrado.' });
+  if (!validTut(key)) return res.status(404).json({ error: 'Passo não encontrado.' });
   const mime = String(req.headers['content-type'] || '').split(';')[0].toLowerCase();
   if (!/^video\/(mp4|quicktime|webm)$/.test(mime)) return res.status(400).json({ error: 'Envie um vídeo MP4 (ou MOV).' });
   if (!Buffer.isBuffer(req.body) || !req.body.length) return res.status(400).json({ error: 'Arquivo vazio.' });
   fs.mkdirSync(TUT_DIR, { recursive: true });
   const tmp = path.join(TUT_DIR, key + '.tmp');
   fs.writeFileSync(tmp, req.body); fs.renameSync(tmp, path.join(TUT_DIR, key + '.mp4'));
-  const meta = tutMeta(); meta[key] = { dur: Math.max(0, Math.round(Number(req.query.dur) || 0)), at: now(), texts: (meta[key] && meta[key].texts) || [] };
+  const meta = tutMeta(); const { off, ...keep } = meta[key] || {}; meta[key] = { ...keep, dur: Math.max(0, Math.round(Number(req.query.dur) || 0)), at: now(), texts: keep.texts || [] };
   fs.writeFileSync(TUT_META, JSON.stringify(meta));
   res.json({ ok: true, tutorials: tutorials() });
 });
 // Textos da aula: quantos blocos a dona quiser, aparecem embaixo do vídeo
 app.put('/api/admin/tutoriais/:key/textos', adminOnly, jsonBody, (req, res) => {
   const key = req.params.key;
-  if (!TUTORIAIS.includes(key)) return res.status(404).json({ error: 'Passo não encontrado.' });
+  if (!validTut(key)) return res.status(404).json({ error: 'Passo não encontrado.' });
   const texts = (Array.isArray(req.body.texts) ? req.body.texts : []).map(t => String(t || '').trim().slice(0, 3000)).filter(Boolean).slice(0, 50);
   fs.mkdirSync(TUT_DIR, { recursive: true });
   const meta = tutMeta(); meta[key] = { ...(meta[key] || {}), texts };
   fs.writeFileSync(TUT_META, JSON.stringify(meta));
   res.json({ ok: true, tutorials: tutorials(), texts });
 });
-app.get('/api/admin/tutoriais/textos', adminOnly, (req, res) => { const meta = tutMeta(); const o = {}; TUTORIAIS.forEach(k => { o[k] = (meta[k] && meta[k].texts) || []; }); res.json({ texts: o }); });
+app.get('/api/admin/tutoriais/textos', adminOnly, (req, res) => { const meta = tutMeta(); const o = {}; tutKeys(meta).forEach(k => { o[k] = (meta[k] && meta[k].texts) || []; }); res.json({ texts: o }); });
 app.delete('/api/admin/tutoriais/:key', adminOnly, (req, res) => {
   const key = req.params.key;
-  if (!TUTORIAIS.includes(key)) return res.status(404).json({ error: 'Passo não encontrado.' });
+  if (!validTut(key)) return res.status(404).json({ error: 'Passo não encontrado.' });
   try { fs.unlinkSync(path.join(TUT_DIR, key + '.mp4')); } catch (e) {}
   fs.mkdirSync(TUT_DIR, { recursive: true });
-  const meta = tutMeta(); meta[key] = { off: true, at: now(), texts: (meta[key] && meta[key].texts) || [] };
+  const meta = tutMeta(); meta[key] = { ...(meta[key] || {}), off: true, at: now(), dur: 0, texts: (meta[key] && meta[key].texts) || [] };
   fs.writeFileSync(TUT_META, JSON.stringify(meta));
   res.json({ ok: true, tutorials: tutorials() });
 });

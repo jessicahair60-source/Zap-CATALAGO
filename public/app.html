@@ -2499,13 +2499,14 @@ const TUT_ORDER = ['tour', 'p1', 'p2', 'p3', 'link', 'banner', 'vender'];
 const TUT_PILLS = { info: ['p1'], banner: ['p2', 'banner'], prod: ['p3'] };
 const TUT_CARDS = [['tour', 'inicio', 'dacts'], ['p1', 'loja'], ['p2', 'visual'], ['p3', 'produtos'], ['vender', 'inicio', 'dsum']];
 const TUT_AUTO = { inicio: 'tour', loja: 'p1', visual: 'p2', produtos: 'p3' };
-const tutOn = () => MODE === 'panel' && !PV && TUT_ORDER.some(k => TUTS[k]);
+const tutInfo = k => [(TUTS[k] || {}).title || (TUT[k] || [])[0] || 'Aula', (TUTS[k] || {}).sub ?? (TUT[k] || [])[1] ?? ''];
+const tutOn = () => MODE === 'panel' && !PV && Object.keys(TUTS).length > 0;
 const tutSeen = (() => { try { return new Set(JSON.parse(localStorage.getItem('zc_tut_seen') || '[]')); } catch (e) { return new Set(); } })();
 const tutMark = k => { tutSeen.add(k); try { localStorage.setItem('zc_tut_seen', JSON.stringify([...tutSeen])); } catch (e) {} };
 const tutDur = k => { const d = (TUTS[k] || {}).dur || 0; return !d ? '' : d < 60 ? `${d} s` : `${Math.round(d / 60)} min`; };
 function openTut(k, auto) {
   if (!TUTS[k] || $('.tmodal') || (auto && $('#paywall'))) return; tutMark(k);
-  const [title] = TUT[k]; const bonus = title.startsWith('Bônus');
+  const [title] = tutInfo(k); const bonus = title.startsWith('Bônus');
   const m = document.createElement('div'); m.className = 'tmodal';
   m.innerHTML = `<div class="tbox" role="dialog" aria-modal="true" aria-label="${esc(title)}"><button class="tx" aria-label="Fechar">×</button>
     <div class="tk">${bonus ? 'Bônus' : 'Tutorial'}${tutDur(k) ? ' · ' + tutDur(k) : ''}</div><h4>${esc(title.replace('Bônus: ', ''))}</h4>
@@ -2520,7 +2521,7 @@ function openTut(k, auto) {
   const v = m.querySelector('video'); const p = v.play(); if (p && p.catch) p.catch(() => {});
 }
 function tutPill(k) {
-  const [t] = TUT[k]; const bonus = t.startsWith('Bônus'); const seen = tutSeen.has(k);
+  const [t] = tutInfo(k); const bonus = t.startsWith('Bônus'); const seen = tutSeen.has(k);
   const b = document.createElement('span'); b.className = 'tpill' + (seen ? ' seen' : '') + (bonus ? ' bonus' : ''); b.setAttribute('role', 'button'); b.tabIndex = 0;
   b.innerHTML = `<i></i>${seen ? 'Assistido' : bonus ? esc(t) : k === 'link' ? 'Como pegar o link' : 'Ver tutorial'}${tutDur(k) ? ` <em>${tutDur(k)}</em>` : ''}`;
   b.onclick = e => { e.preventDefault(); e.stopPropagation(); openTut(k); };
@@ -2542,7 +2543,7 @@ function tutDecorate(force) {
     if (!TUTS[k] || box.querySelector(`.ttab[data-k="${k}"]`)) return;
     const anchor = after ? box.querySelector(`:scope > .${after}`) : box.querySelector(`:scope > h3.pgroup[data-ptab="${tab}"]`);
     if (!anchor) return;
-    const [t, sub] = TUT[k];
+    const [t, sub] = tutInfo(k);
     const c = document.createElement('button'); c.className = 'ttab' + (t.startsWith('Bônus') ? ' bonus' : ''); c.dataset.k = k; c.dataset.tab = tab;
     if (pui.tab !== tab) c.classList.add('offtab');
     c.innerHTML = `<span class="tth"></span><span class="ttx"><span class="tkick">${t.startsWith('Bônus') ? 'Bônus' : 'Tutorial'}</span><b>${tutSeen.has(k) ? '✓ ' : ''}${esc(t.replace('Bônus: ', ''))}</b><small>${esc(sub)}${tutDur(k) ? ' · ' + tutDur(k) : ''}</small></span><span class="tgo">Assistir ›</span>`;
@@ -2556,10 +2557,10 @@ function tutDecorate(force) {
     tsec.querySelector('summary small').textContent = 'Todos os vídeos em um só lugar';
     const body = tsec.querySelector('.sbody'); body.innerHTML = '<div class="tlist"></div>'; const list = body.firstChild;
     let n = 1;
-    [['Comece por aqui', ['tour', 'p1', 'p2', 'p3']], ['Tutoriais extras', ['link', 'banner', 'vender']]].forEach(([g, ks]) => {
+    [['', Object.keys(TUTS)]].forEach(([g, ks]) => {
       ks = ks.filter(k => TUTS[k]); if (!ks.length) return;
-      const h = document.createElement('div'); h.className = 'tgrp'; h.textContent = g; list.appendChild(h);
-      ks.forEach(k => { const [t, sub] = TUT[k];
+      if (g) { const h = document.createElement('div'); h.className = 'tgrp'; h.textContent = g; list.appendChild(h); }
+      ks.forEach(k => { const [t, sub] = tutInfo(k);
         const b = document.createElement('button'); b.className = 'tli';
         b.innerHTML = `<span class="tth"></span><span><b>${n++}. ${esc(t)}</b><small>${esc(sub)}${tutDur(k) ? ' · ' + tutDur(k) : ''}</small></span>`;
         b.onclick = () => openTut(k); list.appendChild(b); });

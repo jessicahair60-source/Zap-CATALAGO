@@ -70,7 +70,7 @@
   <div class="list" id="list"><div class="empty">Carregando...</div></div>
 
   <h2>Vídeos tutoriais do painel</h2>
-  <p class="tnote">Cada vídeo aparece para as lojistas no lugar certo do painel. O botão só aparece onde já tem vídeo. Envie em pé (9:16), MP4.</p>
+  <p class="tnote">Aqui você cria, muda o nome, reordena e apaga as aulas. As 7 primeiras também aparecem sozinhas no lugar certo do painel; as novas ficam na lista de Tutoriais (Conta > Ajuda). A ordem daqui é a ordem da lista. Uma aula só aparece para as lojistas depois de ter vídeo. Envie em pé (9:16), MP4.</p>
   <div class="list" id="tuts"><div class="empty">Carregando...</div></div>
 
   <h2>Pagamentos recentes</h2>
@@ -146,23 +146,37 @@ const TUTS = [['tour', 'Conheça o painel', 'Abre sozinho na 1ª vez que a lojis
   ['link', 'Extra 1 · Como pegar o link da sua vitrine', 'Início, embaixo do link da vitrine'],
   ['banner', 'Extra 2 · Bônus: Como criar o seu banner', 'Aba Visual, dentro de Banner e logo'],
   ['vender', 'Extra 3 · Bônus: Como vender mais usando a sua vitrine', 'Início, no fim da página']];
-let tutData = {}, tutTexts = {}, tutDirty = {};
+let tutData = {}, tutTexts = {}, tutDirty = {}, tutList = [];
 const mmss = d => d ? `${Math.floor(d / 60)}:${String(Math.round(d % 60)).padStart(2, '0')}` : '';
 async function loadTuts() {
   const r = await fetch('/api/admin/tutoriais'); if (!r.ok) return;
-  tutData = (await r.json()).tutorials;
+  const j0 = await r.json(); tutData = j0.tutorials; tutList = j0.list || [];
   const r2 = await fetch('/api/admin/tutoriais/textos'); if (r2.ok) tutTexts = (await r2.json()).texts;
   renderTuts();
 }
 function renderTuts() {
-  $('#tuts').innerHTML = TUTS.map(([k, t, where]) => { const v = tutData[k]; return `<div class="trow">
+  const WHERE = Object.fromEntries(TUTS.map(([k, , w]) => [k, w]));
+  $('#tuts').innerHTML = tutList.map((a, i) => { const k = a.key, v = tutData[k], aula = !a.fixed;
+    const t = `${i + 1}. ${a.title}`, where = `${a.sub ? a.sub + ' · ' : ''}${WHERE[k] ? WHERE[k] + ' e na lista' : 'Na lista de Tutoriais (Conta > Ajuda)'}`; return `<div class="trow">
     ${v ? `<video src="${esc(v.url)}" muted playsinline preload="metadata"></video>` : '<div class="ph">▶</div>'}
     <div class="tinfo"><b>${esc(t)}</b><small>${esc(where)}</small>
       <small><span class="tag ${v ? 't-ok' : 't-no'}">${v ? 'No ar' : 'Sem vídeo'}</span>${v && v.dur ? ' · ' + mmss(v.dur) : ''}</small>
-      <div class="acts"><button data-tup="${k}">${v ? 'Trocar vídeo' : 'Enviar vídeo'}</button>${v ? `<a href="${esc(v.url)}" target="_blank" rel="noopener">Assistir</a><button class="danger" data-tdel="${k}">Tirar</button>` : ''}</div>
+      <div class="acts"><button data-tup="${k}">${v ? 'Trocar vídeo' : 'Enviar vídeo'}</button>${v ? `<a href="${esc(v.url)}" target="_blank" rel="noopener">Assistir</a><button class="danger" data-tdel="${k}">Tirar</button>` : ''}<button data-aed="${k}">Mudar nome</button>${i > 0 ? `<button data-amv="${k}" data-d="up" aria-label="Subir na lista">↑ Subir</button>` : ''}${i < tutList.length - 1 ? `<button data-amv="${k}" data-d="down" aria-label="Descer na lista">↓ Descer</button>` : ''}${aula ? `<button class="danger" data-adel="${k}">Apagar aula</button>` : ''}</div>
       <div class="ttexts"><span class="tlab">Textos da aula (aparecem embaixo do vídeo)</span>
         ${(tutTexts[k] || []).map((t, i) => `<div class="tblk"><textarea data-tk="${k}" data-ti="${i}" placeholder="Escreva aqui uma dica ou explicação">${esc(t)}</textarea><button data-trm="${k}" data-ti="${i}" title="Apagar este texto" aria-label="Apagar este texto">×</button></div>`).join('')}
-        <div class="acts"><button data-tadd="${k}">+ Adicionar texto</button>${tutDirty[k] ? `<button data-tsave="${k}" style="background:#2A1A22;color:#fff;border-color:#2A1A22">Salvar textos</button>` : ''}</div></div></div></div>`; }).join('');
+        <div class="acts"><button data-tadd="${k}">+ Adicionar texto</button>${tutDirty[k] ? `<button data-tsave="${k}" style="background:#2A1A22;color:#fff;border-color:#2A1A22">Salvar textos</button>` : ''}</div></div></div></div>`; }).join('') + `<div class="acts" style="margin-top:4px"><button id="anew" style="background:#2A1A22;color:#fff;border-color:#2A1A22">+ Nova aula</button></div>`;
+  $('#anew').onclick = async () => {
+    const title = prompt('Nome da nova aula (ex.: Como usar o cupom de desconto):'); if (!title || !title.trim()) return;
+    const sub = prompt('Uma frase curta explicando a aula (opcional):') || '';
+    const j = await aulaApi('POST', '/api/admin/tutoriais-aulas', { title, sub }); if (j) toast('Aula criada. Agora envie o vídeo dela.'); };
+  document.querySelectorAll('[data-aed]').forEach(b => b.onclick = async () => { const a = tutList.find(x => x.key === b.dataset.aed);
+    const title = prompt('Nome da aula:', a.title); if (title === null || !title.trim()) return;
+    const sub = prompt('Frase curta (opcional):', a.sub || ''); if (sub === null) return;
+    if (await aulaApi('PUT', '/api/admin/tutoriais-aulas/' + a.key, { title, sub })) toast('Aula atualizada'); });
+  document.querySelectorAll('[data-amv]').forEach(b => b.onclick = () => aulaApi('PUT', '/api/admin/tutoriais-aulas/' + b.dataset.amv, { move: b.dataset.d }));
+  document.querySelectorAll('[data-adel]').forEach(b => b.onclick = async () => { const a = tutList.find(x => x.key === b.dataset.adel);
+    if (!confirm(`Apagar a aula "${a.title}"? O vídeo e os textos dela somem do painel.`)) return;
+    if (await aulaApi('DELETE', '/api/admin/tutoriais-aulas/' + a.key)) toast('Aula apagada'); });
   document.querySelectorAll('[data-tk]').forEach(t => t.oninput = () => { tutTexts[t.dataset.tk][+t.dataset.ti] = t.value;
     if (!tutDirty[t.dataset.tk]) { tutDirty[t.dataset.tk] = 1; const pos = t.selectionStart; renderTuts(); const n = document.querySelector(`[data-tk="${t.dataset.tk}"][data-ti="${t.dataset.ti}"]`); if (n) { n.focus(); n.setSelectionRange(pos, pos); } } });
   document.querySelectorAll('[data-tadd]').forEach(b => b.onclick = () => { const k = b.dataset.tadd; (tutTexts[k] = tutTexts[k] || []).push(''); tutDirty[k] = 1; renderTuts();
@@ -178,6 +192,11 @@ function renderTuts() {
     const r = await fetch('/api/admin/tutoriais/' + b.dataset.tdel, { method: 'DELETE' }); const j = await r.json().catch(() => ({}));
     if (!r.ok) return toast(j.error || 'Não deu certo.'); tutData = j.tutorials; renderTuts(); toast('Vídeo tirado');
   });
+}
+async function aulaApi(method, url, body) {
+  const r = await fetch(url, { method, headers: body ? { 'Content-Type': 'application/json' } : {}, body: body ? JSON.stringify(body) : undefined });
+  const j = await r.json().catch(() => ({})); if (!r.ok) { toast(j.error || 'Não deu certo.'); return null; }
+  tutList = j.list || tutList; tutData = j.tutorials || tutData; tutList.forEach(a => { if (!tutTexts[a.key]) tutTexts[a.key] = []; }); renderTuts(); return j;
 }
 function videoDur(file) { return new Promise(ok => { const v = document.createElement('video'); v.preload = 'metadata';
   v.onloadedmetadata = () => { ok(Math.round(v.duration) || 0); URL.revokeObjectURL(v.src); }; v.onerror = () => ok(0); v.src = URL.createObjectURL(file); }); }
