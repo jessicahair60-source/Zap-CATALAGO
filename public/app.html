@@ -908,6 +908,8 @@ body.painel.pv-on .pv { display: block; animation: pvIn .25s cubic-bezier(.2,.7,
 .ttab .tth { flex: none; width: 52px; height: 72px; border-radius: 10px; background: linear-gradient(160deg, #E0457B, #7a1f48); display: grid; place-items: center; box-shadow: 0 4px 14px rgba(176,48,106,.3); }
 .ttab.bonus .tth { background: linear-gradient(160deg, #F2B33D, #B0306A); }
 .ttab .tth::after { content: ""; border-left: 12px solid #fff; border-top: 8px solid transparent; border-bottom: 8px solid transparent; margin-left: 3px; }
+.ttab .tkick { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: #fff; background: #E0457B; border-radius: 999px; padding: 3px 9px; margin-bottom: 5px; }
+.ttab.bonus .tkick { background: #E0A100; }
 .ttab b { display: block; font-family: var(--f-display); font-size: 15px; }
 .ttab small { display: block; color: var(--p-muted); font-size: 12.5px; margin-top: 2px; }
 .ttab .tgo { margin-left: auto; color: #B0306A; font-weight: 700; font-size: 13px; white-space: nowrap; }
@@ -2540,7 +2542,7 @@ function tutDecorate(force) {
     const [t, sub] = TUT[k];
     const c = document.createElement('button'); c.className = 'ttab' + (t.startsWith('Bônus') ? ' bonus' : ''); c.dataset.k = k; c.dataset.tab = tab;
     if (pui.tab !== tab) c.classList.add('offtab');
-    c.innerHTML = `<span class="tth"></span><span class="ttx"><b>${tutSeen.has(k) ? '✓ ' : ''}${esc(t)}</b><small>${esc(sub)}${tutDur(k) ? ' · ' + tutDur(k) : ''}</small></span><span class="tgo">Assistir ›</span>`;
+    c.innerHTML = `<span class="tth"></span><span class="ttx"><span class="tkick">${t.startsWith('Bônus') ? 'Bônus' : 'Tutorial'}</span><b>${tutSeen.has(k) ? '✓ ' : ''}${esc(t.replace('Bônus: ', ''))}</b><small>${esc(sub)}${tutDur(k) ? ' · ' + tutDur(k) : ''}</small></span><span class="tgo">Assistir ›</span>`;
     c.onclick = () => openTut(k);
     after ? anchor.after(c) : anchor.before(c);
   });
