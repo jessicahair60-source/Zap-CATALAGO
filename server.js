@@ -424,6 +424,8 @@ app.put('/api/store', jsonBody, auth, (req, res) => {
     const base = Number(req.body.base) || 0;
     const cur = db.prepare('SELECT state FROM stores WHERE id = ?').get(req.store.id);
     let old = null; try { old = JSON.parse(cur.state || 'null'); } catch (e) {}
+    // Painel aberto com dados antigos (outra aba ou outro aparelho salvou depois): não apaga o que já foi salvo
+    if (base && old && old._at && base < old._at) return { stale: true, at: old._at };
     const have = new Set(clean.products.map(p => String(p.id)));
     const added = ((old && old.products) || []).filter(p => p.waAt && p.waAt > base && !have.has(String(p.id)));
     if (added.length) {
@@ -431,11 +433,19 @@ app.put('/api/store', jsonBody, auth, (req, res) => {
       clean.cats = Array.isArray(clean.cats) ? clean.cats : [];
       added.forEach(p => { if (p.cat && !clean.cats.includes(p.cat)) clean.cats.push(p.cat); });
     }
-    const at = now();
+    const at = now(); clean._at = at;
     db.prepare('UPDATE stores SET state = ?, name = ?, updated_at = ? WHERE id = ?').run(JSON.stringify(clean), name, at, req.store.id);
-    return at;
-  });
-  res.json({ ok: true, state: clean, savedAt: t() });
+    return { at };
+  })();
+  if (t.stale) return res.status(409).json({ error: 'Este painel está desatualizado: a loja foi salva em outra aba ou outro aparelho. Atualize a página para continuar.', stale: true, savedAt: t.at });
+  res.json({ ok: true, state: clean, savedAt: t.at });
+});
+
+// O painel confere, ao voltar para a aba, se a loja foi salva em outro lugar
+app.get('/api/store/at', auth, (req, res) => {
+  const row = db.prepare('SELECT state FROM stores WHERE id = ?').get(req.store.id);
+  let st = null; try { st = JSON.parse(row.state || 'null'); } catch (e) {}
+  res.set('Cache-Control', 'no-store').json({ at: (st && st._at) || 0 });
 });
 
 app.put('/api/slug', jsonBody, auth, (req, res) => {
@@ -510,7 +520,7 @@ app.post('/api/import', auth, express.raw({ type: '*/*', limit: '400mb' }), (req
   state.products = [...state.products, ...fresh];
   const st = cat.store || {}; state.store = state.store || {};
   if (st.phone && String(state.store.phone || '').replace(/\D/g, '').length < 12) state.store.phone = String(st.phone).replace(/\D/g, '').slice(0, 15);
-  const clean = safeLinks(state); const at = now();
+  const clean = safeLinks(state); const at = now(); clean._at = at;
   db.prepare('UPDATE stores SET state = ?, updated_at = ? WHERE id = ?').run(JSON.stringify(clean), at, req.store.id);
   res.json({ ok: true, added, skipped, media: mediaCount, state: clean, savedAt: at });
 });
