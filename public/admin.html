@@ -38,6 +38,15 @@
   td.num { font-variant-numeric: tabular-nums; text-align: right; } th.num { text-align: right; }
   .empty { padding: 24px; text-align: center; color: var(--muted); background: var(--surface); border-radius: 16px; border: 1px dashed var(--line); }
   .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%); background: #2A1A22; color: #fff; padding: 10px 16px; border-radius: 10px; font-size: 14px; z-index: 9; max-width: 90vw; }
+  .tnote { margin: -4px 0 12px; color: var(--muted); font-size: 13.5px; }
+  .trow { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 12px 14px; display: flex; gap: 12px; align-items: center; }
+  .trow video { width: 54px; height: 96px; border-radius: 10px; object-fit: cover; background: #2A1A22; flex: none; }
+  .trow .ph { width: 54px; height: 96px; border-radius: 10px; border: 1px dashed var(--line); display: grid; place-items: center; color: var(--muted); font-size: 22px; flex: none; }
+  .trow .tinfo { flex: 1; min-width: 0; }
+  .trow .tinfo b { display: block; font-size: 15px; }
+  .trow .tinfo small { display: block; color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+  .trow .acts { margin-top: 8px; }
+  .t-ok { background: #E3F6EA; color: #137A3D; } .t-no { background: #F2ECEF; color: var(--muted); }
   @media (min-width: 760px) { .kpis { grid-template-columns: repeat(4, 1fr); } }
 </style>
 </head>
@@ -54,6 +63,10 @@
     <div class="chips" id="chips"></div>
   </div>
   <div class="list" id="list"><div class="empty">Carregando...</div></div>
+
+  <h2>Vídeos tutoriais do painel</h2>
+  <p class="tnote">Cada vídeo aparece para as lojistas no lugar certo do painel. O botão só aparece onde já tem vídeo. Envie em pé (9:16), MP4.</p>
+  <div class="list" id="tuts"><div class="empty">Carregando...</div></div>
 
   <h2>Pagamentos recentes</h2>
   <div id="pays"></div>
@@ -119,6 +132,54 @@ async function act(id, action) {
 }
 $('#q').oninput = () => data && render();
 load();
+
+/* Vídeos tutoriais: um lugar para cada passo do painel */
+const TUTS = [['tour', 'Conheça o painel', 'Abre sozinho na 1ª vez que a lojista entra no painel'],
+  ['p1', 'Passo 1 · Informações da loja', 'Aba Loja (abre sozinho na 1ª vez)'],
+  ['p2', 'Passo 2 · Visual', 'Aba Visual (abre sozinho na 1ª vez)'],
+  ['p3', 'Passo 3 · Cadastrar produto', 'Aba Produtos (abre sozinho na 1ª vez)'],
+  ['link', 'Extra 1 · Como pegar o link da sua vitrine', 'Início, embaixo do link da vitrine'],
+  ['banner', 'Extra 2 · Bônus: Como criar o seu banner', 'Aba Visual, dentro de Banner e logo'],
+  ['vender', 'Extra 3 · Bônus: Como vender mais usando a sua vitrine', 'Início, no fim da página']];
+let tutData = {};
+const mmss = d => d ? `${Math.floor(d / 60)}:${String(Math.round(d % 60)).padStart(2, '0')}` : '';
+async function loadTuts() {
+  const r = await fetch('/api/admin/tutoriais'); if (!r.ok) return;
+  tutData = (await r.json()).tutorials; renderTuts();
+}
+function renderTuts() {
+  $('#tuts').innerHTML = TUTS.map(([k, t, where]) => { const v = tutData[k]; return `<div class="trow">
+    ${v ? `<video src="${esc(v.url)}" muted playsinline preload="metadata"></video>` : '<div class="ph">▶</div>'}
+    <div class="tinfo"><b>${esc(t)}</b><small>${esc(where)}</small>
+      <small><span class="tag ${v ? 't-ok' : 't-no'}">${v ? 'No ar' : 'Sem vídeo'}</span>${v && v.dur ? ' · ' + mmss(v.dur) : ''}</small>
+      <div class="acts"><button data-tup="${k}">${v ? 'Trocar vídeo' : 'Enviar vídeo'}</button>${v ? `<a href="${esc(v.url)}" target="_blank" rel="noopener">Assistir</a><button class="danger" data-tdel="${k}">Tirar</button>` : ''}</div></div></div>`; }).join('');
+  document.querySelectorAll('[data-tup]').forEach(b => b.onclick = () => pickTut(b.dataset.tup, b));
+  document.querySelectorAll('[data-tdel]').forEach(b => b.onclick = async () => {
+    if (!confirm('Tirar este vídeo? O botão do tutorial some do painel das lojistas.')) return;
+    const r = await fetch('/api/admin/tutoriais/' + b.dataset.tdel, { method: 'DELETE' }); const j = await r.json().catch(() => ({}));
+    if (!r.ok) return toast(j.error || 'Não deu certo.'); tutData = j.tutorials; renderTuts(); toast('Vídeo tirado');
+  });
+}
+function videoDur(file) { return new Promise(ok => { const v = document.createElement('video'); v.preload = 'metadata';
+  v.onloadedmetadata = () => { ok(Math.round(v.duration) || 0); URL.revokeObjectURL(v.src); }; v.onerror = () => ok(0); v.src = URL.createObjectURL(file); }); }
+function pickTut(key, btn) {
+  const inp = document.createElement('input'); inp.type = 'file'; inp.accept = 'video/mp4,video/quicktime,video/webm';
+  inp.onchange = async () => {
+    const file = inp.files[0]; if (!file) return;
+    const dur = await videoDur(file);
+    btn.disabled = true;
+    const xhr = new XMLHttpRequest(); xhr.open('POST', `/api/admin/tutoriais/${key}?dur=${dur}`);
+    xhr.setRequestHeader('Content-Type', file.type || 'video/mp4');
+    xhr.upload.onprogress = e => { if (e.lengthComputable) btn.textContent = `Enviando ${Math.round(e.loaded / e.total * 100)}%`; };
+    xhr.onload = () => { let j = {}; try { j = JSON.parse(xhr.responseText); } catch (e) {}
+      if (xhr.status !== 200) { toast(j.error || 'Não deu para enviar.'); renderTuts(); return; }
+      tutData = j.tutorials; renderTuts(); toast('Vídeo no ar!'); };
+    xhr.onerror = () => { toast('Sem conexão. Tente de novo.'); renderTuts(); };
+    xhr.send(file);
+  };
+  inp.click();
+}
+loadTuts();
 </script>
 </body>
 </html>
