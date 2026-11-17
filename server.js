@@ -970,16 +970,16 @@ app.get('/og/pedido/:slug/:code.png', (req, res) => {
   const store = orderStore(req.params.slug);
   if (!store || store.blocked || !isPro(store)) return res.sendStatus(404);
   const o = orderOf(store, req.params.code); if (!o) return res.sendStatus(404);
-  const key = `${store.id}:${store.updated_at}:${o.items.map(x => x.id).join('.')}`;
+  const key = `${store.id}:${store.updated_at}:${o.items.map(x => x.id + '-' + x.qty).join('.')}`;
   let png = orderCache.get(key);
   if (png === undefined) {
-    try { png = orderCard({ state: o.state, ids: o.items.map(x => x.id), uploads: UPLOADS }); }
+    try { png = orderCard({ state: o.state, items: o.items.map(x => ({ id: x.id, qty: x.qty })), uploads: UPLOADS }); }
     catch (e) { console.error('og pedido', e.message); return res.sendStatus(500); }
     if (orderCache.size > 300) orderCache.delete(orderCache.keys().next().value);
     orderCache.set(key, png);
   }
   if (!png) return res.redirect(302, `/og/${encodeURIComponent(store.slug)}.png?v=${store.updated_at || 0}`);
-  res.type('image/png').set('Cache-Control', 'public, max-age=86400').send(png);
+  res.type(png.type).set('Cache-Control', 'public, max-age=86400').send(png.data);
 });
 app.get('/:slug/pedido/:code', (req, res) => {
   const store = orderStore(req.params.slug);
@@ -995,18 +995,42 @@ app.get('/:slug/pedido/:code', (req, res) => {
   const desc = `Pedido com ${n} ${n === 1 ? 'produto' : 'produtos'} · Vitrine Digital`;
   const og = `${CFG.publicUrl}/og/pedido/${encodeURIComponent(store.slug)}/${encodeURIComponent(req.params.code)}.png?v=${store.updated_at || 0}`;
   const pic = p => { const m = (p.media || []).find(m => m && m.type !== 'video' && m.id && m.id !== 'demo'); return m ? (m.id.startsWith('ex-') ? '/static/exemplo/' + m.id.slice(3) : '/u/' + String(m.id).replace(/^\/u\//, '')) : ''; };
-  const rows = o.items.map(x => { const u = pic(x.p);
-    return `<li>${u ? `<img src="${escHtml(u)}" alt="" loading="lazy">` : '<span class="ph"></span>'}<div><b>${escHtml(x.p.name)}</b><small>${x.qty} ${x.qty === 1 ? 'unidade' : 'unidades'}</small></div></li>`; }).join('');
+  const brl = v => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const showPrice = st.sumPrice !== false;
+  const total = o.items.reduce((t, x) => t + (x.p.price > 0 ? x.p.price * x.qty : 0), 0);
+  const lineVal = x => x.p.price > 0 ? (x.p.fromPrice ? 'a partir de ' : '') + brl(x.p.price * x.qty) : 'a consultar';
+  const units = q => `${q} ${q === 1 ? 'unidade' : 'unidades'}`;
+  // cards com a foto inteira, no formato em que a lojista enviou (sem cortar)
+  const cards = o.items.map(x => { const u = pic(x.p);
+    return `<li class="card"><div class="ph">${u ? `<img src="${escHtml(u)}" alt="${escHtml(x.p.name)}" loading="lazy">` : ''}${x.qty > 1 ? `<span class="qb">${x.qty}x</span>` : ''}</div>
+      <div class="info"><b>${escHtml(x.p.name)}</b><small>${units(x.qty)}</small>${showPrice ? `<span class="pr">${escHtml(lineVal(x))}</span>` : ''}</div></li>`; }).join('');
+  const sumRows = o.items.map(x => `<div class="row"><span>${x.qty}x ${escHtml(x.p.name)}</span>${showPrice ? `<span>${escHtml(lineVal(x))}</span>` : ''}</div>`).join('');
+  const one = o.items.length === 1 ? ' one' : '';
   res.set('Cache-Control', 'no-cache').type('html').send(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Pedido · ${name}</title><meta name="robots" content="noindex">
 <meta property="og:type" content="website"><meta property="og:site_name" content="${name}"><meta property="og:title" content="${name}"><meta property="og:description" content="${escHtml(desc)}">
-<meta property="og:url" content="${escHtml(CFG.publicUrl + req.path)}"><meta property="og:image" content="${escHtml(og)}"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="400"><meta property="og:image:height" content="400">
-<style>body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:${col(c.bg, '#FBF3F5')};color:${col(c.title, '#2A1A22')}}main{max-width:520px;margin:0 auto;padding:28px 16px 40px}
-h1{font-size:22px;margin:0 0 4px}p{margin:0 0 20px;color:${col(c.muted, '#8C7480')}}ul{list-style:none;margin:0 0 24px;padding:0;display:grid;gap:10px}
-li{display:flex;gap:12px;align-items:center;background:#fff;border-radius:16px;padding:10px}li img,li .ph{width:72px;height:72px;border-radius:12px;object-fit:cover;flex:none;background:#f1e4e9}
-li b{display:block;font-size:16px}li small{color:${col(c.muted, '#8C7480')};font-size:14px}
+<meta property="og:url" content="${escHtml(CFG.publicUrl + req.path)}"><meta property="og:image" content="${escHtml(og)}"><meta property="og:image:type" content="image/jpeg"><meta property="og:image:width" content="600"><meta property="og:image:height" content="600">
+<style>*{box-sizing:border-box}html{background:${col(c.bg, '#FBF3F5')}}body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,sans-serif;background:${col(c.bg, '#FBF3F5')};color:${col(c.title, '#2A1A22')}}
+main{max-width:560px;margin:0 auto;padding:24px 16px 40px}
+header{display:flex;align-items:center;gap:12px;margin-bottom:18px}header img{width:52px;height:52px;border-radius:50%;object-fit:contain;background:#fff;flex:none}
+h1{font-size:22px;margin:0}header p{margin:2px 0 0;color:${col(c.muted, '#8C7480')};font-size:15px}
+.tag{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.14em;color:${col(c.buyBg, '#B9476F')};margin:0 0 10px}
+ul{list-style:none;margin:0 0 18px;padding:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
+ul.one{grid-template-columns:minmax(0,1fr);max-width:340px;margin-left:auto;margin-right:auto}
+.card{background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.ph{position:relative;background:#f1e4e9;min-height:120px}.ph img{width:100%;height:auto;display:block}
+.qb{position:absolute;top:8px;right:8px;background:${col(c.buyBg, '#B9476F')};color:${col(c.buyText, '#FFFFFF')};font-weight:700;font-size:14px;padding:3px 10px;border-radius:999px}
+.info{padding:10px 12px 12px}.info b{display:block;font-size:15px;line-height:1.25}.info small{display:block;color:${col(c.muted, '#8C7480')};font-size:13px;margin-top:2px}
+.pr{display:block;font-weight:700;margin-top:4px;color:${col(c.buyBg, '#B9476F')}}
+.sum{background:#fff;border-radius:18px;padding:14px 16px;margin:0 0 22px}.sum h2{font-size:16px;margin:0 0 8px}
+.row{display:flex;justify-content:space-between;gap:12px;padding:6px 0;font-size:15px}.row span:last-child{white-space:nowrap}
+.tot{border-top:1px solid #f0e3e8;margin-top:6px;padding-top:10px;font-weight:700;font-size:17px}
 a.btn{display:block;text-align:center;text-decoration:none;font-weight:700;padding:15px;border-radius:999px;background:${col(c.buyBg, '#B9476F')};color:${col(c.buyText, '#FFFFFF')}}</style></head>
-<body><main><h1>${name}</h1><p>Pedido com ${n} ${n === 1 ? 'produto' : 'produtos'}</p><ul>${rows}</ul><a class="btn" href="${escHtml(shop)}">Ver a vitrine</a></main></body></html>`);
+<body><main><header><div><h1>${name}</h1><p>Pedido com ${n} ${n === 1 ? 'produto' : 'produtos'}</p></div></header>
+<span class="tag">RESUMO DO PEDIDO</span>
+<ul class="${one.trim()}">${cards}</ul>
+<section class="sum"><h2>Resumo</h2>${sumRows}${showPrice && total > 0 ? `<div class="row tot"><span>Total dos produtos</span><span>${escHtml(brl(total))}</span></div>` : ''}</section>
+<a class="btn" href="${escHtml(shop)}">Ver a vitrine</a></main></body></html>`);
 });
 
 /* ---------- vitrine pelo endereço /nome-da-loja ---------- */

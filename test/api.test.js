@@ -224,9 +224,10 @@ test('link do pedido: página com as fotos e prévia do WhatsApp', async () => {
   r = await pub('GET', `/acessorios-da-lu/pedido/${code}`); assert.strictEqual(r.status, 200);
   assert.match(r.text, /<meta property="og:title" content="Loja Teste">/);
   assert.match(r.text, /Pedido com 3 produtos/); assert.match(r.text, /Brinco Coração Dourado/); assert.match(r.text, /Colar &lt;Brilhante&gt;/); assert.match(r.text, /2 unidades/);
+  assert.match(r.text, /RESUMO DO PEDIDO/); assert.match(r.text, /2x Colar &lt;Brilhante&gt;/);
   assert.match(r.text, new RegExp(`/u/${foto.replace('.', '\\.')}`));
   const og = /property="og:image" content="([^"]+)"/.exec(r.text)[1].replace('http://localhost', '');
-  r = await fetch(base + og); assert.strictEqual(r.status, 200); assert.strictEqual(r.headers.get('content-type'), 'image/png');
+  r = await fetch(base + og); assert.strictEqual(r.status, 200); assert.strictEqual(r.headers.get('content-type'), 'image/jpeg');
   // pedido sem produto válido volta para a vitrine; loja que não existe dá 404
   r = await pub('GET', '/acessorios-da-lu/pedido/zzz'); assert.strictEqual(r.status, 302);
   r = await pub('GET', '/nao-existe/pedido/1'); assert.strictEqual(r.status, 404);
