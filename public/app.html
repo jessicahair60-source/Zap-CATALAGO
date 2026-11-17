@@ -199,6 +199,8 @@ html, body { overflow-x: clip; }
 .slide .vtag { position: absolute; left: 8px; bottom: 8px; background: rgba(0,0,0,.55); color: #fff; font-size: 11px; padding: 3px 8px; border-radius: 6px; pointer-events: none; }
 .opt-label { font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--c-muted); margin: 14px 0 6px; font-weight: 700; }
 .opts { display: flex; gap: 8px; flex-wrap: wrap; }
+.opts.need { animation: need .5s ease 2; border-radius: 12px; box-shadow: 0 0 0 3px color-mix(in srgb, var(--c-buyBg, #B9476F) 45%, transparent); }
+@keyframes need { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 .opt { border: 1px solid var(--c-cardBorder); background: var(--c-cardBg); padding: 8px 14px; border-radius: 10px; font-weight: 600; font-size: 14px; color: var(--c-text); }
 .opt[aria-pressed="true"] { border-color: var(--c-buyBg); box-shadow: inset 0 0 0 1px var(--c-buyBg); }
 .qty { display: inline-flex; align-items: center; border: 1px solid var(--c-cardBorder); border-radius: 10px; overflow: hidden; }
@@ -1638,7 +1640,10 @@ function openProduct(id) {
   document.querySelectorAll('[data-size]').forEach(bt => bt.onclick = () => { size = bt.dataset.size; document.querySelectorAll('[data-size]').forEach(x => x.setAttribute('aria-pressed', x === bt)); $('#perr').hidden = true; });
   if (showQty) { $('#qm').onclick = () => { qty = Math.max(1, qty - 1); $('#qv').textContent = qty; };
     $('#qp').onclick = () => { qty = Math.min(maxQty(p), qty + 1); $('#qv').textContent = qty; }; }
-  const add = () => { if (size === null) { $('#perr').hidden = false; return false; }
+  // Sem tamanho escolhido: no celular as opções ficam embaixo da foto, então leva a cliente até elas e avisa
+  const add = () => { if (size === null) { $('#perr').hidden = false; const o = document.querySelector('#sheet .opts');
+      if (o) { o.scrollIntoView({ behavior: 'smooth', block: 'center' }); o.classList.remove('need'); void o.offsetWidth; o.classList.add('need'); }
+      toast(`Escolha o ${(p.optLabel || 'tamanho').toLowerCase()} antes de continuar`); return false; }
     const ex = cart.find(c => c.id === id && c.size === size); ex ? ex.qty = Math.min(maxQty(p), ex.qty + qty) : cart.push({ id, size, qty }); updateCartBar(); return true; };
   $('#addc').onclick = () => { if (add()) { closeSheet(); toast('Adicionado ao pedido'); } };
   $('#buyn').onclick = () => { if (add()) { track('click', id); openCart(); } };
