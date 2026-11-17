@@ -970,10 +970,10 @@ app.get('/og/pedido/:slug/:code.png', (req, res) => {
   const store = orderStore(req.params.slug);
   if (!store || store.blocked || !isPro(store)) return res.sendStatus(404);
   const o = orderOf(store, req.params.code); if (!o) return res.sendStatus(404);
-  const key = `${store.id}:${store.updated_at}:${o.items.map(x => x.id).join('.')}`;
+  const key = `${store.id}:${store.updated_at}:${o.items.map(x => x.id + '-' + x.qty).join('.')}`;
   let png = orderCache.get(key);
   if (png === undefined) {
-    try { png = orderCard({ state: o.state, ids: o.items.map(x => x.id), uploads: UPLOADS }); }
+    try { png = orderCard({ state: o.state, items: o.items.map(x => ({ id: x.id, qty: x.qty })), uploads: UPLOADS }); }
     catch (e) { console.error('og pedido', e.message); return res.sendStatus(500); }
     if (orderCache.size > 300) orderCache.delete(orderCache.keys().next().value);
     orderCache.set(key, png);
@@ -993,14 +993,14 @@ app.get('/:slug/pedido/:code', (req, res) => {
   const name = escHtml(st.name || store.name);
   const n = o.items.reduce((a, x) => a + x.qty, 0);
   const desc = `Pedido com ${n} ${n === 1 ? 'produto' : 'produtos'} · Vitrine Digital`;
-  const og = `${CFG.publicUrl}/og/pedido/${encodeURIComponent(store.slug)}/${encodeURIComponent(req.params.code)}.png?v=${store.updated_at || 0}`;
+  const og = `${CFG.publicUrl}/og/pedido/${encodeURIComponent(store.slug)}/${encodeURIComponent(req.params.code)}.png?v=${store.updated_at || 0}${/^[0-9a-z]{1,12}$/.test(String(req.query.f || '')) ? '-' + req.query.f : ''}`;
   const pic = p => { const m = (p.media || []).find(m => m && m.type !== 'video' && m.id && m.id !== 'demo'); return m ? (m.id.startsWith('ex-') ? '/static/exemplo/' + m.id.slice(3) : '/u/' + String(m.id).replace(/^\/u\//, '')) : ''; };
   const rows = o.items.map(x => { const u = pic(x.p);
     return `<li>${u ? `<img src="${escHtml(u)}" alt="" loading="lazy">` : '<span class="ph"></span>'}<div><b>${escHtml(x.p.name)}</b><small>${x.qty} ${x.qty === 1 ? 'unidade' : 'unidades'}</small></div></li>`; }).join('');
   res.set('Cache-Control', 'no-cache').type('html').send(`<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Pedido · ${name}</title><meta name="robots" content="noindex">
 <meta property="og:type" content="website"><meta property="og:site_name" content="${name}"><meta property="og:title" content="${name}"><meta property="og:description" content="${escHtml(desc)}">
-<meta property="og:url" content="${escHtml(CFG.publicUrl + req.path)}"><meta property="og:image" content="${escHtml(og)}"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="400"><meta property="og:image:height" content="400">
+<meta property="og:url" content="${escHtml(CFG.publicUrl + req.path + (/^[0-9a-z]{1,12}$/.test(String(req.query.f || '')) ? '?f=' + req.query.f : ''))}"><meta property="og:image" content="${escHtml(og)}"><meta property="og:image:type" content="image/png"><meta property="og:image:width" content="800"><meta property="og:image:height" content="800">
 <style>body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:${col(c.bg, '#FBF3F5')};color:${col(c.title, '#2A1A22')}}main{max-width:520px;margin:0 auto;padding:28px 16px 40px}
 h1{font-size:22px;margin:0 0 4px}p{margin:0 0 20px;color:${col(c.muted, '#8C7480')}}ul{list-style:none;margin:0 0 24px;padding:0;display:grid;gap:10px}
 li{display:flex;gap:12px;align-items:center;background:#fff;border-radius:16px;padding:10px}li img,li .ph{width:72px;height:72px;border-radius:12px;object-fit:cover;flex:none;background:#f1e4e9}

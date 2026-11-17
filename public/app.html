@@ -1699,7 +1699,12 @@ function orderLink() {
   const q = new Map();
   cart.forEach(c => (c.kit ? (c.picks || []).map(x => x.id) : [c.id]).forEach(id => { if (/^\d+$/.test(String(id))) q.set(String(id), (q.get(String(id)) || 0) + c.qty); }));
   const code = [...q].slice(0, 30).map(([id, n]) => Number(id).toString(36) + (n > 1 ? '-' + Math.min(n, 999) : '')).join('.');
-  return code ? `${BOOT.home}/${encodeURIComponent(BOOT.store.slug)}/pedido/${code}` : '';
+  if (!code) return '';
+  // marca das fotos atuais: quando a foto de um produto muda, o link muda e o WhatsApp busca a prévia nova
+  // (com o mesmo link ele continua mostrando a foto antiga que guardou)
+  let h = 0; for (const id of q.keys()) { const p = S.products.find(x => String(x.id) === id); const k = JSON.stringify(p ? (p.media || []).map(m => m && m.id) : '') + (p ? p.name : '');
+    for (let i = 0; i < k.length; i++) h = (h * 31 + k.charCodeAt(i)) >>> 0; }
+  return `${BOOT.home}/${encodeURIComponent(BOOT.store.slug)}/pedido/${code}?f=${h.toString(36)}`;
 }
 function openCheckout() {
   if (!entList().includes(co.entrega)) co.entrega = entList()[0] || '';
