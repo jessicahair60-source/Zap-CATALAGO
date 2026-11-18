@@ -112,11 +112,11 @@ h1 em, h2 em { font-style: normal; color: var(--pink); }
 .dica { text-align: center; font-size: 12.5px; color: var(--muted); font-weight: 600; margin: 0; }
 
 .esteira { margin: 22px -20px 8px; overflow: hidden; -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent); }
-.esteira-trilho { display: flex; gap: 14px; width: max-content; padding: 6px 0 16px; animation: esteira 22s linear infinite; }
-.esteira-trilho img { height: 340px; width: auto; flex: none; filter: drop-shadow(0 16px 22px rgba(194,16,106,.28)); }
-.esteira:hover .esteira-trilho, .esteira:active .esteira-trilho { animation-play-state: paused; }
-@keyframes esteira { to { transform: translateX(calc(-50% - 7px)); } }
-@media (prefers-reduced-motion: reduce) { .esteira { overflow-x: auto; } .esteira-trilho { animation: none; } }
+.esteira-trilho { display: flex; gap: 14px; width: max-content; padding: 6px 0 16px; transition: transform .45s cubic-bezier(.3,.7,.2,1); will-change: transform; }
+.esteira-trilho.sem-anim, .esteira-trilho.sem-anim img { transition: none; }
+.esteira-trilho img { height: 340px; width: auto; flex: none; filter: drop-shadow(0 16px 22px rgba(194,16,106,.28)); transform: scale(.86); opacity: .55; transition: transform .45s, opacity .45s; }
+.esteira-trilho img.atual { transform: none; opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .esteira-trilho, .esteira-trilho img { transition: none; } }
 
 /* benefícios */
 .bens { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
@@ -127,6 +127,11 @@ h1 em, h2 em { font-style: normal; color: var(--pink); }
 @media (prefers-reduced-motion: reduce) { .ben { animation: none; opacity: 1; } }
 
 /* para quem */
+.nichos { list-style: none; padding: 0; margin: 18px 0 0; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.nichos li { display: inline-flex; align-items: center; gap: 6px; background: var(--branco); border: 1px solid var(--line); border-radius: 99px; padding: 6px 10px; font-size: 12.5px; font-weight: 700; line-height: 1.2; box-shadow: 0 6px 14px -12px rgba(194,16,106,.6); opacity: 0; animation: sobe .35s cubic-bezier(.2,.8,.2,1) forwards; }
+.nichos li span { font-size: 14px; }
+.nichos li.mais { background: var(--grad); color: #fff; border-color: transparent; }
+@media (prefers-reduced-motion: reduce) { .nichos li { animation: none; opacity: 1; } }
 .quem { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
 .qc { position: relative; margin: 0; aspect-ratio: 4/4.4; border-radius: 18px; overflow: hidden; background: var(--grad); box-shadow: 0 10px 24px -18px rgba(194,16,106,.6); }
 .qc img { width: 100%; height: 100%; object-fit: cover; }
@@ -401,16 +406,7 @@ h1 em, h2 em { font-style: normal; color: var(--pink); }
   <!-- 8. Para quem é -->
   <section class="step" id="s8" data-step="8" aria-labelledby="t8">
     <h2 id="t8">Se você vende algum produto ou serviço, <em>o Zap Catálogo é para você!</em></h2>
-    <div class="quem">
-      <figure class="qc"><img src="/static/exemplo/boutique-conj1.webp" alt="" loading="lazy" width="900" height="1125"><figcaption>Lojas de roupas</figcaption></figure>
-      <figure class="qc"><img src="/static/exemplo/salao-unhas.webp" alt="" loading="lazy" width="900" height="1125"><figcaption>Manicures e beleza</figcaption></figure>
-      <figure class="qc"><img src="/static/exemplo/doceria-bolo.webp" alt="" loading="lazy" width="900" height="1200"><figcaption>Confeiteiras</figcaption></figure>
-      <figure class="qc"><img src="/static/exemplo/salao-corte.webp" alt="" loading="lazy" width="900" height="1125"><figcaption>Cabeleireiras</figcaption></figure>
-      <figure class="qc"><img src="/static/exemplo/boutique-bolsa1.webp" alt="" loading="lazy" width="900" height="1125"><figcaption>Lojas de acessórios</figcaption></figure>
-      <figure class="qc"><span class="emo" aria-hidden="true">🎈</span><figcaption>Decoração de festas</figcaption></figure>
-      <figure class="qc"><span class="emo" aria-hidden="true">🧶</span><figcaption>Artesãs</figcaption></figure>
-      <figure class="qc"><img src="/static/exemplo/mentoria-mentoria.webp" alt="" loading="lazy" width="900" height="1125"><figcaption>Prestadores de serviços</figcaption></figure>
-    </div>
+    <ul class="nichos"><li><span aria-hidden="true">👗</span>Lojas de roupas</li><li><span aria-hidden="true">🧸</span>Moda infantil</li><li><span aria-hidden="true">🏋️</span>Moda fitness</li><li><span aria-hidden="true">👙</span>Moda praia e lingerie</li><li><span aria-hidden="true">👠</span>Calçados</li><li><span aria-hidden="true">👜</span>Bolsas e acessórios</li><li><span aria-hidden="true">💍</span>Semijoias e bijuterias</li><li><span aria-hidden="true">💄</span>Maquiagem e cosméticos</li><li><span aria-hidden="true">🌸</span>Perfumaria</li><li><span aria-hidden="true">💅</span>Manicures e nail designers</li><li><span aria-hidden="true">💇‍♀️</span>Cabeleireiras</li><li><span aria-hidden="true">👁️</span>Lash e sobrancelhas</li><li><span aria-hidden="true">🧖‍♀️</span>Estética e massagem</li><li><span aria-hidden="true">🎂</span>Confeiteiras</li><li><span aria-hidden="true">🥟</span>Salgados e marmitas</li><li><span aria-hidden="true">🍫</span>Doces gourmet</li><li><span aria-hidden="true">🎈</span>Decoração de festas</li><li><span aria-hidden="true">🧶</span>Artesãs</li><li><span aria-hidden="true">✂️</span>Papelaria personalizada</li><li><span aria-hidden="true">🕯️</span>Velas e aromas</li><li><span aria-hidden="true">🐶</span>Pet shop</li><li><span aria-hidden="true">🪴</span>Plantas e flores</li><li><span aria-hidden="true">📸</span>Fotógrafas</li><li><span aria-hidden="true">🎓</span>Mentoras e cursos</li><li><span aria-hidden="true">🛠️</span>Prestadores de serviços</li><li><span aria-hidden="true">🛍️</span>Revendedoras</li><li class="mais">E muito mais!</li></ul>
     <p class="frase">Não importa o tamanho do seu negócio. <b>Você também pode ter uma vitrine profissional!</b></p>
     <div class="fim"><button class="btn" type="button" data-next>Continuar <span class="seta" aria-hidden="true">→</span></button></div>
   </section>
@@ -602,6 +598,28 @@ const CONFIG = {
     const iv = setInterval(tick, 1000); tick();
   })();
 
+  // vitrines de exemplo: troca uma por vez, a cada 1 segundo, com a atual no centro
+  (function () {
+    const box = document.querySelector('.esteira'); if (!box) return;
+    const tr = box.querySelector('.esteira-trilho'), imgs = [...tr.querySelectorAll('img')], N = imgs.length / 2;
+    let i = 0, parado = false;
+    const centra = () => {
+      const im = imgs[i]; if (!im.offsetWidth) return;
+      tr.style.transform = 'translateX(' + (box.clientWidth / 2 - (im.offsetLeft + im.offsetWidth / 2)) + 'px)';
+      imgs.forEach((x, j) => x.classList.toggle('atual', j === i));
+    };
+    const passo = () => {
+      if (parado || !box.offsetParent) return;
+      i++; centra();
+      if (i === N) setTimeout(() => { tr.classList.add('sem-anim'); i = 0; centra(); tr.offsetWidth; tr.classList.remove('sem-anim'); }, 480);
+    };
+    imgs.forEach(im => im.addEventListener('load', centra));
+    window.addEventListener('resize', centra);
+    box.addEventListener('pointerdown', () => { parado = true; }); box.addEventListener('pointerup', () => { parado = false; }); box.addEventListener('pointerleave', () => { parado = false; });
+    setInterval(passo, 1000);
+    window.__centraEsteira = centra;
+  })();
+
   // textos personalizados pelas respostas
   const DIAG = {
     vende: {
@@ -658,6 +676,7 @@ const CONFIG = {
     }
     sec.querySelector('.ops') && sec.querySelector('.ops').classList.remove('travado');
     tocaVideos(sec);
+    if (sec.querySelector('.esteira') && window.__centraEsteira) requestAnimationFrame(window.__centraEsteira);
     window.scrollTo(0, 0);
     const h = sec.querySelector('h1, h2');
     if (h && dir) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
@@ -692,6 +711,7 @@ const CONFIG = {
 
   // atraso escalonado dos cartões de benefícios
   document.querySelectorAll('.ben').forEach((b, i) => { b.style.animationDelay = (i * 45) + 'ms'; });
+  document.querySelectorAll('.nichos li').forEach((b, i) => { b.style.animationDelay = (i * 30) + 'ms'; });
 
   try { history.replaceState({ step: st.step }, '', st.step ? '#' + st.step : location.pathname + location.search); } catch (e) {}
   render(0);
