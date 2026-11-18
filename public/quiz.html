@@ -148,6 +148,22 @@ h1 em, h2 em { font-style: normal; color: var(--pink); }
 .vazio { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 8px; text-align: center; padding: 24px; color: var(--muted); font-size: 14px; font-weight: 600; background: repeating-linear-gradient(135deg, #FFF0F7 0 14px, #FFE6F2 14px 28px); }
 .vazio b { font-size: 34px; }
 .som { position: absolute; right: 12px; bottom: 58px; z-index: 3; border: 0; border-radius: 99px; padding: 8px 12px; background: rgba(30,20,24,.78); color: #fff; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+.tel-v { width: auto; height: clamp(320px, calc(100vh - 260px), 620px); height: clamp(320px, calc(100svh - 260px), 620px); aspect-ratio: 9/19; max-width: 100%; margin-top: 14px; padding: 8px; border-radius: 42px; }
+.tel-v .tel-tela { display: flex; flex-direction: column; background: #fff; border-radius: 34px; }
+.tel-sb { flex: none; height: 34px; display: flex; align-items: center; justify-content: space-between; padding: 2px 20px 0 24px; font: 700 12.5px/1 var(--f); color: #111; }
+.tel-sb .bt { width: 22px; height: 11px; border: 1.5px solid #111; border-radius: 3.5px; position: relative; }
+.tel-sb .bt::after { content: ""; position: absolute; inset: 1.5px; right: 5px; background: #111; border-radius: 1.5px; }
+.vid-tela { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+.vid-tela video { width: 100%; height: 100%; object-fit: cover; object-position: top; display: block; background: #fff; }
+.tel-v .som { display: none !important; }
+.tel-v::before { width: 32%; height: 17px; top: 15px; margin-left: -16%; }
+.tel-v .tel-sb { height: 30px; padding: 0 12px 0 16px; font-size: 11px; }
+.tel-v .tel-sb .bt { width: 19px; height: 10px; }
+.pedido-fotos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px -6px 0; }
+.pedido-fotos figure { margin: 0; text-align: center; }
+.pedido-fotos img { width: 100%; height: auto; display: block; filter: drop-shadow(0 14px 18px rgba(194,16,106,.24)); }
+.pedido-fotos figcaption { margin-top: 8px; font-size: 13px; font-weight: 600; color: var(--muted); line-height: 1.3; }
+.pedido-fotos figcaption b { display: inline-grid; place-items: center; width: 20px; height: 20px; margin-right: 4px; border-radius: 50%; background: var(--pink, #E91E85); color: #fff; font-size: 11.5px; font-weight: 700; vertical-align: 1px; }
 .legenda { margin: 14px auto 0; text-align: center; font-size: 13.5px; font-weight: 600; color: var(--muted); max-width: 330px; }
 .passos { list-style: none; counter-reset: p; padding: 0; margin: 16px 0 0; display: grid; gap: 8px; }
 .passos li { counter-increment: p; display: flex; align-items: center; gap: 10px; font-size: 14.5px; font-weight: 600; background: var(--branco); border: 1px solid var(--line); border-radius: 14px; padding: 9px 12px; }
@@ -536,17 +552,19 @@ body.capa-on .bar { background: transparent; backdrop-filter: none; -webkit-back
   <!-- 9. Demonstração da vitrine (vídeo 1: VIDEOS.vitrine) -->
   <section class="step" id="s9" data-step="9" aria-labelledby="t9">
     <h2 id="t9">Veja como seu cliente vai enxergar sua vitrine! 😍</h2>
-    <div class="tel"><div class="tel-tela" data-video="vitrine"></div></div>
+    <div class="tel tel-v"><div class="tel-tela"><div class="tel-sb" aria-hidden="true"><span>23:10</span><span class="bt"></span></div><div class="vid-tela" data-video="vitrine"></div></div></div>
     <p class="legenda" data-legenda="vitrine"></p>
     <div class="fim"><button class="btn" type="button" data-next>Continuar <span class="seta" aria-hidden="true">→</span></button></div>
   </section>
 
-  <!-- 10. Pedido no WhatsApp (vídeo 2: VIDEOS.pedido) -->
+  <!-- 10. Pedido no WhatsApp (duas fotos: vitrine e pedido) -->
   <section class="step" id="s10" data-step="10" aria-labelledby="t10">
     <h2 id="t10">Olha como o pedido chega <em>prontinho</em> no seu WhatsApp! 💚</h2>
     <p class="sub">Seu cliente escolhe o que deseja e envia o pedido organizado diretamente para você.</p>
-    <div class="tel"><div class="tel-tela" data-video="pedido"></div></div>
-    <p class="legenda" data-legenda="pedido"></p>
+    <div class="pedido-fotos">
+      <figure><img src="/static/exemplo/quiz-pedido-1.webp" alt="Vitrine da loja Acessórios da Lu no celular, com produtos e botão Eu quero" width="348" height="680" loading="lazy" decoding="async"><figcaption><b>1</b>Cliente escolhe na vitrine</figcaption></figure>
+      <figure><img src="/static/exemplo/quiz-pedido-2.webp" alt="Pedido do Brinco Coração Dourado chegando organizado no WhatsApp da loja" width="342" height="680" loading="lazy" decoding="async"><figcaption><b>2</b>Pedido chega no seu WhatsApp</figcaption></figure>
+    </div>
     <div class="fim"><button class="btn" type="button" data-next>Continuar <span class="seta" aria-hidden="true">→</span></button></div>
   </section>
 
@@ -615,7 +633,7 @@ body.capa-on .bar { background: transparent; backdrop-filter: none; -webkit-back
 /* ===================== CONFIGURAÇÃO (é só mexer aqui) =====================
    VIDEOS: troque o "src" para trocar o vídeo de cada tela. Deixe src: '' para mostrar o espaço vazio "vídeo em breve".
      - vitrine: tela "Veja como seu cliente vai enxergar sua vitrine"
-     - pedido:  tela "Olha como o pedido chega prontinho no seu WhatsApp"
+     - pedido:  não usado no momento (a tela do pedido mostra duas fotos)
      Coloque o arquivo .mp4 (vertical, 9:16) em public/static/exemplo/ e aponte o caminho aqui.
    CHECKOUT: link de pagamento da Kiwify do botão final.
    BONUS_FIM: data e hora em que os bônus acabam (horário de Brasília). O cronômetro conta até essa data, que é a mesma para todo mundo
@@ -625,8 +643,8 @@ body.capa-on .bar { background: transparent; backdrop-filter: none; -webkit-back
    PRECO_DE: preço "De" riscado. Deixe null para mostrar só "Por apenas R$ 47/mês" (use só se for um preço real). */
 const CONFIG = {
   VIDEOS: {
-    vitrine: { src: '/static/exemplo/vitrine-video.mp4', poster: '/static/exemplo/vitrine-video-capa.webp',
-      legenda: 'Vitrine real no celular: a marca da loja, as categorias e os produtos com fotos, vídeos e preços.' },
+    vitrine: { src: '/static/exemplo/tour-cliente.mp4', poster: '/static/exemplo/tour-cliente-capa.webp',
+      legenda: '' },
     pedido: { src: '/static/exemplo/demo-mini-site.mp4', poster: '/static/exemplo/demo-mini-site-capa.webp',
       legenda: 'Demonstração real: a cliente escolhe, confere o pedido e envia direto para o WhatsApp da loja.' }
   },
@@ -672,10 +690,11 @@ const CONFIG = {
     }
     const v = document.createElement('video');
     v.src = cfg.src; if (cfg.poster) v.poster = cfg.poster;
-    v.muted = true; v.loop = true; v.playsInline = true; v.controls = true; v.preload = 'metadata';
+    v.muted = true; v.loop = true; v.playsInline = true; v.controls = !box.closest(".tel-v"); v.preload = 'metadata';
     v.setAttribute('playsinline', ''); v.setAttribute('muted', '');
     v.setAttribute('aria-label', cfg.legenda || 'Vídeo de demonstração');
     box.appendChild(v);
+    if (!v.controls) v.addEventListener('click', () => { v.paused ? v.play().catch(() => {}) : v.pause(); });
     // botão de som: só aparece se o vídeo tiver áudio
     const som = document.createElement('button');
     som.type = 'button'; som.className = 'som'; som.hidden = true; som.textContent = '🔊 Ativar som';
