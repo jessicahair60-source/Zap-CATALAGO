@@ -222,6 +222,12 @@ h1 em, h2 em { font-style: normal; color: var(--pink); }
 .comofunc ol { list-style: none; counter-reset: c; margin: 0; padding: 0; display: grid; gap: 10px; }
 .comofunc li { counter-increment: c; display: flex; gap: 10px; align-items: flex-start; font-size: 15px; line-height: 1.4; font-weight: 600; }
 .comofunc li::before { content: counter(c); width: 24px; height: 24px; flex: none; border-radius: 50%; background: #fff; color: var(--pink-d); font-size: 13px; font-weight: 900; display: grid; place-items: center; }
+.crono { margin-top: 16px; background: #fff; color: var(--fg); border-radius: 18px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; box-shadow: 0 18px 40px -24px rgba(60,0,30,.6); }
+.crono b { font-size: 13.5px; font-weight: 800; line-height: 1.3; color: var(--pink-d); }
+.crono b small { display: block; font-size: 11.5px; font-weight: 600; color: var(--muted); }
+.crono-t { display: flex; gap: 4px; flex: none; font-variant-numeric: tabular-nums; }
+.crono-t span { display: grid; justify-items: center; min-width: 38px; background: var(--rosa); border-radius: 10px; padding: 5px 4px 4px; font-size: 17px; font-weight: 900; line-height: 1; color: var(--pink); }
+.crono-t span small { font-size: 9px; font-weight: 700; color: var(--muted); margin-top: 3px; letter-spacing: .04em; }
 .urg { margin: 22px 0 0; text-align: center; font-weight: 800; font-size: 17px; line-height: 1.4; }
 
 @media (min-width: 700px) {
@@ -442,7 +448,12 @@ h1 em, h2 em { font-style: normal; color: var(--pink); }
         </ul>
       </div>
 
-      <div class="bonus">
+      <div class="crono" id="crono" hidden role="timer" aria-live="off">
+        <b>⏰ Os bônus saem do ar em<small id="cronoData"></small></b>
+        <div class="crono-t"><span><i id="cr-d">0</i><small>DIAS</small></span><span><i id="cr-h">00</i><small>HORAS</small></span><span><i id="cr-m">00</i><small>MIN</small></span><span><i id="cr-s">00</i><small>SEG</small></span></div>
+      </div>
+
+      <div class="bonus" id="bonus">
         <h3>Bônus</h3>
         <p><span class="gi" aria-hidden="true">🎁</span><span><b>Bônus 1:</b> Aula para criar banners profissionais em 5 minutos.</span></p>
         <p><span class="gi" aria-hidden="true">🎁</span><span><b>Bônus 2:</b> Mensagens prontas para divulgar sua vitrine e vender pelo WhatsApp.</span></p>
@@ -491,6 +502,8 @@ h1 em, h2 em { font-style: normal; color: var(--pink); }
      - pedido:  tela "Olha como o pedido chega prontinho no seu WhatsApp"
      Coloque o arquivo .mp4 (vertical, 9:16) em public/static/exemplo/ e aponte o caminho aqui.
    CHECKOUT: link de pagamento da Kiwify do botão final.
+   BONUS_FIM: data e hora em que os bônus acabam (horário de Brasília). O cronômetro conta até essa data, que é a mesma para todo mundo
+     e não reinicia. Quando o prazo acaba, o cronômetro e os bônus somem sozinhos. Para uma nova campanha, troque a data. null = sem cronômetro.
    PRECO_DE: preço "De" riscado. Deixe null para mostrar só "Por apenas R$ 47/mês" (use só se for um preço real). */
 const CONFIG = {
   VIDEOS: {
@@ -500,6 +513,7 @@ const CONFIG = {
       legenda: 'Demonstração real: a cliente escolhe, confere o pedido e envia direto para o WhatsApp da loja.' }
   },
   CHECKOUT: 'https://pay.kiwify.com.br/ze66upr',
+  BONUS_FIM: '2026-11-23T23:59:59-03:00',
   PRECO_DE: null
 };
 /* ========================================================================== */
@@ -563,6 +577,26 @@ const CONFIG = {
       s.querySelectorAll('.op').forEach(b => b.setAttribute('aria-pressed', String(st.respostas[q] === b.dataset.v)));
     });
   }
+
+  // cronômetro dos bônus: prazo fixo (CONFIG.BONUS_FIM), igual para todo mundo; depois do prazo some junto com os bônus
+  (function () {
+    const fim = Date.parse(CONFIG.BONUS_FIM || ''); if (!Number.isFinite(fim)) return;
+    const cr = document.getElementById('crono'), bn = document.getElementById('bonus');
+    const d = new Date(fim);
+    document.getElementById('cronoData').textContent = 'Até ' + d.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' }) + ', às ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
+    const z = n => String(n).padStart(2, '0');
+    const tick = () => {
+      const t = fim - Date.now();
+      if (t <= 0) { cr.hidden = true; bn.hidden = true; clearInterval(iv); return; }
+      cr.hidden = false;
+      const sec = Math.floor(t / 1000);
+      document.getElementById('cr-d').textContent = Math.floor(sec / 86400);
+      document.getElementById('cr-h').textContent = z(Math.floor(sec % 86400 / 3600));
+      document.getElementById('cr-m').textContent = z(Math.floor(sec % 3600 / 60));
+      document.getElementById('cr-s').textContent = z(sec % 60);
+    };
+    const iv = setInterval(tick, 1000); tick();
+  })();
 
   // textos personalizados pelas respostas
   const DIAG = {
