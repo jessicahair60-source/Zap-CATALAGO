@@ -111,6 +111,13 @@ h1 em, h2 em { font-style: normal; color: var(--pink); }
 .vitrines figcaption { text-align: center; font-size: 13px; font-weight: 700; color: var(--muted); margin-top: 8px; }
 .dica { text-align: center; font-size: 12.5px; color: var(--muted); font-weight: 600; margin: 0; }
 
+.esteira { margin: 22px -20px 8px; overflow: hidden; -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent); }
+.esteira-trilho { display: flex; gap: 14px; width: max-content; padding: 6px 0 16px; animation: esteira 22s linear infinite; }
+.esteira-trilho img { height: 340px; width: auto; border-radius: 22px; box-shadow: var(--sh); flex: none; background: #F6E3EA; }
+.esteira:hover .esteira-trilho, .esteira:active .esteira-trilho { animation-play-state: paused; }
+@keyframes esteira { to { transform: translateX(calc(-50% - 7px)); } }
+@media (prefers-reduced-motion: reduce) { .esteira { overflow-x: auto; } .esteira-trilho { animation: none; } }
+
 /* benefícios */
 .bens { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
 .ben { background: var(--branco); border: 1px solid var(--line); border-radius: 18px; padding: 14px 12px 14px; display: grid; gap: 8px; align-content: start; box-shadow: 0 10px 24px -20px rgba(194,16,106,.55); opacity: 0; animation: sobe .4s cubic-bezier(.2,.8,.2,1) forwards; }
@@ -368,13 +375,10 @@ h1 em, h2 em { font-style: normal; color: var(--pink); }
     <span class="tag">Conheça o Zap Catálogo</span>
     <h2 id="t6">Seu link da bio + sua <em>vitrine digital</em> em um só lugar!</h2>
     <p class="sub">Tenha sua própria vitrine online, com a identidade da sua marca, disponível 24 horas por dia.</p>
-    <div class="vitrines" aria-label="Exemplos de vitrines">
-      <figure><img src="/static/exemplo/topo-boutique.webp" alt="Vitrine de uma boutique de roupas" width="540" height="1080" loading="lazy"><figcaption>Boutique</figcaption></figure>
-      <figure><img src="/static/exemplo/topo-doceria.webp" alt="Vitrine de uma doceria" width="540" height="1080" loading="lazy"><figcaption>Doceria</figcaption></figure>
-      <figure><img src="/static/exemplo/topo-acessorios.webp" alt="Vitrine de uma loja de acessórios" width="540" height="1080" loading="lazy"><figcaption>Acessórios</figcaption></figure>
-      <figure><img src="/static/exemplo/topo-mentoria.webp" alt="Vitrine de uma mentora" width="540" height="1080" loading="lazy"><figcaption>Mentoria</figcaption></figure>
+    <div class="esteira" aria-label="Exemplos de vitrines feitas no Zap Catálogo">
+      <div class="esteira-trilho"><img src="/static/exemplo/quiz-vitrine-1.webp" alt="Vitrine Acessórios da Lu" height="340" loading="lazy"><img src="/static/exemplo/quiz-vitrine-2.webp" alt="Vitrine Bella Fashion" height="340" loading="lazy"><img src="/static/exemplo/quiz-vitrine-3.webp" alt="Vitrine Doceria Encanto" height="340" loading="lazy"><img src="/static/exemplo/quiz-vitrine-4.webp" alt="Vitrine Boutique da Maria" height="340" loading="lazy"><img src="/static/exemplo/quiz-vitrine-5.webp" alt="Vitrine Mentoria Empreendedora" height="340" loading="lazy"><img src="/static/exemplo/quiz-vitrine-1.webp" alt="" aria-hidden="true" height="340" loading="lazy"><img src="/static/exemplo/quiz-vitrine-2.webp" alt="" aria-hidden="true" height="340" loading="lazy"><img src="/static/exemplo/quiz-vitrine-3.webp" alt="" aria-hidden="true" height="340" loading="lazy"><img src="/static/exemplo/quiz-vitrine-4.webp" alt="" aria-hidden="true" height="340" loading="lazy"><img src="/static/exemplo/quiz-vitrine-5.webp" alt="" aria-hidden="true" height="340" loading="lazy"></div>
     </div>
-    <p class="dica">Arraste para o lado para ver mais →</p>
+    <p class="dica">Exemplos de vitrines feitas no Zap Catálogo</p>
     <div class="fim"><button class="btn" type="button" data-next>Continuar <span class="seta" aria-hidden="true">→</span></button></div>
   </section>
 
