@@ -73,3 +73,15 @@ test('Kiwify: quem já pagou ativa o acesso só com e-mail, nome da loja e senha
   r = await post('/api/ativar/check', { email: 'carla@kw.com' }); assert.strictEqual(r.json.status, 'account');
   r = await post('/api/ativar', { email: 'carla@kw.com', storeName: 'X', password: '1234', terms: true }); assert.strictEqual(r.status, 409);
 });
+
+test('Kiwify: compra com o mesmo WhatsApp marca o contato do quiz como "fechou"', async () => {
+  const post = (url, body) => fetch(base + url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  assert.strictEqual((await post('/api/quiz/lead', { sid: 'kwlead0000000001', name: 'Rita', phone: '5511987654321' })).status, 200);
+  assert.strictEqual((await post('/api/quiz/lead', { sid: 'kwlead0000000002', name: 'Outra', phone: '5521987654321' })).status, 200);
+  const body = paid('rita@kw.com', 'o20'); body.Customer.mobile = '+55 11 98765-4321';
+  assert.strictEqual(await hook(body), 200);
+  const { db } = require('../lib/db');
+  const rows = db.prepare('SELECT name, paid_at FROM quiz_leads WHERE sid LIKE ?').all('kwlead%');
+  assert.ok(rows.find(r => r.name === 'Rita').paid_at);
+  assert.strictEqual(rows.find(r => r.name === 'Outra').paid_at, null);
+});

@@ -384,9 +384,21 @@ app.post('/api/quiz/click', express.text({ limit: '2kb', type: () => true }), (r
   if (sid) db.prepare('UPDATE quiz_leads SET clicked_at = COALESCE(clicked_at, ?) WHERE sid = ?').run(now(), sid);
   res.status(204).end();
 });
+// compra aprovada na Kiwify: marca como "fechou" o contato do quiz com o mesmo WhatsApp (DDD + 8 últimos dígitos)
+const phoneKey = p => { let d = String(p || '').replace(/\D/g, ''); if (d.length > 11 && d.startsWith('55')) d = d.slice(2); return d.length >= 10 ? d.slice(0, 2) + d.slice(-8) : ''; };
+function markLeadPaid(phone) {
+  const key = phoneKey(phone); if (!key) return;
+  const ids = db.prepare('SELECT id, phone FROM quiz_leads WHERE paid_at IS NULL AND created_at > ?').all(now() - 90 * DAY).filter(l => phoneKey(l.phone) === key).map(l => l.id);
+  for (const id of ids) db.prepare('UPDATE quiz_leads SET paid_at = ? WHERE id = ?').run(now(), id);
+}
 app.get('/api/admin/quiz-leads', adminOnly, (req, res) => {
-  const rows = db.prepare('SELECT id, name, phone, answers, clicked_at, created_at FROM quiz_leads ORDER BY created_at DESC LIMIT 1000').all();
-  res.json({ leads: rows.map(l => { let a = {}; try { a = JSON.parse(l.answers); } catch (e) {} return { id: l.id, name: l.name, phone: l.phone, answers: a, clickedAt: l.clicked_at, createdAt: l.created_at }; }) });
+  const rows = db.prepare('SELECT id, name, phone, answers, clicked_at, paid_at, created_at FROM quiz_leads ORDER BY created_at DESC LIMIT 1000').all();
+  res.json({ leads: rows.map(l => { let a = {}; try { a = JSON.parse(l.answers); } catch (e) {} return { id: l.id, name: l.name, phone: l.phone, answers: a, clickedAt: l.clicked_at, paidAt: l.paid_at, createdAt: l.created_at }; }) });
+});
+// a dona marca à mão quem fechou (ex.: pagou com outro número)
+app.post('/api/admin/quiz-leads/:id', adminOnly, jsonBody, (req, res) => {
+  db.prepare('UPDATE quiz_leads SET paid_at = ? WHERE id = ?').run(req.body && req.body.paid ? now() : null, Number(req.params.id) || 0);
+  res.json({ ok: true });
 });
 app.delete('/api/admin/quiz-leads/:id', adminOnly, (req, res) => {
   db.prepare('DELETE FROM quiz_leads WHERE id = ?').run(Number(req.params.id) || 0);
@@ -738,6 +750,7 @@ app.post('/api/webhooks/kiwify', express.raw({ type: '*/*', limit: '1mb' }), (re
   const payId = 'kiwify:' + k.orderId;
   const seen = k.orderId && db.prepare('SELECT 1 FROM payments WHERE mp_id = ? AND status = ?');
   const paid = (k.event === 'order_approved' || k.event === 'subscription_renewed') && k.status === 'paid';
+  if (paid) markLeadPaid(k.phone);
   if (paid) {
     // Vale até a próxima cobrança, com 2 dias de folga; sem a data, 32 dias
     const until = k.nextPayment > now() ? k.nextPayment + 2 * DAY : Math.max(now(), (store && store.pro_until) || 0) + (k.yearly ? 367 : 32) * DAY;

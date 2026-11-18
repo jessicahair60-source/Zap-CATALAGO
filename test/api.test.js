@@ -276,3 +276,16 @@ test('contatos do quiz: salva nome e WhatsApp e marca o clique em comprar', asyn
   r = await dona('DELETE', `/api/admin/quiz-leads/${l.id}`); assert.strictEqual(r.status, 200);
   r = await dona('GET', '/api/admin/quiz-leads'); assert.ok(!r.json.leads.some(x => x.id === l.id));
 });
+
+test('contatos do quiz: a dona marca à mão quem fechou', async () => {
+  const anon = client();
+  await anon('POST', '/api/quiz/lead', { sid: 'sidmanual00000001', name: 'Bela', phone: '11911112222' });
+  const dona = client();
+  await dona('POST', '/api/login', { email: 'dona@teste.com', password: 'senha-forte', admin: true });
+  let r = await dona('GET', '/api/admin/quiz-leads'); const l = r.json.leads.find(x => x.name === 'Bela'); assert.strictEqual(l.paidAt, null);
+  r = await anon('POST', `/api/admin/quiz-leads/${l.id}`, { paid: true }); assert.notStrictEqual(r.status, 200);
+  r = await dona('POST', `/api/admin/quiz-leads/${l.id}`, { paid: true }); assert.strictEqual(r.status, 200);
+  r = await dona('GET', '/api/admin/quiz-leads'); assert.ok(r.json.leads.find(x => x.id === l.id).paidAt);
+  await dona('POST', `/api/admin/quiz-leads/${l.id}`, { paid: false });
+  r = await dona('GET', '/api/admin/quiz-leads'); assert.strictEqual(r.json.leads.find(x => x.id === l.id).paidAt, null);
+});
