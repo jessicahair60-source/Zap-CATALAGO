@@ -234,6 +234,7 @@ h1 em, h2 em { font-style: normal; color: var(--pink); }
 .vs-com { background: var(--branco); border: 2px solid var(--pink); box-shadow: var(--sh); }
 .vs-com h3 { color: var(--pink); }
 .vs-com li i { background: var(--pink); color: #fff; }
+.vs-img { display: block; width: 100%; height: auto; margin: 18px 0 0; border-radius: 22px; box-shadow: var(--sh); }
 .alerta { margin: 18px 0 0; padding: 14px 16px; border-radius: 18px; background: var(--rosa-2); color: var(--pink-d); font-weight: 800; font-size: 17px; line-height: 1.4; text-align: center; }
 
 /* oferta: extras */
@@ -541,26 +542,7 @@ p, li, .pensa p, .sub { text-wrap: pretty; }
   <!-- Antes x depois -->
   <section class="step" id="sVs" aria-labelledby="tVs">
     <h2 id="tVs">Veja a diferença na <em>rotina das suas vendas</em></h2>
-    <div class="vs">
-      <div class="vs-c vs-sem">
-        <h3>😩 Sem vitrine</h3>
-        <ul>
-          <li><i>✕</i>Mandar foto por foto no WhatsApp</li>
-          <li><i>✕</i>Responder "qual o preço?" o dia inteiro</li>
-          <li><i>✕</i>Cliente esperando resposta e desistindo</li>
-          <li><i>✕</i>Pedido perdido no meio da conversa</li>
-        </ul>
-      </div>
-      <div class="vs-c vs-com">
-        <h3>😍 Com o Zap Catálogo</h3>
-        <ul>
-          <li><i>✓</i>Um link com tudo o que você vende</li>
-          <li><i>✓</i>Fotos, vídeos e preços à vista do cliente</li>
-          <li><i>✓</i>Cliente escolhe sozinho, a qualquer hora</li>
-          <li><i>✓</i>Pedido chega organizado no seu WhatsApp</li>
-        </ul>
-      </div>
-    </div>
+    <img class="vs-img" src="/static/exemplo/quiz-antes-depois.webp" width="1080" height="1350" alt="Sem vitrine: fotos soltas no WhatsApp com +9 e sem preço. Com vitrine: catálogo Jéssica Hair com categorias, preços e botão EU QUERO. A mesma loja, só mudou a forma de mostrar." decoding="async">
     <p class="alerta">Cada dia sem catálogo é cliente perguntando preço no direct e desistindo.</p>
     <div class="fim"><button class="btn" type="button" data-next>Continuar <span class="seta" aria-hidden="true">→</span></button></div>
   </section>
