@@ -459,6 +459,16 @@ body.capa-on .bar { background: transparent; backdrop-filter: none; -webkit-back
 h1, h2, h3, .btn, .capa-selo, .fixo, .dia, .paga, .garantia, .parab-g, .chamada, .urg, .expira-s, .aviso p, .legenda, .selos li, .op { text-wrap: balance; }
 p, li, .pensa p, .sub { text-wrap: pretty; }
 .center .sub, .parab p, .preco p, .expira p, .aviso p, .garantia, .paga, .urg { text-wrap: balance; }
+/* ===== tela do contato (nome + WhatsApp) ===== */
+.lead-f { margin: 22px auto 0; max-width: 420px; text-align: left; display: grid; gap: 6px; }
+.lead-f label { font-weight: 700; font-size: 16px; color: var(--fg); margin-top: 8px; }
+.lead-f input { width: 100%; box-sizing: border-box; font: 600 18px/1.2 var(--f); color: var(--fg); background: var(--branco); border: 2px solid var(--line); border-radius: 16px; padding: 16px 16px; outline: none; transition: border-color .2s, box-shadow .2s; }
+.lead-f input::placeholder { color: #B89AAA; font-weight: 500; }
+.lead-f input:focus { border-color: var(--pink); box-shadow: 0 0 0 4px rgba(233,30,133,.14); }
+.lead-f input[aria-invalid="true"] { border-color: #D93025; }
+.lead-f .btn { margin-top: 16px; width: 100%; }
+.lead-erro { margin: 6px 0 0; color: #C5221F; font-weight: 700; font-size: 15.5px; }
+.lead-priv { margin: 10px 0 0; text-align: center; color: var(--muted); font-size: 14.5px; }
 </style>
 </head>
 <body>
@@ -535,6 +545,21 @@ p, li, .pensa p, .sub { text-wrap: pretty; }
     </div>
   </section>
 
+  <!-- Contato: nome + WhatsApp antes do resultado -->
+  <section class="step center lead" id="sLead" aria-labelledby="tLead">
+    <div class="result-badge" aria-hidden="true">🎉</div>
+    <h2 id="tLead" style="margin-top:22px">Seu diagnóstico está pronto! <em>Pra quem eu mando?</em></h2>
+    <form class="lead-f" id="leadForm" novalidate>
+      <label for="leadNome">Seu nome</label>
+      <input id="leadNome" name="nome" type="text" autocomplete="given-name" autocapitalize="words" maxlength="60" placeholder="Ex.: Maria" required>
+      <label for="leadZap">Seu WhatsApp</label>
+      <input id="leadZap" name="zap" type="tel" inputmode="tel" autocomplete="tel-national" maxlength="16" placeholder="(11) 91234-5678" required>
+      <p class="lead-erro" id="leadErro" role="alert" hidden></p>
+      <button class="btn" type="submit">Ver meu resultado <span class="seta" aria-hidden="true">→</span></button>
+      <p class="lead-priv">🔒 Seus dados ficam guardados com segurança. Nada de spam.</p>
+    </form>
+  </section>
+
   <!-- Analisando (passa sozinha) -->
   <section class="step anal" id="sAnal" data-auto="2600" aria-labelledby="tAnal" aria-live="polite">
     <div class="anal-ring" aria-hidden="true"></div>
@@ -550,7 +575,7 @@ p, li, .pensa p, .sub { text-wrap: pretty; }
   <section class="step center" id="sRes" aria-labelledby="tRes">
     <div class="result-badge" aria-hidden="true">🏆</div>
     <span class="tag" style="margin-top:26px">Seu resultado</span>
-    <h2 id="tRes">Seu negócio merece uma <em>vitrine profissional!</em> 💖</h2>
+    <h2 id="tRes"><span data-nome="Seu">Seu</span> negócio merece uma <em>vitrine profissional!</em> 💖</h2>
     <div class="diag">
       <div class="diag-l"><span class="di" aria-hidden="true">📍</span><div><small>Seu momento</small><p data-diag="vende"></p></div></div>
       <div class="diag-l"><span class="di" aria-hidden="true">⚠️</span><div><small>O que pode estar travando</small><p data-diag="apresenta"></p></div></div>
@@ -604,7 +629,7 @@ p, li, .pensa p, .sub { text-wrap: pretty; }
   <!-- 11. Oferta final -->
   <section class="step final" id="sOferta" aria-labelledby="t11">
     <div class="oferta">
-      <h2 id="t11">Chegou a sua vez de ter uma <em>vitrine profissional!</em> 💖</h2>
+      <h2 id="t11"><span data-nome="Chegou">Chegou</span> a sua vez de ter uma <em>vitrine profissional!</em> 💖</h2>
       <div class="pensa"><b>Pensa comigo:</b><p>Sua próxima cliente pode entrar no seu perfil <strong>HOJE</strong>.</p><p>O que ela vai encontrar? Um monte de foto solta no WhatsApp ou uma vitrine organizada, bonita e fácil de comprar?</p></div>
       <p class="pessoal" id="pessoal" hidden></p>
 
@@ -849,6 +874,8 @@ const CONFIG = {
     document.querySelectorAll('[data-diag]').forEach(p => { const q = p.dataset.diag; p.textContent = (DIAG[q] && DIAG[q][st.respostas[q]]) || FALLBACK[q]; });
     const pe = document.getElementById('pessoal'); const t = DIAG.mudaria[st.respostas.mudaria];
     if (t) { pe.innerHTML = '💖 ' + t; pe.hidden = false; } else pe.hidden = true;
+    const nome = (st.nome || '').split(' ')[0];
+    document.querySelectorAll('[data-nome]').forEach(x => { const w = x.dataset.nome; x.textContent = nome ? nome + ', ' + w.toLowerCase() : w; });
   }
 
   let autoT = null;
@@ -906,6 +933,33 @@ const CONFIG = {
       setTimeout(() => vaiPara(steps.indexOf(s) + 1, 1), 380);
     });
   });
+
+  // contato: nome + WhatsApp (guarda no servidor; se falhar, a pessoa segue normalmente)
+  if (!st.sid) { st.sid = Array.from(crypto.getRandomValues(new Uint8Array(12)), b => b.toString(16).padStart(2, '0')).join(''); salva(); }
+  const lf = document.getElementById('leadForm');
+  const lNome = document.getElementById('leadNome'), lZap = document.getElementById('leadZap'), lErro = document.getElementById('leadErro');
+  if (st.nome) lNome.value = st.nome; if (st.zap) lZap.value = st.zap;
+  const soDig = v => v.replace(/\D/g, '');
+  lZap.addEventListener('input', () => {
+    let d = soDig(lZap.value); if (d.length > 11 && d.startsWith('55')) d = d.slice(2); d = d.slice(0, 11);
+    lZap.value = d.length > 7 ? `(${d.slice(0, 2)}) ${d.slice(2, d.length - 4)}-${d.slice(-4)}` : d.length > 2 ? `(${d.slice(0, 2)}) ${d.slice(2)}` : d;
+  });
+  const erro = (campo, msg) => { lErro.textContent = msg; lErro.hidden = false; campo.setAttribute('aria-invalid', 'true'); campo.focus(); };
+  lf.addEventListener('submit', e => {
+    e.preventDefault(); lErro.hidden = true; lNome.removeAttribute('aria-invalid'); lZap.removeAttribute('aria-invalid');
+    const nome = lNome.value.replace(/\s+/g, ' ').trim().replace(/(^|\s)\S/g, c => c.toUpperCase());
+    const zap = soDig(lZap.value);
+    if (nome.length < 2) return erro(lNome, 'Digite seu nome 😊');
+    if (zap.length < 10 || zap.length > 11) return erro(lZap, 'Digite seu WhatsApp com DDD. Ex.: (11) 91234-5678');
+    st.nome = nome; st.zap = lZap.value; salva();
+    try { fetch('/api/quiz/lead', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ sid: st.sid, name: nome, phone: '55' + zap, answers: st.respostas }), keepalive: true }).catch(() => {}); } catch (err) {}
+    vaiPara(steps.indexOf(lf.closest('.step')) + 1, 1);
+  });
+  // avisa que a pessoa clicou para comprar
+  document.querySelectorAll('#checkout, [data-checkout]').forEach(a => a.addEventListener('click', () => {
+    if (!st.nome) return;
+    try { navigator.sendBeacon('/api/quiz/click', JSON.stringify({ sid: st.sid })); } catch (err) {}
+  }));
 
   // atraso escalonado dos cartões de benefícios
   document.querySelectorAll('.ben').forEach((b, i) => { b.style.animationDelay = (i * 45) + 'ms'; });

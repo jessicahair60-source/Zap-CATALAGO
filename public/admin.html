@@ -103,12 +103,13 @@
   @media (min-width: 760px) { .shorts { grid-template-columns: repeat(4, 1fr); } .hdr h1 { font-size: 28px; } }
   .kpi span { display: block; line-height: 1.3; margin-top: 4px; }
   .tab { position: relative; }
+  .lbl-s { display: none; }
   @media (max-width: 520px) {
     .tabs { gap: 2px; padding: 5px; overflow: visible; }
     .tab { flex: 1 1 0; min-width: 0; flex-direction: column; gap: 3px; padding: 8px 2px; font-size: 11.5px; border-radius: 12px; }
     .tab svg { width: 21px; height: 21px; }
     .tab .n { position: absolute; top: 3px; right: 6px; font-size: 10px; padding: 0 5px; }
-    .tab .lbl-l { display: none; } .hdr .acts a.site { display: none; }
+    .tab .lbl-l { display: none; } .tab .lbl-s { display: inline; } .hdr .acts a.site { display: none; }
     .hdr { padding-bottom: 70px; } .tabs-wrap { margin-top: -54px; }
   }
 </style>
@@ -122,7 +123,8 @@
   <button class="tab" role="tab" data-tab="resumo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Resumo</button>
   <button class="tab" role="tab" data-tab="lojistas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16l-1.5 12a2 2 0 0 1-2 2h-9a2 2 0 0 1-2-2z"/><path d="M9 7V5a3 3 0 0 1 6 0v2"/></svg>Lojistas <span class="n" id="n-loj"></span></button>
   <button class="tab" role="tab" data-tab="minhas"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/></svg><span>Minhas<span class="lbl-l"> lojas</span></span> <span class="n" id="n-mine"></span></button>
-  <button class="tab" role="tab" data-tab="pagamentos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/></svg>Pagamentos</button>
+  <button class="tab" role="tab" data-tab="pagamentos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/></svg><span class="lbl-l">Pagamentos</span><span class="lbl-s">Pagos</span></button>
+  <button class="tab" role="tab" data-tab="contatos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0 1 14 0"/><path d="M17 11h5M19.5 8.5v5"/></svg><span>Contatos<span class="lbl-l"> do quiz</span></span> <span class="n" id="n-lead"></span></button>
   <button class="tab" role="tab" data-tab="tutoriais"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M10 9l5 3-5 3z"/></svg><span>Vídeos<span class="lbl-l"> tutoriais</span></span></button>
 </nav></div></div>
 <main class="container">
@@ -155,6 +157,12 @@
   <section class="sec" id="sec-pagamentos" data-sec="pagamentos" hidden>
     <div class="sec-h"><div><h2>Pagamentos recentes</h2><p>Os últimos 30 pagamentos das lojistas.</p></div></div>
     <div id="pays"></div>
+  </section>
+
+  <section class="sec" id="sec-contatos" data-sec="contatos" hidden>
+    <div class="sec-h"><div><h2>Contatos do quiz</h2><p>Quem fez o diagnóstico na página inicial e deixou nome e WhatsApp. Toque no número para chamar a pessoa.</p></div></div>
+    <div class="chips" id="leadChips"></div>
+    <div class="list" id="leads"><div class="empty">Carregando...</div></div>
   </section>
 
   <section class="sec" id="sec-tutoriais" data-sec="tutoriais" hidden>
@@ -249,8 +257,40 @@ async function act(id, action) {
 $('#q').oninput = () => data && render();
 load();
 
-/* Abas: Resumo, Lojistas, Pagamentos, Vídeos tutoriais */
-const TABS = ['resumo', 'lojistas', 'minhas', 'pagamentos', 'tutoriais'];
+/* Contatos do quiz: nome, WhatsApp, respostas e se clicou para comprar */
+let leads = [], leadF = 'all';
+const PERG = { vende: 'O que vende', apresenta: 'Como mostra hoje', dificuldade: 'Maior dificuldade', mudaria: 'O que mudaria' };
+const fone = p => { const d = String(p).replace(/^55/, ''); return d.length >= 10 ? `(${d.slice(0, 2)}) ${d.slice(2, -4)}-${d.slice(-4)}` : p; };
+const dataHora = t => new Date(t).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+async function loadLeads() {
+  const r = await fetch('/api/admin/quiz-leads'); if (!r.ok) return;
+  leads = (await r.json()).leads; renderLeads();
+}
+function renderLeads() {
+  const cl = leads.filter(l => l.clickedAt).length;
+  $('#n-lead').textContent = leads.length || '';
+  $('#leadChips').innerHTML = [['all', `Todos (${leads.length})`], ['sim', `Clicaram em comprar (${cl})`], ['nao', `Não clicaram (${leads.length - cl})`]]
+    .map(([k, l]) => `<button class="chip" data-lf="${k}" aria-pressed="${leadF === k}">${l}</button>`).join('');
+  document.querySelectorAll('[data-lf]').forEach(b => b.onclick = () => { leadF = b.dataset.lf; renderLeads(); });
+  const list = leads.filter(l => leadF === 'all' || (leadF === 'sim' ? l.clickedAt : !l.clickedAt));
+  $('#leads').innerHTML = list.length ? list.map(l => {
+    const msg = encodeURIComponent(`Oi ${l.name.split(' ')[0]}! Tudo bem? Vi que você fez o diagnóstico do Zap Catálogo 💖`);
+    return `<div class="row"><div class="row-top"><div><b>${esc(l.name)}</b>
+      <div class="meta"><a href="https://wa.me/${esc(l.phone)}?text=${msg}" target="_blank" rel="noopener">WhatsApp ${esc(fone(l.phone))}</a> · ${dataHora(l.createdAt)}</div>
+      </div><span class="tag ${l.clickedAt ? 't-pro' : 't-expired'}">${l.clickedAt ? 'Clicou em comprar' : 'Não clicou ainda'}</span></div>
+      <div>${Object.keys(PERG).filter(k => l.answers[k]).map(k => `<div class="meta">${PERG[k]}: <b style="font-size:12.5px">${esc(l.answers[k])}</b></div>`).join('')}</div>
+      <div class="acts"><a href="https://wa.me/${esc(l.phone)}?text=${msg}" target="_blank" rel="noopener">Chamar no WhatsApp</a><button class="del" data-ldel="${l.id}">Apagar contato</button></div></div>`;
+  }).join('') : '<div class="empty">Nenhum contato aqui ainda. Eles aparecem quando alguém faz o quiz da página inicial.</div>';
+  document.querySelectorAll('[data-ldel]').forEach(b => b.onclick = async () => {
+    const l = leads.find(x => x.id === +b.dataset.ldel); if (!confirm(`Apagar o contato de ${l.name}?`)) return;
+    const r = await fetch(`/api/admin/quiz-leads/${l.id}`, { method: 'DELETE' }); if (!r.ok) return toast('Não deu certo.');
+    toast('Contato apagado'); loadLeads();
+  });
+}
+loadLeads();
+
+/* Abas: Resumo, Lojistas, Pagamentos, Contatos do quiz, Vídeos tutoriais */
+const TABS = ['resumo', 'lojistas', 'minhas', 'pagamentos', 'contatos', 'tutoriais'];
 function showTab(t, push) {
   if (!TABS.includes(t)) t = 'resumo';
   document.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.tab === t));

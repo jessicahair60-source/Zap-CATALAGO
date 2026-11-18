@@ -257,3 +257,22 @@ test('ativar acesso de quem já pagou na Kiwify', async () => {
   r = await client()('GET', '/ativar'); assert.strictEqual(r.status, 200); assert.match(r.text, /Ative seu acesso/);
 });
 
+
+test('contatos do quiz: salva nome e WhatsApp e marca o clique em comprar', async () => {
+  const anon = client();
+  let r = await anon('POST', '/api/quiz/lead', { sid: 'abc', name: 'Maria', phone: '11912345678' }); assert.strictEqual(r.status, 400);
+  r = await anon('POST', '/api/quiz/lead', { sid: 'sid0123456789ab', name: 'M', phone: '11912345678' }); assert.strictEqual(r.status, 400);
+  r = await anon('POST', '/api/quiz/lead', { sid: 'sid0123456789ab', name: 'Maria  Silva', phone: '55 (11) 91234-5678', answers: { vende: 'Produtos', mudaria: 'Tudo isso!', lixo: 'x' } });
+  assert.strictEqual(r.status, 200);
+  r = await anon('POST', '/api/quiz/click', null, {}); assert.strictEqual(r.status, 204);
+  r = await fetch(base + '/api/quiz/click', { method: 'POST', body: JSON.stringify({ sid: 'sid0123456789ab' }) }); assert.strictEqual(r.status, 204);
+  r = await anon('GET', '/api/admin/quiz-leads'); assert.notStrictEqual(r.status, 200);
+  const dona = client();
+  await dona('POST', '/api/login', { email: 'dona@teste.com', password: 'senha-forte', admin: true });
+  r = await dona('GET', '/api/admin/quiz-leads'); assert.strictEqual(r.status, 200);
+  const l = r.json.leads.find(x => x.name === 'Maria Silva');
+  assert.ok(l); assert.strictEqual(l.phone, '5511912345678'); assert.ok(l.clickedAt);
+  assert.deepStrictEqual(l.answers, { vende: 'Produtos', mudaria: 'Tudo isso!' });
+  r = await dona('DELETE', `/api/admin/quiz-leads/${l.id}`); assert.strictEqual(r.status, 200);
+  r = await dona('GET', '/api/admin/quiz-leads'); assert.ok(!r.json.leads.some(x => x.id === l.id));
+});
