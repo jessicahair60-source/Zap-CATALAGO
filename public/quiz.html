@@ -397,12 +397,13 @@ body.capa-on .bar { background: transparent; backdrop-filter: none; -webkit-back
 .parab h3 { font: 800 21px/1.25 "Montserrat", system-ui, sans-serif; margin: 12px 0 8px; color: var(--fg); }
 .parab h3 em { font-style: normal; color: var(--pink); }
 .parab p { margin: 0; color: var(--muted); font-size: 15px; }
-.parab .pz { display: flex; align-items: baseline; justify-content: center; gap: 10px; margin: 16px 0 6px; }
+.parab .pz { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; column-gap: 8px; row-gap: 2px; margin: 14px 0 6px; white-space: nowrap; }
+.parab .pz s { flex-basis: 100%; }
 .parab .pz s { color: var(--muted); font-size: 17px; }
 .parab .pz b { color: var(--pink); font: 800 34px/1 "Inter", system-ui, sans-serif; font-variant-numeric: tabular-nums; }
 .parab .pz small { font-size: 15px; color: var(--fg); font-weight: 700; }
 .parab .fixo { display: inline-block; margin-top: 6px; padding: 6px 12px; border-radius: 99px; background: var(--rosa); color: var(--pink-d); font-size: 13px; font-weight: 700; }
-.parab .btn { margin-top: 18px; width: 100%; }
+.parab .parab-c .btn { margin-top: 18px; width: 100%; white-space: normal; font-size: 16px; padding: 14px 16px; }
 #confete { position: fixed; inset: 0; z-index: 51; pointer-events: none; width: 100%; height: 100%; }
 .entrar { justify-self: end; font-size: 13.5px; font-weight: 700; color: var(--pink-d); text-decoration: none; padding: 8px 4px; }
 </style>
@@ -671,7 +672,7 @@ const CONFIG = {
   CHECKOUT: 'https://pay.kiwify.com.br/ze66upr',
   BONUS_MINUTOS: 15,
   BONUS_FIM: '2026-11-23T23:59:59-03:00',
-  PRECO_DE: null
+  PRECO_DE: 150
 };
 /* ========================================================================== */
 
@@ -920,11 +921,11 @@ const CONFIG = {
   const box = document.getElementById('parab'); if (!box) return;
   const KEY = 'zapcat-parabens';
   const de = (typeof CONFIG !== 'undefined' && CONFIG.PRECO_DE) ? Number(CONFIG.PRECO_DE) : 0;
-  const brl = v => 'R$ ' + v.toFixed(2).replace('.', ',');
+  const brl = v => 'R$ ' + (Number.isInteger(v) ? String(v) : v.toFixed(2).replace('.', ','));
   if (de > 47) {
     document.getElementById('parabT').innerHTML = 'Você ganhou <em>' + brl(de - 47) + ' de desconto!</em>';
-    document.getElementById('parabTx').textContent = 'Para criar a vitrine da sua loja agora.';
-    const s = document.getElementById('parabDe'); s.textContent = 'De ' + brl(de); s.hidden = false;
+    document.getElementById('parabTx').textContent = 'Para criar a vitrine da sua loja agora:';
+    const s = document.getElementById('parabDe'); s.textContent = 'De ' + 'R$ ' + de.toFixed(2).replace('.', ','); s.hidden = false; document.querySelector('.parab .pz small').textContent = '/mês';
   } else {
     document.getElementById('parabT').innerHTML = 'Parabéns! <em>Sua vitrine está liberada!</em>';
     document.getElementById('parabTx').textContent = 'Crie agora a vitrine da sua loja por apenas:';
