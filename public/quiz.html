@@ -332,6 +332,12 @@ h2, .oferta h2 { font-size: clamp(23px, 6.6vw, 29px); }
 .barra-in p { margin: 0; flex: none; font: 800 18px/1.1 var(--f); color: var(--fg); }
 .barra-in p small { display: block; font: 600 11.5px/1.2 "Inter", sans-serif; color: var(--muted); }
 .barra-in .btn { flex: 1; min-height: 50px; padding: 12px 14px; font-size: 15px; margin: 0; }
+
+.capa-dona { width: 100%; margin: 6px 0 2px; }
+.capa-dona img { aspect-ratio: 3/2; object-position: center 30%; border-radius: 24px; }
+.capa-dona::before { display: none; }
+.chip.c-a { left: 10px; top: auto; bottom: -14px; }
+.chip.c-b { right: 10px; bottom: -14px; }
 </style>
 </head>
 <body>
@@ -348,11 +354,11 @@ h2, .oferta h2 { font-size: clamp(23px, 6.6vw, 29px); }
   <!-- 0. Capa -->
   <section class="step center" id="s0" data-step="0" aria-labelledby="t0">
     <div class="capa-dona">
-      <img src="/static/exemplo/mentoria-mentoria.webp" alt="Empreendedora sorrindo com uma xícara de café" width="900" height="1125" fetchpriority="high">
+      <img src="/static/exemplo/quiz-capa-empreendedoras.webp" alt="Empreendedoras de vários negócios sorrindo: confeiteira, manicure, cabeleireira, maquiadora, loja de roupas, costureira e decoradora de festas" width="900" height="600" fetchpriority="high">
       <span class="chip c-a" aria-hidden="true">🔗 Link da bio</span>
       <span class="chip c-b" aria-hidden="true">💬 Pedidos no WhatsApp</span>
     </div>
-    <h1 id="t0">Sua loja pode estar <em>perdendo oportunidades de venda</em> sem você perceber!</h1>
+    <h1 id="t0" style="margin-top:26px">Sua loja pode estar <em>perdendo oportunidades de venda</em> sem você perceber!</h1>
     <p class="sub">Descubra em menos de 1 minuto como apresentar seus produtos ou serviços de um jeito mais profissional e facilitar seus pedidos.</p>
     <div class="fim">
       <button class="btn" type="button" data-next>Quero descobrir <span class="seta" aria-hidden="true">→</span></button>
