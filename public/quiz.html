@@ -291,7 +291,7 @@ h1 em, h2 em { font-style: normal; color: var(--pink); }
 /* ===== leitura mais leve: Inter no texto, Montserrat só nos títulos, sem tudo em maiúsculas ===== */
 body { font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; font-weight: 400; line-height: 1.55; }
 h1, h2 { font-family: var(--f); font-weight: 800; text-transform: none; letter-spacing: -.02em; line-height: 1.18; }
-h1 { font-size: clamp(26px, 7.6vw, 34px); }
+h1 { font-size: clamp(25px, 7vw, 32px); }
 h2, .oferta h2 { font-size: clamp(23px, 6.6vw, 29px); }
 .sub, .oferta .sub { font-weight: 400; font-size: 16px; line-height: 1.6; }
 .btn, .oferta .btn.cta { font-family: var(--f); font-weight: 700; text-transform: none; letter-spacing: 0; font-size: 17px; }
@@ -306,6 +306,16 @@ h2, .oferta h2 { font-size: clamp(23px, 6.6vw, 29px); }
 .preco .val { font-family: var(--f); font-weight: 800; }
 .dia { font-weight: 700; }
 .marca { font-family: var(--f); }
+
+/* capa: foto da dona de loja, sem moldura de celular */
+.capa-dona { position: relative; width: min(230px, 62%); margin: 4px auto 0; }
+.capa-dona img { width: 100%; height: auto; aspect-ratio: 1/1; object-fit: cover; object-position: center 18%; border-radius: 50% 50% 46% 46% / 50% 50% 44% 44%; box-shadow: 0 26px 50px -26px rgba(194,16,106,.55); background: var(--rosa-2); }
+.capa-dona::before { content: ""; position: absolute; inset: -10px; border-radius: 50%; background: radial-gradient(circle, #FFD0E7 0%, transparent 70%); z-index: -1; }
+.chip { position: absolute; background: var(--branco); color: var(--fg); font: 700 12.5px/1 var(--f); padding: 9px 12px; border-radius: 99px; box-shadow: 0 10px 22px -12px rgba(194,16,106,.55); white-space: nowrap; animation: flutua 3.2s ease-in-out infinite; }
+.chip.c-a { left: -18px; top: 18%; }
+.chip.c-b { right: -22px; bottom: 14%; animation-delay: 1.4s; }
+@keyframes flutua { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@media (prefers-reduced-motion: reduce) { .chip { animation: none; } }
 </style>
 </head>
 <body>
@@ -321,10 +331,10 @@ h2, .oferta h2 { font-size: clamp(23px, 6.6vw, 29px); }
 <main id="funil">
   <!-- 0. Capa -->
   <section class="step center" id="s0" data-step="0" aria-labelledby="t0">
-    <div class="capa-fotos" aria-hidden="true">
-      <img class="c2" src="/static/exemplo/topo-doceria.webp" alt="" width="112" height="180" fetchpriority="high">
-      <img class="c1" src="/static/exemplo/topo-boutique.webp" alt="" width="132" height="210" fetchpriority="high">
-      <img class="c3" src="/static/exemplo/topo-acessorios.webp" alt="" width="112" height="180" fetchpriority="high">
+    <div class="capa-dona">
+      <img src="/static/exemplo/mentoria-mentoria.webp" alt="Empreendedora sorrindo com uma xícara de café" width="900" height="1125" fetchpriority="high">
+      <span class="chip c-a" aria-hidden="true">🔗 Link da bio</span>
+      <span class="chip c-b" aria-hidden="true">💬 Pedidos no WhatsApp</span>
     </div>
     <h1 id="t0">Sua loja pode estar <em>perdendo oportunidades de venda</em> sem você perceber!</h1>
     <p class="sub">Descubra em menos de 1 minuto como apresentar seus produtos ou serviços de um jeito mais profissional e facilitar seus pedidos.</p>
