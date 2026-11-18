@@ -313,6 +313,12 @@ h2, .oferta h2 { font-size: clamp(23px, 6.6vw, 29px); }
 .btn, .oferta .btn.cta { font-family: var(--f); font-weight: 700; text-transform: none; letter-spacing: 0; font-size: 17px; }
 .op { font-weight: 600; font-size: 16px; }
 .ben b, .inc li, .nichos li { font-weight: 600; }
+.pensa { margin: 16px 0 0; background: var(--branco); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; text-align: left; font-size: 15px; line-height: 1.5; color: var(--fg); }
+.pensa b { display: block; color: var(--pink-d); font-weight: 800; }
+.pensa p { margin: 6px 0 0; }
+.garantia { margin: 14px 0 0; text-align: center; font-size: 13.5px; line-height: 1.45; color: var(--muted); }
+.garantia b { color: var(--pink-d); }
+.pensa strong { color: var(--pink-d); font-weight: 800; }
 .diag-l p, .resumo-txt, .vs-c li, .bonus p, .comofunc li, .legenda, .passos li, .pessoal { font-weight: 400; }
 .frase, .chamada, .urg { font-weight: 600; }
 .selos, .garantias { font-weight: 600; }
@@ -596,7 +602,8 @@ body.capa-on .bar { background: transparent; backdrop-filter: none; -webkit-back
   <section class="step final" id="sOferta" aria-labelledby="t11">
     <div class="oferta">
       <h2 id="t11">Chegou a sua vez de ter uma <em>vitrine profissional!</em> 💖</h2>
-      <p class="sub">Pare de perder tempo enviando fotos e preços. Organize seu negócio, facilite os pedidos e tenha mais oportunidades de vender!</p>
+      <div class="pensa"><b>Pensa comigo:</b><p>Sua próxima cliente pode entrar no seu perfil <strong>HOJE</strong>.</p><p>O que ela vai encontrar? Um monte de foto solta no WhatsApp ou uma vitrine organizada, bonita e fácil de comprar?</p></div>
+      <p class="sub">Pare de perder tempo mandando foto e preço o dia inteiro. Organize seu negócio, facilite os pedidos e venda com muito mais profissionalismo.</p>
       <p class="pessoal" id="pessoal" hidden></p>
 
       <div class="pacote">
@@ -618,16 +625,11 @@ body.capa-on .bar { background: transparent; backdrop-filter: none; -webkit-back
         <p class="por" id="precoPor">Por apenas</p>
         <p class="val" aria-label="R$ 47,00 por mês"><small>R$</small><big>47</big><em>,00</em><span>/mês</span></p>
         <span class="dia">Menos de R$ 1,60 por dia</span>
-        <p class="paga">Uma única venda já pode pagar o seu mês inteiro.</p>
+        <p class="paga">Uma única venda já pode pagar seu mês inteiro.</p>
       </div>
 
-      <p class="chamada">Sua próxima cliente já pode conhecer seu negócio de um jeito muito mais profissional!</p>
       <a class="btn cta" id="checkout" href="https://pay.kiwify.com.br/ze66upr" rel="noopener">Clique aqui para cadastrar sua vitrine <span class="seta" aria-hidden="true">→</span></a>
-      <ul class="garantias">
-        <li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Garantia de 7 dias</li>
-        <li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Cadastro simples</li>
-        <li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Acesso conforme liberação da plataforma</li>
-      </ul>
+      <p class="garantia"><b>Garantia de 7 dias</b> - Se não gostar, você recebe 100% de volta.</p>
 
       <div class="risco">
         <span class="sel" aria-hidden="true">7<small>DIAS</small></span>
