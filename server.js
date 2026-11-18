@@ -359,6 +359,52 @@ app.get('/admin', (req, res) => {
 /* ---------- API: conta ---------- */
 const jsonBody = express.json({ limit: '25mb' });
 
+/* ---------- quiz da página inicial: contatos (nome + WhatsApp) ---------- */
+const smallJson = express.json({ limit: '20kb' });
+const quizSid = v => { const s = String(v || ''); return /^[a-z0-9]{12,40}$/i.test(s) ? s : null; };
+app.post('/api/quiz/lead', smallJson, (req, res) => {
+  const b = req.body || {};
+  const sid = quizSid(b.sid);
+  const name = String(b.name || '').replace(/\s+/g, ' ').trim().slice(0, 60);
+  const phone = String(b.phone || '').replace(/\D/g, '').slice(0, 15);
+  if (!sid || name.length < 2 || phone.length < 10) return res.status(400).json({ error: 'Preencha seu nome e seu WhatsApp com DDD.' });
+  if (tooMany(req.ip, 'quiz')) return res.status(429).json({ error: 'Muitas tentativas. Espere 5 minutos.' });
+  const answers = {};
+  const r = b.answers && typeof b.answers === 'object' ? b.answers : {};
+  for (const k of ['vende', 'apresenta', 'dificuldade', 'mudaria']) if (r[k] != null) answers[k] = String(r[k]).slice(0, 120);
+  const t = now();
+  db.prepare(`INSERT INTO quiz_leads (sid, name, phone, answers, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)
+    ON CONFLICT(sid) DO UPDATE SET name = excluded.name, phone = excluded.phone, answers = excluded.answers, updated_at = excluded.updated_at`)
+    .run(sid, name, phone, JSON.stringify(answers), t, t);
+  res.json({ ok: true });
+});
+// clicou no botão de comprar (vem por sendBeacon, então aceita texto também)
+app.post('/api/quiz/click', express.text({ limit: '2kb', type: () => true }), (req, res) => {
+  let sid = null; try { sid = quizSid(JSON.parse(String(req.body || '{}')).sid); } catch (e) {}
+  if (sid) db.prepare('UPDATE quiz_leads SET clicked_at = COALESCE(clicked_at, ?) WHERE sid = ?').run(now(), sid);
+  res.status(204).end();
+});
+// compra aprovada na Kiwify: marca como "fechou" o contato do quiz com o mesmo WhatsApp (DDD + 8 últimos dígitos)
+const phoneKey = p => { let d = String(p || '').replace(/\D/g, ''); if (d.length > 11 && d.startsWith('55')) d = d.slice(2); return d.length >= 10 ? d.slice(0, 2) + d.slice(-8) : ''; };
+function markLeadPaid(phone) {
+  const key = phoneKey(phone); if (!key) return;
+  const ids = db.prepare('SELECT id, phone FROM quiz_leads WHERE paid_at IS NULL AND created_at > ?').all(now() - 90 * DAY).filter(l => phoneKey(l.phone) === key).map(l => l.id);
+  for (const id of ids) db.prepare('UPDATE quiz_leads SET paid_at = ? WHERE id = ?').run(now(), id);
+}
+app.get('/api/admin/quiz-leads', adminOnly, (req, res) => {
+  const rows = db.prepare('SELECT id, name, phone, answers, clicked_at, paid_at, created_at FROM quiz_leads ORDER BY created_at DESC LIMIT 1000').all();
+  res.json({ leads: rows.map(l => { let a = {}; try { a = JSON.parse(l.answers); } catch (e) {} return { id: l.id, name: l.name, phone: l.phone, answers: a, clickedAt: l.clicked_at, paidAt: l.paid_at, createdAt: l.created_at }; }) });
+});
+// a dona marca à mão quem fechou (ex.: pagou com outro número)
+app.post('/api/admin/quiz-leads/:id', adminOnly, jsonBody, (req, res) => {
+  db.prepare('UPDATE quiz_leads SET paid_at = ? WHERE id = ?').run(req.body && req.body.paid ? now() : null, Number(req.params.id) || 0);
+  res.json({ ok: true });
+});
+app.delete('/api/admin/quiz-leads/:id', adminOnly, (req, res) => {
+  db.prepare('DELETE FROM quiz_leads WHERE id = ?').run(Number(req.params.id) || 0);
+  res.json({ ok: true });
+});
+
 app.post('/api/signup', jsonBody, (req, res) => {
   const name = String(req.body.name || '').trim().slice(0, 80);
   const storeName = String(req.body.storeName || '').trim().slice(0, 80);
@@ -704,6 +750,7 @@ app.post('/api/webhooks/kiwify', express.raw({ type: '*/*', limit: '1mb' }), (re
   const payId = 'kiwify:' + k.orderId;
   const seen = k.orderId && db.prepare('SELECT 1 FROM payments WHERE mp_id = ? AND status = ?');
   const paid = (k.event === 'order_approved' || k.event === 'subscription_renewed') && k.status === 'paid';
+  if (paid) markLeadPaid(k.phone);
   if (paid) {
     // Vale até a próxima cobrança, com 2 dias de folga; sem a data, 32 dias
     const until = k.nextPayment > now() ? k.nextPayment + 2 * DAY : Math.max(now(), (store && store.pro_until) || 0) + (k.yearly ? 367 : 32) * DAY;
