@@ -234,7 +234,30 @@ h1 em, h2 em { font-style: normal; color: var(--pink); }
 .vs-com { background: var(--branco); border: 2px solid var(--pink); box-shadow: var(--sh); }
 .vs-com h3 { color: var(--pink); }
 .vs-com li i { background: var(--pink); color: #fff; }
-.vs-img { display: block; width: 100%; height: auto; margin: 18px 0 0; border-radius: 22px; box-shadow: var(--sh); }
+.ad-real { margin: 16px 0 0; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 11px 16px; border-radius: 999px; background: var(--pink); color: #fff; font-weight: 800; font-size: 16.5px; }
+.ad-real span { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #fff; display: grid; place-items: center; font-size: 12px; }
+.ad-card { margin-top: 16px; border-radius: 24px; overflow: hidden; background: var(--branco); }
+.ad-card img { display: block; width: 100%; height: auto; }
+.ad-antes { border: 2px solid #EBDDE3; }
+.ad-depois { border: 2px solid var(--pink); box-shadow: var(--sh); }
+.ad-top { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: var(--rosa); }
+.ad-antes .ad-top { background: #F7EEF2; }
+.ad-top i { font-style: normal; flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--pink); color: #fff; display: grid; place-items: center; font: 800 16px/1 "Inter", sans-serif; }
+.ad-antes .ad-top i { background: #8A6B78; }
+.ad-top b { flex: 1; font: 800 17px/1.25 var(--f); text-transform: uppercase; letter-spacing: .02em; color: var(--pink-d); }
+.ad-antes .ad-top b { color: #6E5A63; }
+.ad-seta { flex: none; width: 32px; height: 32px; border-radius: 50%; background: var(--pink); color: #fff; display: grid; place-items: center; font-size: 19px; font-weight: 900; }
+.ad-antes .ad-seta { background: #8A6B78; }
+.ad-tel { width: min(280px, 78%); margin: 16px auto; border-radius: 24px; overflow: hidden; border: 1px solid var(--line); box-shadow: 0 22px 40px -24px rgba(194,16,106,.5); }
+.ad-tela { position: relative; overflow: hidden; border-radius: 0; background: #fff; aspect-ratio: 9/17; }
+.ad-tela.ad-fixa { aspect-ratio: auto; background: #EFE7DE; }
+.ad-tela img { display: block; width: 100%; height: auto; }
+.ad-rola { position: absolute; left: 0; right: 0; top: 0; animation: adRola var(--t, 12s) ease-in-out infinite alternate; }
+@keyframes adRola { 0%, 12% { top: 0; transform: translateY(0); } 88%, 100% { top: 100%; transform: translateY(-100%); } }
+@media (prefers-reduced-motion: reduce) { .ad-rola { animation: none; } }
+.ad-card .ad-tel + * { margin-top: 0; }
+.ad-frase { margin: 18px 0 0; text-align: center; font-size: 19px; font-weight: 800; line-height: 1.35; text-wrap: balance; }
+.ad-frase em { font-style: normal; color: var(--pink); }
 .alerta { margin: 18px 0 0; padding: 14px 16px; border-radius: 18px; background: var(--rosa-2); color: var(--pink-d); font-weight: 800; font-size: 17px; line-height: 1.4; text-align: center; }
 
 /* oferta: extras */
@@ -540,7 +563,20 @@ p, li, .pensa p, .sub { text-wrap: pretty; }
   <!-- Antes x depois -->
   <section class="step" id="sVs" aria-labelledby="tVs">
     <h2 id="tVs">Veja a diferença na <em>rotina das suas vendas</em></h2>
-    <img class="vs-img" src="/static/exemplo/quiz-antes-depois.webp" width="1080" height="1350" alt="Sem vitrine: fotos soltas no WhatsApp com +9 e sem preço. Com vitrine: catálogo Jéssica Hair com categorias, preços e botão EU QUERO. A mesma loja, só mudou a forma de mostrar." decoding="async">
+    <p class="ad-real"><span aria-hidden="true">✓</span>Exemplo real · Jéssica Hair</p>
+    <div class="ad-card ad-antes">
+      <div class="ad-top"><i>1</i><b>Sem vitrine</b><span class="ad-seta" aria-hidden="true">↓</span></div>
+      <div class="ad-tel"><div class="ad-tela ad-fixa"><img src="/static/exemplo/ad-antes-whats.webp" width="720" height="784" alt="Fotos de cabelo soltas no WhatsApp, com +9 e sem preço" loading="lazy" decoding="async"></div></div>
+    </div>
+    <div class="ad-card ad-depois">
+      <div class="ad-top"><i>2</i><b>Com vitrine</b><span class="ad-seta" aria-hidden="true">↓</span></div>
+      <div class="ad-tel"><div class="ad-tela"><div class="ad-rola" style="--t:16s"><img src="/static/exemplo/ad-depois-vitrine.webp" width="720" height="2805" alt="Vitrine Jéssica Hair: capa, categorias, produtos com preço e botão EU QUERO" loading="lazy" decoding="async"></div></div></div>
+    </div>
+    <div class="ad-card ad-depois">
+      <div class="ad-top"><i>3</i><b>Pedido chega no seu WhatsApp</b><span class="ad-seta" aria-hidden="true">↓</span></div>
+      <div class="ad-tel"><div class="ad-tela ad-fixa"><img src="/static/exemplo/ad-depois-pedido.webp" width="720" height="1203" alt="Pedido chegando organizado no WhatsApp com produtos e total" loading="lazy" decoding="async"></div></div>
+    </div>
+    <p class="ad-frase">A mesma loja. <em>Só mudou a forma de mostrar.</em></p>
     <p class="alerta">Cada dia sem catálogo é cliente perguntando preço no direct e desistindo.</p>
     <div class="fim"><button class="btn" type="button" data-next>Continuar <span class="seta" aria-hidden="true">→</span></button></div>
   </section>
@@ -562,25 +598,6 @@ p, li, .pensa p, .sub { text-wrap: pretty; }
     <h2 id="t8">Se você vende algum produto ou serviço, <em>o Zap Catálogo é para você!</em></h2>
     <ul class="nichos"><li><span aria-hidden="true">👗</span>Lojas de roupas</li><li><span aria-hidden="true">🧸</span>Moda infantil</li><li><span aria-hidden="true">🏋️</span>Moda fitness</li><li><span aria-hidden="true">👙</span>Moda praia e lingerie</li><li><span aria-hidden="true">👠</span>Calçados</li><li><span aria-hidden="true">👜</span>Bolsas e acessórios</li><li><span aria-hidden="true">💍</span>Semijoias e bijuterias</li><li><span aria-hidden="true">💄</span>Maquiagem e cosméticos</li><li><span aria-hidden="true">🌸</span>Perfumaria</li><li><span aria-hidden="true">💅</span>Manicures e nail designers</li><li><span aria-hidden="true">💇‍♀️</span>Cabeleireiras</li><li><span aria-hidden="true">👁️</span>Lash e sobrancelhas</li><li><span aria-hidden="true">🧖‍♀️</span>Estética e massagem</li><li><span aria-hidden="true">🎂</span>Confeiteiras</li><li><span aria-hidden="true">🥟</span>Salgados e marmitas</li><li><span aria-hidden="true">🍫</span>Doces gourmet</li><li><span aria-hidden="true">🎈</span>Decoração de festas</li><li><span aria-hidden="true">🧶</span>Artesãs</li><li><span aria-hidden="true">✂️</span>Papelaria personalizada</li><li><span aria-hidden="true">🕯️</span>Velas e aromas</li><li><span aria-hidden="true">🐶</span>Pet shop</li><li><span aria-hidden="true">🪴</span>Plantas e flores</li><li><span aria-hidden="true">📸</span>Fotógrafas</li><li><span aria-hidden="true">🎓</span>Mentoras e cursos</li><li><span aria-hidden="true">🛠️</span>Prestadores de serviços</li><li><span aria-hidden="true">🛍️</span>Revendedoras</li><li class="mais">E muito mais!</li></ul>
     <p class="frase">Não importa o tamanho do seu negócio. <b>Você também pode ter uma vitrine profissional!</b></p>
-    <div class="fim"><button class="btn" type="button" data-next>Continuar <span class="seta" aria-hidden="true">→</span></button></div>
-  </section>
-
-  <!-- 9. Demonstração da vitrine (vídeo 1: VIDEOS.vitrine) -->
-  <section class="step" id="s9" data-step="9" aria-labelledby="t9">
-    <h2 id="t9">Veja como seu cliente vai enxergar sua vitrine! 😍</h2>
-    <div class="tel tel-v"><div class="tel-tela"><div class="tel-sb" aria-hidden="true"><span>23:10</span><span class="bt"></span></div><div class="vid-tela" data-video="vitrine"></div></div></div>
-    <p class="legenda" data-legenda="vitrine"></p>
-    <div class="fim"><button class="btn" type="button" data-next>Continuar <span class="seta" aria-hidden="true">→</span></button></div>
-  </section>
-
-  <!-- 10. Pedido no WhatsApp (duas fotos: vitrine e pedido) -->
-  <section class="step" id="s10" data-step="10" aria-labelledby="t10">
-    <h2 id="t10">Olha como o pedido chega <em>prontinho</em> no seu WhatsApp! 💚</h2>
-    <p class="sub">Seu cliente escolhe o que deseja e envia o pedido organizado diretamente para você.</p>
-    <div class="pedido-fotos">
-      <figure><img src="/static/exemplo/quiz-pedido-1.webp" alt="Vitrine da loja Acessórios da Lu no celular, com produtos e botão Eu quero" width="348" height="680" loading="lazy" decoding="async"><figcaption><b>1</b>Cliente escolhe na vitrine</figcaption></figure>
-      <figure><img src="/static/exemplo/quiz-pedido-2.webp" alt="Pedido do Brinco Coração Dourado chegando organizado no WhatsApp da loja" width="342" height="680" loading="lazy" decoding="async"><figcaption><b>2</b>Pedido chega no seu WhatsApp</figcaption></figure>
-    </div>
     <div class="fim"><button class="btn" type="button" data-next>Continuar <span class="seta" aria-hidden="true">→</span></button></div>
   </section>
 
