@@ -611,7 +611,6 @@ p, li, .pensa p, .sub { text-wrap: pretty; }
       <div class="expira" id="crono" hidden role="timer" aria-live="off">
         <p class="expira-t">⏰ Essa oferta expira em</p>
         <div class="crono-t"><span hidden><i id="cr-d">0</i><small>DIAS</small></span><span hidden><i id="cr-h">00</i><small>HORAS</small></span><span><i id="cr-m">15</i><small>MIN</small></span><span><i id="cr-s">00</i><small>SEG</small></span></div>
-        <p class="expira-s" id="cronoData">Depois desse tempo, você perde os 2 bônus.</p>
       </div>
 
       <div class="aviso">
@@ -770,7 +769,7 @@ const CONFIG = {
     } else {
       fim = Date.parse(CONFIG.BONUS_FIM || ''); if (!Number.isFinite(fim)) return;
       const d = new Date(fim);
-      document.getElementById('cronoData').textContent = 'Até ' + d.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' }) + ', às ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
+      const cdt = document.getElementById('cronoData'); if (cdt) cdt.textContent = 'Até ' + d.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' }) + ', às ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
     }
     const z = n => String(n).padStart(2, '0');
     const tick = () => {
