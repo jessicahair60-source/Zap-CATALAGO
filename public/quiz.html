@@ -172,8 +172,57 @@ h1 em, h2 em { font-style: normal; color: var(--pink); }
 .garantias { list-style: none; padding: 0; margin: 16px 0 0; display: grid; gap: 7px; justify-items: center; font-size: 14px; font-weight: 700; }
 .garantias li { display: inline-flex; align-items: center; gap: 8px; }
 .garantias .ok { background: #fff; color: var(--pink); }
-#s11 { min-height: 0; }
-#s11 > .oferta { min-height: calc(100dvh - 96px); }
+.step.final { min-height: 0; }
+.step.final > .oferta { min-height: calc(100dvh - 96px); }
+
+/* analisando */
+.anal { justify-content: center; text-align: center; }
+.anal-ring { width: 96px; height: 96px; margin: 0 auto; border-radius: 50%; border: 7px solid var(--rosa-2); border-top-color: var(--pink); animation: gira 1s linear infinite; }
+.anal-list { list-style: none; padding: 0; margin: 26px auto 0; display: grid; gap: 12px; max-width: 320px; text-align: left; }
+.anal-list li { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 15.5px; color: var(--muted); opacity: .35; transition: opacity .3s, color .3s; }
+.anal-list li .ok { background: var(--rosa-2); transition: background .3s; }
+.anal-list li.feito { opacity: 1; color: var(--fg); }
+.anal-list li.feito .ok { background: var(--pink); }
+
+/* diagnóstico personalizado */
+.diag { margin: 20px 0 0; background: var(--branco); border: 1px solid var(--line); border-radius: 22px; padding: 6px 16px; box-shadow: var(--sh); text-align: left; }
+.diag-l { display: flex; gap: 12px; padding: 13px 0; }
+.diag-l + .diag-l { border-top: 1px solid var(--line); }
+.diag-l .di { width: 38px; height: 38px; flex: none; border-radius: 12px; background: var(--rosa); display: grid; place-items: center; font-size: 18px; }
+.diag-l small { display: block; font-size: 11.5px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--pink); }
+.diag-l p { margin: 2px 0 0; font-size: 15px; line-height: 1.45; font-weight: 600; }
+.resumo-txt { margin: 16px 0 0; font-size: 15.5px; line-height: 1.5; color: var(--muted); font-weight: 500; text-wrap: pretty; }
+
+/* antes x depois */
+.vs { display: grid; gap: 12px; margin-top: 20px; }
+.vs-c { border-radius: 22px; padding: 16px 16px 14px; }
+.vs-c h3 { margin: 0 0 10px; font-size: 14px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+.vs-c ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.vs-c li { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; font-weight: 600; line-height: 1.35; }
+.vs-c li i { font-style: normal; flex: none; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 900; margin-top: 1px; }
+.vs-sem { background: #F7EEF2; border: 1px solid #EBDDE3; color: #6E5A63; }
+.vs-sem h3 { color: #8A6B78; }
+.vs-sem li i { background: #E3D3DA; color: #8A6B78; }
+.vs-com { background: var(--branco); border: 2px solid var(--pink); box-shadow: var(--sh); }
+.vs-com h3 { color: var(--pink); }
+.vs-com li i { background: var(--pink); color: #fff; }
+.alerta { margin: 18px 0 0; padding: 14px 16px; border-radius: 18px; background: var(--rosa-2); color: var(--pink-d); font-weight: 800; font-size: 15px; line-height: 1.4; text-align: center; }
+
+/* oferta: extras */
+.pessoal { margin: 16px 0 0; background: rgba(255,255,255,.16); border-radius: 16px; padding: 12px 14px; font-size: 15px; line-height: 1.45; font-weight: 600; }
+.pessoal b { font-weight: 800; }
+.paga { margin: 10px 0 0; font-size: 14px; font-weight: 700; color: var(--muted); }
+.risco { margin-top: 22px; background: var(--branco); color: var(--fg); border-radius: 22px; padding: 18px; display: flex; gap: 14px; align-items: flex-start; box-shadow: 0 24px 50px -26px rgba(60,0,30,.6); }
+.risco .sel { width: 58px; height: 58px; flex: none; border-radius: 50%; background: var(--grad); color: #fff; display: grid; place-items: center; text-align: center; font-weight: 900; font-size: 20px; line-height: .9; }
+.risco .sel small { display: block; font-size: 9px; letter-spacing: .06em; }
+.risco b { display: block; font-size: 16px; font-weight: 900; text-transform: uppercase; color: var(--pink-d); }
+.risco p { margin: 4px 0 0; font-size: 14.5px; line-height: 1.45; font-weight: 500; color: var(--muted); }
+.comofunc { margin-top: 12px; background: rgba(255,255,255,.14); border-radius: 22px; padding: 16px 18px; }
+.comofunc h3 { margin: 0 0 10px; font-size: 13px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.comofunc ol { list-style: none; counter-reset: c; margin: 0; padding: 0; display: grid; gap: 10px; }
+.comofunc li { counter-increment: c; display: flex; gap: 10px; align-items: flex-start; font-size: 15px; line-height: 1.4; font-weight: 600; }
+.comofunc li::before { content: counter(c); width: 24px; height: 24px; flex: none; border-radius: 50%; background: #fff; color: var(--pink-d); font-size: 13px; font-weight: 900; display: grid; place-items: center; }
+.urg { margin: 22px 0 0; text-align: center; font-weight: 800; font-size: 17px; line-height: 1.4; }
 
 @media (min-width: 700px) {
   main { padding-top: 18px; }
@@ -256,16 +305,56 @@ h1 em, h2 em { font-style: normal; color: var(--pink); }
     </div>
   </section>
 
-  <!-- 5. Resultado -->
-  <section class="step center" id="s5" data-step="5" aria-labelledby="t5">
+  <!-- Analisando (passa sozinha) -->
+  <section class="step anal" id="sAnal" data-auto="2600" aria-labelledby="tAnal" aria-live="polite">
+    <div class="anal-ring" aria-hidden="true"></div>
+    <h2 id="tAnal" style="margin-top:26px">Analisando suas respostas...</h2>
+    <ul class="anal-list">
+      <li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Como você vende hoje</li>
+      <li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>O que está travando suas vendas</li>
+      <li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>O melhor caminho para o seu negócio</li>
+    </ul>
+  </section>
+
+  <!-- Resultado personalizado -->
+  <section class="step center" id="sRes" aria-labelledby="tRes">
     <div class="result-badge" aria-hidden="true">🏆</div>
     <span class="tag" style="margin-top:26px">Seu resultado</span>
-    <h2 id="t5">Seu negócio merece uma <em>vitrine profissional!</em> 💖</h2>
-    <div class="resumo">
-      <p>Chega de depender de várias fotos e mensagens para apresentar o que você vende.</p>
-      <p>Existe uma forma mais prática de mostrar seus produtos ou serviços e facilitar a vida dos seus clientes.</p>
+    <h2 id="tRes">Seu negócio merece uma <em>vitrine profissional!</em> 💖</h2>
+    <div class="diag">
+      <div class="diag-l"><span class="di" aria-hidden="true">📍</span><div><small>Seu momento</small><p data-diag="vende"></p></div></div>
+      <div class="diag-l"><span class="di" aria-hidden="true">⚠️</span><div><small>O que pode estar travando</small><p data-diag="apresenta"></p></div></div>
+      <div class="diag-l"><span class="di" aria-hidden="true">💡</span><div><small>A solução para você</small><p data-diag="dificuldade"></p></div></div>
     </div>
+    <p class="resumo-txt">Chega de depender de várias fotos e mensagens para apresentar o que você vende. Existe uma forma mais prática de mostrar seus produtos ou serviços e facilitar a vida dos seus clientes.</p>
     <div class="fim"><button class="btn" type="button" data-next>Continuar <span class="seta" aria-hidden="true">→</span></button></div>
+  </section>
+
+  <!-- Antes x depois -->
+  <section class="step" id="sVs" aria-labelledby="tVs">
+    <h2 id="tVs">Veja a diferença na <em>rotina das suas vendas</em></h2>
+    <div class="vs">
+      <div class="vs-c vs-sem">
+        <h3>😩 Sem vitrine</h3>
+        <ul>
+          <li><i>✕</i>Mandar foto por foto no WhatsApp</li>
+          <li><i>✕</i>Responder "qual o preço?" o dia inteiro</li>
+          <li><i>✕</i>Cliente esperando resposta e desistindo</li>
+          <li><i>✕</i>Pedido perdido no meio da conversa</li>
+        </ul>
+      </div>
+      <div class="vs-c vs-com">
+        <h3>😍 Com o Zap Catálogo</h3>
+        <ul>
+          <li><i>✓</i>Um link com tudo o que você vende</li>
+          <li><i>✓</i>Fotos, vídeos e preços à vista do cliente</li>
+          <li><i>✓</i>Cliente escolhe sozinho, a qualquer hora</li>
+          <li><i>✓</i>Pedido chega organizado no seu WhatsApp</li>
+        </ul>
+      </div>
+    </div>
+    <p class="alerta">Cada dia sem catálogo é cliente perguntando preço no direct e desistindo.</p>
+    <div class="fim"><button class="btn" type="button" data-next>Quero isso no meu negócio <span class="seta" aria-hidden="true">→</span></button></div>
   </section>
 
   <!-- 6. Conheça o Zap Catálogo -->
@@ -334,10 +423,11 @@ h1 em, h2 em { font-style: normal; color: var(--pink); }
   </section>
 
   <!-- 11. Oferta final -->
-  <section class="step" id="s11" data-step="11" aria-labelledby="t11">
+  <section class="step final" id="sOferta" aria-labelledby="t11">
     <div class="oferta">
       <h2 id="t11">Chegou a sua vez de ter uma vitrine profissional! 💖</h2>
       <p class="sub">Pare de perder tempo enviando fotos e preços. Organize seu negócio, facilite os pedidos e tenha mais oportunidades de vender!</p>
+      <p class="pessoal" id="pessoal" hidden></p>
 
       <div class="inclui">
         <h3>Tudo o que está incluído</h3>
@@ -363,6 +453,7 @@ h1 em, h2 em { font-style: normal; color: var(--pink); }
         <p class="por" id="precoPor">Por apenas</p>
         <p class="val" aria-label="R$ 47,00 por mês"><small>R$</small><big>47</big><em>,00</em><span>/mês</span></p>
         <span class="dia">Menos de R$ 1,60 por dia!</span>
+        <p class="paga">Uma única venda já pode pagar o seu mês inteiro.</p>
       </div>
 
       <p class="chamada">Sua próxima cliente já pode conhecer seu negócio de um jeito muito mais profissional!</p>
@@ -372,6 +463,23 @@ h1 em, h2 em { font-style: normal; color: var(--pink); }
         <li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Cadastro simples</li>
         <li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Acesso conforme liberação da plataforma</li>
       </ul>
+
+      <div class="risco">
+        <span class="sel" aria-hidden="true">7<small>DIAS</small></span>
+        <div><b>Risco zero para você</b><p>Você tem 7 dias de garantia. Se não gostar, é só pedir o reembolso dentro desse prazo e recebe 100% do valor de volta.</p></div>
+      </div>
+
+      <div class="comofunc">
+        <h3>Como funciona depois do pagamento</h3>
+        <ol>
+          <li>Pagamento aprovado, você cria seu acesso com o mesmo e-mail da compra.</li>
+          <li>No painel, você coloca sua logo, suas cores, seus produtos e preços.</li>
+          <li>Coloca o link na bio e começa a receber pedidos no WhatsApp.</li>
+        </ol>
+      </div>
+
+      <p class="urg">Cada dia sem catálogo é cliente perguntando preço no direct e desistindo. 💔</p>
+      <a class="btn" data-checkout href="https://pay.kiwify.com.br/ze66upr" rel="noopener">Quero começar agora 💖</a>
     </div>
   </section>
 </main>
@@ -399,7 +507,7 @@ const CONFIG = {
 (function () {
   const steps = [...document.querySelectorAll('.step')];
   const LAST = steps.length - 1;
-  const KEY = 'zapcat-quiz-v1';
+  const KEY = 'zapcat-quiz-v2';
   const voltar = document.getElementById('voltar');
   const progWrap = document.getElementById('progWrap');
   const progBar = document.getElementById('progBar');
@@ -410,8 +518,7 @@ const CONFIG = {
   const salva = () => { try { sessionStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} };
 
   // checkout e preço
-  const ck = document.getElementById('checkout');
-  ck.href = CONFIG.CHECKOUT;
+  document.querySelectorAll('#checkout, [data-checkout]').forEach(a => { a.href = CONFIG.CHECKOUT; });
   if (CONFIG.PRECO_DE) {
     const de = document.getElementById('precoDe');
     de.querySelector('s').textContent = 'R$ ' + Number(CONFIG.PRECO_DE).toFixed(2).replace('.', ',');
@@ -457,6 +564,41 @@ const CONFIG = {
     });
   }
 
+  // textos personalizados pelas respostas
+  const DIAG = {
+    vende: {
+      'Produtos': 'Você vende produtos. Seus clientes querem ver fotos, opções e preços sem precisar perguntar.',
+      'Serviços': 'Você vende serviços. Seus clientes querem ver seus trabalhos, entender o que você faz e saber os valores.',
+      'Produtos e serviços': 'Você vende produtos e serviços. Deixar tudo separado por categorias faz toda a diferença.',
+      'Estou começando agora': 'Você está começando. Já sair com uma vitrine profissional passa confiança desde a primeira cliente.'
+    },
+    apresenta: {
+      'Pelo Instagram': 'Hoje a cliente precisa rolar o feed e chamar no direct só para saber o preço.',
+      'Envio fotos pelo WhatsApp': 'Mandar foto por foto no WhatsApp toma seu tempo e deixa a cliente esperando.',
+      'Tenho um catálogo ou site': 'Se o seu catálogo não leva a cliente direto para o pedido no WhatsApp, muita venda fica pelo caminho.',
+      'Ainda não tenho tudo organizado': 'Sem tudo num lugar só, a cliente se perde no meio das mensagens e desiste.'
+    },
+    dificuldade: {
+      'Enviar fotos e preços toda hora': 'Com a sua vitrine, você manda um link só e a cliente vê tudo sozinha: fotos, vídeos e preços.',
+      'Deixar meus produtos organizados': 'Seus produtos ficam separados por categorias, cada um com foto, vídeo, preço e descrição.',
+      'Transformar interessados em clientes': 'A cliente escolhe, monta o pedido e já te chama no WhatsApp pronta para comprar.',
+      'Apresentar meu negócio profissionalmente': 'Sua logo, suas cores e seus produtos numa vitrine com cara de loja de verdade.'
+    },
+    mudaria: {
+      'Economizaria meu tempo': 'Você disse que quer <b>ganhar tempo</b>. Com um link só, chega de mandar foto por foto.',
+      'Facilitaria meus atendimentos': 'Você disse que quer <b>facilitar seus atendimentos</b>. O pedido já chega pronto no seu WhatsApp.',
+      'Deixaria meu negócio mais profissional': 'Você disse que quer um <b>negócio mais profissional</b>. Sua vitrine fica com a sua marca e as suas cores.',
+      'Tudo isso!': 'Você disse que quer <b>tudo isso</b>: mais tempo, atendimento fácil e um negócio profissional. Está tudo aqui.'
+    }
+  };
+  const FALLBACK = { vende: 'Você quer apresentar o que vende de um jeito mais profissional.', apresenta: 'Mandar fotos e preços um por um toma tempo e faz cliente desistir.', dificuldade: 'Uma vitrine com tudo num link só, e o pedido chegando pronto no seu WhatsApp.' };
+  function personaliza() {
+    document.querySelectorAll('[data-diag]').forEach(p => { const q = p.dataset.diag; p.textContent = (DIAG[q] && DIAG[q][st.respostas[q]]) || FALLBACK[q]; });
+    const pe = document.getElementById('pessoal'); const t = DIAG.mudaria[st.respostas.mudaria];
+    if (t) { pe.innerHTML = '💖 ' + t; pe.hidden = false; } else pe.hidden = true;
+  }
+
+  let autoT = null;
   function render(dir) {
     const n = Math.max(0, Math.min(LAST, st.step));
     steps.forEach((s, i) => { s.classList.toggle('on', i === n); s.classList.toggle('volta', i === n && dir < 0); });
@@ -467,7 +609,15 @@ const CONFIG = {
     prog.setAttribute('aria-valuenow', String(pct));
     document.body.classList.toggle('oferta-on', n === LAST);
     marcaRespostas();
+    personaliza();
     const sec = steps[n];
+    clearTimeout(autoT);
+    if (sec.dataset.auto) {
+      if (dir < 0) { st.step = n - 1; salva(); try { history.replaceState({ step: st.step }, '', '#' + st.step); } catch (e) {} return render(-1); }
+      const lis = sec.querySelectorAll('.anal-list li'); const ms = +sec.dataset.auto;
+      lis.forEach((li, i) => { li.classList.remove('feito'); setTimeout(() => li.classList.add('feito'), (i + 1) * ms / (lis.length + 1)); });
+      autoT = setTimeout(() => { if (st.step === n) vaiPara(n + 1, 1, true); }, ms);
+    }
     sec.querySelector('.ops') && sec.querySelector('.ops').classList.remove('travado');
     tocaVideos(sec);
     window.scrollTo(0, 0);
@@ -475,9 +625,9 @@ const CONFIG = {
     if (h && dir) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
   }
 
-  function vaiPara(n, dir) {
+  function vaiPara(n, dir, troca) {
     st.step = Math.max(0, Math.min(LAST, n)); salva();
-    try { history.pushState({ step: st.step }, '', '#' + st.step); } catch (e) {}
+    try { history[troca ? 'replaceState' : 'pushState']({ step: st.step }, '', '#' + st.step); } catch (e) {}
     render(dir);
   }
 
@@ -498,7 +648,7 @@ const CONFIG = {
       st.respostas[q] = b.dataset.v; salva();
       marcaRespostas();
       ops.classList.add('travado');
-      setTimeout(() => vaiPara(+s.dataset.step + 1, 1), 380);
+      setTimeout(() => vaiPara(steps.indexOf(s) + 1, 1), 380);
     });
   });
 
