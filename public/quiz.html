@@ -317,6 +317,18 @@ h2, .oferta h2 { font-size: clamp(23px, 6.6vw, 29px); }
 .pensa { margin: 16px 0 0; background: var(--branco); border: 1px solid var(--line); border-radius: 16px; padding: 14px 16px; text-align: left; font-size: 17px; line-height: 1.5; color: var(--fg); }
 .pensa b { display: block; color: var(--pink-d); font-weight: 800; }
 .pensa p { margin: 6px 0 0; }
+.expira { margin-top: 18px; background: #2B1220; color: #fff; border-radius: 22px; padding: 16px 18px; text-align: center; }
+.expira-t { margin: 0 0 10px; font-size: 17px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: #FFC2E1; }
+.expira .crono-t { justify-content: center; gap: 8px; }
+.expira .crono-t span { min-width: 64px; font-size: 30px; padding: 8px 6px 6px; background: rgba(255,255,255,.12); color: #fff; }
+.expira .crono-t span small { color: rgba(255,255,255,.7); font-size: 11px; }
+.expira-s { margin: 10px 0 0; font-size: 15.5px; line-height: 1.4; color: rgba(255,255,255,.85); }
+.aviso { margin-top: 14px; background: #FFF4D6; border: 1px solid #F5D98A; border-radius: 18px; padding: 14px 16px; color: #5A3B00; font-size: 16.5px; line-height: 1.45; text-align: center; }
+.aviso p { margin: 0; } .aviso p + p { margin-top: 4px; }
+.inc.inc-1 { grid-template-columns: 1fr; }
+.preco .de s { text-decoration: none; }
+.trava { margin: 16px 0 0; text-align: center; font-size: 16px; line-height: 1.45; color: var(--fg); }
+.trava b { color: var(--pink-d); }
 .garantia { margin: 14px 0 0; text-align: center; font-size: 15.5px; line-height: 1.45; color: var(--muted); }
 .garantia b { color: var(--pink-d); }
 .pensa strong { color: var(--pink-d); font-weight: 800; }
@@ -412,10 +424,19 @@ body.capa-on .bar { background: transparent; backdrop-filter: none; -webkit-back
 .parab .pz s { color: var(--muted); font-size: 17px; }
 .parab .pz b { color: var(--pink); font: 800 34px/1 "Inter", system-ui, sans-serif; font-variant-numeric: tabular-nums; }
 .parab .pz small { font-size: 17px; color: var(--fg); font-weight: 700; }
+.parab .fixo.hoje { background: #FFF4D6; color: #7A4F00; }
+.parab .parab-g { margin: 10px 0 0; font-size: 13.5px; line-height: 1.4; color: var(--muted); }
+.parab-c { max-height: calc(100dvh - 32px); overflow-y: auto; }
+@media (max-height: 700px) { .parab-c { padding-top: 22px; } .parab-ic { font-size: 34px; } .parab h3 { margin-top: 6px; } .parab .pz { margin-top: 8px; } .parab .parab-c .btn { margin-top: 12px; font-size: 16px; padding: 12px 14px; } }
 .parab .fixo { display: inline-block; margin-top: 6px; padding: 6px 12px; border-radius: 99px; background: var(--rosa); color: var(--pink-d); font-size: 15px; font-weight: 700; }
 .parab .parab-c .btn { margin-top: 18px; width: 100%; white-space: normal; font-size: 18px; font-weight: 800; letter-spacing: .03em; padding: 14px 16px; }
 #confete { position: fixed; inset: 0; z-index: 51; pointer-events: none; width: 100%; height: 100%; }
 .entrar { justify-self: end; font-size: 15.5px; font-weight: 700; color: var(--pink-d); text-decoration: none; padding: 8px 4px; }
+
+/* quebras de linha mais equilibradas (sem palavra sozinha na última linha) */
+h1, h2, h3, .btn, .capa-selo, .fixo, .dia, .paga, .trava, .garantia, .parab-g, .chamada, .urg, .expira-s, .aviso p, .legenda, .selos li, .op { text-wrap: balance; }
+p, li, .pensa p, .sub { text-wrap: pretty; }
+.center .sub, .parab p, .preco p, .expira p, .aviso p, .trava, .garantia, .paga, .urg { text-wrap: balance; }
 </style>
 </head>
 <body>
@@ -607,47 +628,58 @@ body.capa-on .bar { background: transparent; backdrop-filter: none; -webkit-back
       <p class="sub">Pare de perder tempo mandando foto e preço o dia inteiro. Organize seu negócio, facilite os pedidos e venda com muito mais profissionalismo.</p>
       <p class="pessoal" id="pessoal" hidden></p>
 
+      <div class="expira" id="crono" hidden role="timer" aria-live="off">
+        <p class="expira-t">⏰ Essa oferta expira em</p>
+        <div class="crono-t"><span hidden><i id="cr-d">0</i><small>DIAS</small></span><span hidden><i id="cr-h">00</i><small>HORAS</small></span><span><i id="cr-m">15</i><small>MIN</small></span><span><i id="cr-s">00</i><small>SEG</small></span></div>
+        <p class="expira-s" id="cronoData">Depois desse tempo, você perde os 2 bônus.</p>
+      </div>
+
+      <div class="aviso">
+        <p><b>⚠️ O Zap Catálogo vai aumentar pra R$&nbsp;150/mês.</b></p>
+        <p>Hoje você ainda consegue travar por <b>R$&nbsp;47/mês pra sempre</b>.</p>
+      </div>
+
       <div class="pacote">
-        <h3>Tudo o que está incluído</h3>
-        <ul class="inc"><li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Sua vitrine digital</li><li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Link da bio personalizado</li><li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Produtos e serviços ilimitados</li><li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Fotos e vídeos</li><li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Personalização com sua marca</li><li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Pedidos pelo WhatsApp</li><li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Painel de gerenciamento</li></ul>
+        <h3>Olha tudo que você recebe</h3>
+        <ul class="inc inc-1">
+          <li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Sua vitrine digital completa</li>
+          <li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Link da bio personalizado</li>
+          <li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Produtos e serviços ilimitados</li>
+          <li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Fotos, vídeos, preços e categorias</li>
+          <li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Personalização com sua logo e cores</li>
+          <li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Pedidos organizados direto no WhatsApp</li>
+          <li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Painel pra você mesma atualizar quando quiser</li>
+        </ul>
         <div class="bonus" id="bonus">
-          <h3>+ 2 bônus</h3>
-          <p><span class="gi" aria-hidden="true">🎁</span><span><b>Bônus 1:</b> Aula para criar banners profissionais em 5 minutos.</span></p>
-          <p><span class="gi" aria-hidden="true">🎁</span><span><b>Bônus 2:</b> Mensagens prontas para divulgar sua vitrine e vender pelo WhatsApp.</span></p>
-          <div class="crono" id="crono" hidden role="timer" aria-live="off">
-            <b>Os bônus saem do ar em<small id="cronoData"></small></b>
-            <div class="crono-t"><span><i id="cr-d">0</i><small>DIAS</small></span><span><i id="cr-h">00</i><small>HORAS</small></span><span><i id="cr-m">00</i><small>MIN</small></span><span><i id="cr-s">00</i><small>SEG</small></span></div>
-          </div>
+          <h3>+ 2 bônus de hoje</h3>
+          <p><span class="gi" aria-hidden="true">🎁</span><span>Aula pra criar banners profissionais em 5 minutos</span></p>
+          <p><span class="gi" aria-hidden="true">🎁</span><span>Mensagens prontas pra divulgar sua vitrine e vender no WhatsApp</span></p>
         </div>
       </div>
 
       <div class="preco">
-        <p class="de" id="precoDe" hidden>De <s>R$ 150,00</s></p>
-        <p class="por" id="precoPor">Por apenas</p>
-        <p class="val" aria-label="R$ 47,00 por mês"><small>R$</small><big>47</big><em>,00</em><span>/mês</span></p>
-        <span class="dia">Menos de R$ 1,60 por dia</span>
-        <p class="paga">Uma única venda já pode pagar seu mês inteiro.</p>
+        <p class="de" id="precoDe" hidden>Depois: <s>R$&nbsp;150,00</s>/mês</p>
+        <p class="por">Hoje</p>
+        <p class="val" aria-label="R$&nbsp;47,00 por mês"><small>R$</small><big>47</big><em>,00</em><span>/mês</span></p>
+        <span class="dia">Você economiza R$&nbsp;103 por mês só por decidir agora</span>
+        <p class="paga">Menos de R$&nbsp;1,60 por dia. Uma única venda já paga seu mês inteiro.</p>
       </div>
 
-      <a class="btn cta" id="checkout" href="https://pay.kiwify.com.br/ze66upr" rel="noopener">Clique aqui para cadastrar sua vitrine <span class="seta" aria-hidden="true">→</span></a>
-      <p class="garantia"><b>Garantia de 7 dias</b> - Se não gostar, você recebe 100% de volta.</p>
+      <p class="trava">🔒 E quando aumentar pra R$&nbsp;150, você continua pagando <b>R$&nbsp;47. Travado.</b></p>
 
-      <div class="risco">
-        <span class="sel" aria-hidden="true">7<small>DIAS</small></span>
-        <div><b>Risco zero para você</b><p>Se não gostar, peça o reembolso em até 7 dias e receba 100% do valor de volta.</p></div>
-      </div>
+      <a class="btn cta" id="checkout" href="https://pay.kiwify.com.br/ze66upr" rel="noopener">Quero travar meus R$&nbsp;47 antes que aumente <span class="seta" aria-hidden="true">→</span></a>
+      <p class="garantia"><b>Garantia de 7 dias.</b> Se não gostar, você recebe 100% de volta. Risco zero.</p>
 
       <div class="comofunc">
-        <h3>Como funciona depois do pagamento</h3>
+        <h3>Como funciona depois</h3>
         <ol>
-          <li>Você cria seu acesso com o mesmo e-mail da compra.</li>
-          <li>No painel, coloca sua logo, cores, produtos e preços.</li>
-          <li>Coloca o link na bio e recebe os pedidos no WhatsApp.</li>
+          <li>Cria seu acesso com o mesmo e&#8209;mail da compra.</li>
+          <li>Coloca logo, cores, produtos e preços.</li>
+          <li>Coloca o link na bio e já recebe pedidos no WhatsApp.</li>
         </ol>
       </div>
 
-      <p class="urg">Cada dia sem catálogo é cliente perguntando preço no direct e desistindo.</p>
-      <a class="btn cta" data-checkout href="https://pay.kiwify.com.br/ze66upr" rel="noopener">Clique aqui para cadastrar sua vitrine <span class="seta" aria-hidden="true">→</span></a>
+      <a class="btn cta" data-checkout href="https://pay.kiwify.com.br/ze66upr" rel="noopener">Quero travar meus R$&nbsp;47 antes que aumente <span class="seta" aria-hidden="true">→</span></a>
     </div>
   </section>
 </main>
@@ -756,8 +788,6 @@ const CONFIG = {
       const arma = () => { if (ini) return; ini = Date.now(); try { localStorage.setItem(K, String(ini)); } catch (e) {} };
       if (!ini) { if (document.body.classList.contains('oferta-on')) arma(); else new MutationObserver((m, o) => { if (document.body.classList.contains('oferta-on')) { arma(); o.disconnect(); } }).observe(document.body, { attributes: true, attributeFilter: ['class'] }); }
       Object.defineProperty(window, '__bonusFim', { get: () => ini ? ini + CONFIG.BONUS_MINUTOS * 60000 : Date.now() + CONFIG.BONUS_MINUTOS * 60000 });
-      cr.querySelector('b').firstChild.textContent = 'Seus bônus ficam reservados por';
-      document.getElementById('cronoData').textContent = 'Depois desse tempo, os bônus saem da oferta.';
       cr.querySelectorAll('.crono-t span').forEach((sp, i) => { if (i < 2) sp.hidden = true; });
       cr.classList.add('curto');
     } else {
@@ -917,8 +947,10 @@ const CONFIG = {
     <h3 id="parabT"></h3>
     <p id="parabTx"></p>
     <div class="pz"><s id="parabDe" hidden></s><b>R$ 47</b><small>/mês</small></div>
-    <span class="fixo">🔒 Valor fixo: não aumenta com o tempo</span>
-    <button class="btn" type="button" data-fecha-parab>EU QUERO <span class="seta" aria-hidden="true">→</span></button>
+    <span class="fixo">🔒 Valor travado: não aumenta com o tempo</span>
+    <span class="fixo hoje">⏰ Só hoje, com os 2 bônus</span>
+    <button class="btn" type="button" data-fecha-parab>EU QUERO MINHA VITRINE POR R$&nbsp;47 <span class="seta" aria-hidden="true">→</span></button>
+    <p class="parab-g">Garantia de 7 dias. Se não gostar, recebe 100% de volta.</p>
   </div>
 </div>
 <canvas id="confete" aria-hidden="true" hidden></canvas>
@@ -930,7 +962,7 @@ const CONFIG = {
   const brl = v => 'R$ ' + (Number.isInteger(v) ? String(v) : v.toFixed(2).replace('.', ','));
   if (de > 47) {
     document.getElementById('parabT').innerHTML = 'Você ganhou <em>' + brl(de - 47) + ' de desconto!</em>';
-    document.getElementById('parabTx').textContent = 'Para criar a vitrine da sua loja agora:';
+    document.getElementById('parabTx').textContent = 'Pra criar a vitrine da sua loja agora:';
     const s = document.getElementById('parabDe'); s.textContent = 'De ' + 'R$ ' + de.toFixed(2).replace('.', ','); s.hidden = false; document.querySelector('.parab .pz small').textContent = '/mês';
   } else {
     document.getElementById('parabT').innerHTML = 'Parabéns! <em>Sua vitrine está liberada!</em>';
