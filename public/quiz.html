@@ -234,6 +234,7 @@ h1 em, h2 em { font-style: normal; color: var(--pink); }
 .vs-com { background: var(--branco); border: 2px solid var(--pink); box-shadow: var(--sh); }
 .vs-com h3 { color: var(--pink); }
 .vs-com li i { background: var(--pink); color: #fff; }
+.vs-img { display: block; width: 100%; height: auto; margin: 18px 0 0; border-radius: 22px; box-shadow: var(--sh); }
 .alerta { margin: 18px 0 0; padding: 14px 16px; border-radius: 18px; background: var(--rosa-2); color: var(--pink-d); font-weight: 800; font-size: 17px; line-height: 1.4; text-align: center; }
 
 /* oferta: extras */
@@ -327,8 +328,6 @@ h2, .oferta h2 { font-size: clamp(23px, 6.6vw, 29px); }
 .aviso p { margin: 0; } .aviso p + p { margin-top: 4px; }
 .inc.inc-1 { grid-template-columns: 1fr; }
 .preco .de s { text-decoration: none; }
-.trava { margin: 16px 0 0; text-align: center; font-size: 16px; line-height: 1.45; color: var(--fg); }
-.trava b { color: var(--pink-d); }
 .garantia { margin: 14px 0 0; text-align: center; font-size: 15.5px; line-height: 1.45; color: var(--muted); }
 .garantia b { color: var(--pink-d); }
 .pensa strong { color: var(--pink-d); font-weight: 800; }
@@ -434,9 +433,9 @@ body.capa-on .bar { background: transparent; backdrop-filter: none; -webkit-back
 .entrar { justify-self: end; font-size: 15.5px; font-weight: 700; color: var(--pink-d); text-decoration: none; padding: 8px 4px; }
 
 /* quebras de linha mais equilibradas (sem palavra sozinha na última linha) */
-h1, h2, h3, .btn, .capa-selo, .fixo, .dia, .paga, .trava, .garantia, .parab-g, .chamada, .urg, .expira-s, .aviso p, .legenda, .selos li, .op { text-wrap: balance; }
+h1, h2, h3, .btn, .capa-selo, .fixo, .dia, .paga, .garantia, .parab-g, .chamada, .urg, .expira-s, .aviso p, .legenda, .selos li, .op { text-wrap: balance; }
 p, li, .pensa p, .sub { text-wrap: pretty; }
-.center .sub, .parab p, .preco p, .expira p, .aviso p, .trava, .garantia, .paga, .urg { text-wrap: balance; }
+.center .sub, .parab p, .preco p, .expira p, .aviso p, .garantia, .paga, .urg { text-wrap: balance; }
 </style>
 </head>
 <body>
@@ -541,26 +540,7 @@ p, li, .pensa p, .sub { text-wrap: pretty; }
   <!-- Antes x depois -->
   <section class="step" id="sVs" aria-labelledby="tVs">
     <h2 id="tVs">Veja a diferença na <em>rotina das suas vendas</em></h2>
-    <div class="vs">
-      <div class="vs-c vs-sem">
-        <h3>😩 Sem vitrine</h3>
-        <ul>
-          <li><i>✕</i>Mandar foto por foto no WhatsApp</li>
-          <li><i>✕</i>Responder "qual o preço?" o dia inteiro</li>
-          <li><i>✕</i>Cliente esperando resposta e desistindo</li>
-          <li><i>✕</i>Pedido perdido no meio da conversa</li>
-        </ul>
-      </div>
-      <div class="vs-c vs-com">
-        <h3>😍 Com o Zap Catálogo</h3>
-        <ul>
-          <li><i>✓</i>Um link com tudo o que você vende</li>
-          <li><i>✓</i>Fotos, vídeos e preços à vista do cliente</li>
-          <li><i>✓</i>Cliente escolhe sozinho, a qualquer hora</li>
-          <li><i>✓</i>Pedido chega organizado no seu WhatsApp</li>
-        </ul>
-      </div>
-    </div>
+    <img class="vs-img" src="/static/exemplo/quiz-antes-depois.webp" width="1080" height="1350" alt="Sem vitrine: fotos soltas no WhatsApp com +9 e sem preço. Com vitrine: catálogo Jéssica Hair com categorias, preços e botão EU QUERO. A mesma loja, só mudou a forma de mostrar." decoding="async">
     <p class="alerta">Cada dia sem catálogo é cliente perguntando preço no direct e desistindo.</p>
     <div class="fim"><button class="btn" type="button" data-next>Continuar <span class="seta" aria-hidden="true">→</span></button></div>
   </section>
@@ -574,22 +554,6 @@ p, li, .pensa p, .sub { text-wrap: pretty; }
       <div class="esteira-trilho"><img src="/static/exemplo/quiz-vitrine-1.webp" alt="Vitrine Acessórios da Lu" height="340" loading="lazy"><img src="/static/exemplo/quiz-vitrine-2.webp" alt="Vitrine Bella Fashion" height="340" loading="lazy"><img src="/static/exemplo/quiz-vitrine-3.webp" alt="Vitrine Doceria Encanto" height="340" loading="lazy"><img src="/static/exemplo/quiz-vitrine-4.webp" alt="Vitrine Boutique da Maria" height="340" loading="lazy"><img src="/static/exemplo/quiz-vitrine-5.webp" alt="Vitrine Mentoria Empreendedora" height="340" loading="lazy"><img src="/static/exemplo/quiz-vitrine-1.webp" alt="" aria-hidden="true" height="340" loading="lazy"><img src="/static/exemplo/quiz-vitrine-2.webp" alt="" aria-hidden="true" height="340" loading="lazy"><img src="/static/exemplo/quiz-vitrine-3.webp" alt="" aria-hidden="true" height="340" loading="lazy"><img src="/static/exemplo/quiz-vitrine-4.webp" alt="" aria-hidden="true" height="340" loading="lazy"><img src="/static/exemplo/quiz-vitrine-5.webp" alt="" aria-hidden="true" height="340" loading="lazy"></div>
     </div>
     <p class="dica">Exemplos de vitrines feitas no Zap Catálogo</p>
-    <div class="fim"><button class="btn" type="button" data-next>Continuar <span class="seta" aria-hidden="true">→</span></button></div>
-  </section>
-
-  <!-- 7. Tudo o que você pode ter -->
-  <section class="step" id="s7" data-step="7" aria-labelledby="t7">
-    <h2 id="t7">Olha tudo o que você pode ter na sua vitrine! 😍</h2>
-    <div class="bens">
-      <div class="ben"><span class="bi" aria-hidden="true">♾️</span><b>Produtos e serviços ilimitados</b></div>
-      <div class="ben"><span class="bi" aria-hidden="true">🎬</span><b>Fotos e vídeos dos produtos</b></div>
-      <div class="ben"><span class="bi" aria-hidden="true">🏷️</span><b>Preços e descrições</b></div>
-      <div class="ben"><span class="bi" aria-hidden="true">🗂️</span><b>Categorias organizadas</b></div>
-      <div class="ben"><span class="bi" aria-hidden="true">🎨</span><b>Sua logo e suas cores</b></div>
-      <div class="ben"><span class="bi" aria-hidden="true">🔗</span><b>Link da bio personalizado</b></div>
-      <div class="ben"><span class="bi" aria-hidden="true">💬</span><b>Pedidos enviados ao WhatsApp</b></div>
-      <div class="ben"><span class="bi" aria-hidden="true">📱</span><b>Painel para atualizar sua vitrine</b></div>
-    </div>
     <div class="fim"><button class="btn" type="button" data-next>Continuar <span class="seta" aria-hidden="true">→</span></button></div>
   </section>
 
@@ -625,7 +589,6 @@ p, li, .pensa p, .sub { text-wrap: pretty; }
     <div class="oferta">
       <h2 id="t11">Chegou a sua vez de ter uma <em>vitrine profissional!</em> 💖</h2>
       <div class="pensa"><b>Pensa comigo:</b><p>Sua próxima cliente pode entrar no seu perfil <strong>HOJE</strong>.</p><p>O que ela vai encontrar? Um monte de foto solta no WhatsApp ou uma vitrine organizada, bonita e fácil de comprar?</p></div>
-      <p class="sub">Pare de perder tempo mandando foto e preço o dia inteiro. Organize seu negócio, facilite os pedidos e venda com muito mais profissionalismo.</p>
       <p class="pessoal" id="pessoal" hidden></p>
 
       <div class="expira" id="crono" hidden role="timer" aria-live="off">
@@ -665,8 +628,6 @@ p, li, .pensa p, .sub { text-wrap: pretty; }
         <p class="paga">Menos de R$&nbsp;1,60 por dia. Uma única venda já paga seu mês inteiro.</p>
       </div>
 
-      <p class="trava">🔒 E quando aumentar pra R$&nbsp;150, você continua pagando <b>R$&nbsp;47. Travado.</b></p>
-
       <a class="btn cta" id="checkout" href="https://pay.kiwify.com.br/ze66upr" rel="noopener">Quero travar meus R$&nbsp;47 antes que aumente <span class="seta" aria-hidden="true">→</span></a>
       <p class="garantia"><b>Garantia de 7 dias.</b> Se não gostar, você recebe 100% de volta. Risco zero.</p>
 
@@ -679,7 +640,6 @@ p, li, .pensa p, .sub { text-wrap: pretty; }
         </ol>
       </div>
 
-      <a class="btn cta" data-checkout href="https://pay.kiwify.com.br/ze66upr" rel="noopener">Quero travar meus R$&nbsp;47 antes que aumente <span class="seta" aria-hidden="true">→</span></a>
     </div>
   </section>
 </main>
