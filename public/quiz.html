@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Zap Catálogo · Descubra em 1 minuto</title>
+<meta name="description" content="Responda 4 perguntas e descubra como apresentar seus produtos ou serviços de um jeito mais profissional e facilitar seus pedidos.">
+<meta property="og:title" content="Sua loja pode estar perdendo oportunidades de venda sem você perceber!">
+<meta property="og:description" content="Descubra em menos de 1 minuto como apresentar o que você vende de um jeito mais profissional. Gratuito, 4 perguntas, resultado imediato.">
+<meta name="theme-color" content="#E91E85">
+<link rel="icon" href="/static/logo-zap.webp" type="image/webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800;900&display=swap">
+<style>
+/* Funil em quiz do Zap Catálogo (rota /quiz). Página independente: não mexe na página de vendas (/). */
+:root {
+  --pink: #E91E85; --pink-2: #FF4FA6; --pink-d: #C2106A; --rosa: #FFF0F7; --rosa-2: #FFE0EF; --branco: #FFFFFF;
+  --fg: #2B1220; --muted: #7D6170; --line: #F6D3E5;
+  --grad: linear-gradient(135deg, #FF5FAE 0%, #E91E85 55%, #C2106A 100%);
+  --sh: 0 18px 40px -22px rgba(194,16,106,.45);
+  --f: "Montserrat", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--rosa); color: var(--fg); font: 500 16px/1.5 var(--f); -webkit-font-smoothing: antialiased; overflow-x: clip; }
+body.oferta-on { background: #FFE3F1; }
+button { font: inherit; color: inherit; }
+img, video { display: block; max-width: 100%; }
+
+/* topo: voltar + marca + barra de progresso */
+.bar { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--rosa) 88%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: max(10px, env(safe-area-inset-top)) 16px 10px; }
+body.oferta-on .bar { background: color-mix(in srgb, #FFE3F1 88%, transparent); }
+.bar-in { max-width: 480px; margin: 0 auto; display: grid; grid-template-columns: 40px 1fr 40px; align-items: center; }
+.back { width: 40px; height: 40px; border: 0; background: transparent; border-radius: 12px; display: grid; place-items: center; cursor: pointer; color: var(--pink-d); }
+.back:hover { background: var(--rosa-2); }
+.back svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.back[hidden] { display: grid !important; visibility: hidden; }
+.marca { justify-self: center; display: inline-flex; align-items: center; gap: 8px; font-weight: 800; font-size: 15px; letter-spacing: -.01em; color: var(--fg); text-decoration: none; }
+.marca img { width: 28px; height: 28px; border-radius: 8px; }
+.prog { max-width: 480px; margin: 8px auto 0; height: 5px; border-radius: 99px; background: var(--rosa-2); overflow: hidden; }
+.prog i { display: block; height: 100%; width: 0; border-radius: inherit; background: var(--grad); transition: width .45s cubic-bezier(.2,.8,.2,1); }
+.prog-wrap[hidden] { display: block !important; visibility: hidden; }
+
+/* uma tela por etapa */
+main { overflow-x: clip; max-width: 480px; margin: 0 auto; padding: 8px 20px max(28px, env(safe-area-inset-bottom)); }
+.step { display: none; flex-direction: column; min-height: calc(100dvh - 90px); }
+.step.on { display: flex; animation: entra .38s cubic-bezier(.2,.8,.2,1) both; }
+.step.on.volta { animation-name: entraVolta; }
+@keyframes entra { from { opacity: 0; transform: translateX(26px); } to { opacity: 1; transform: none; } }
+@keyframes entraVolta { from { opacity: 0; transform: translateX(-26px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .step.on, .step.on.volta { animation: none; } .prog i { transition: none; } }
+.step > .fim { margin-top: auto; padding-top: 22px; }
+
+h1, h2 { font-weight: 900; text-transform: uppercase; letter-spacing: -.01em; line-height: 1.1; margin: 10px 0 0; text-wrap: balance; }
+h1 { font-size: clamp(25px, 7.4vw, 33px); }
+h2 { font-size: clamp(22px, 6.4vw, 28px); }
+h1 em, h2 em { font-style: normal; color: var(--pink); }
+.sub { margin: 14px 0 0; font-size: 16.5px; line-height: 1.5; color: var(--muted); font-weight: 500; text-wrap: pretty; }
+.sub b { color: var(--fg); }
+.tag { align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; background: var(--branco); color: var(--pink-d); border: 1px solid var(--line); font-size: 12px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; padding: 6px 12px; border-radius: 99px; margin-top: 8px; }
+
+.btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; border: 0; border-radius: 18px; padding: 19px 22px; background: var(--grad); color: #fff; font: 800 17px/1.15 var(--f); letter-spacing: .02em; text-transform: uppercase; text-decoration: none; text-align: center; cursor: pointer; box-shadow: 0 14px 30px -14px rgba(233,30,133,.75), inset 0 1px 0 rgba(255,255,255,.25); transition: transform .15s, box-shadow .15s, filter .15s; -webkit-tap-highlight-color: transparent; }
+.btn:hover { filter: brightness(1.05); }
+.btn:active { transform: scale(.98); }
+.btn:focus-visible, .op:focus-visible, .back:focus-visible { outline: 3px solid #FFB3D9; outline-offset: 3px; }
+.btn .seta { font-size: 1.2em; line-height: 1; }
+
+/* capa */
+.capa-fotos { position: relative; height: 190px; margin: 6px -4px 0; }
+.capa-fotos img { position: absolute; top: 0; width: 132px; aspect-ratio: 9/18; object-fit: cover; object-position: top; border-radius: 22px; border: 5px solid #1E1418; box-shadow: var(--sh); background: #fff; }
+.capa-fotos .c1 { left: 50%; margin-left: -60px; z-index: 2; width: 120px; height: 190px; }
+.capa-fotos .c2, .capa-fotos .c3 { top: 22px; width: 100px; height: 160px; opacity: .95; }
+.capa-fotos .c2 { left: 50%; margin-left: -150px; transform: rotate(-7deg); }
+.capa-fotos .c3 { left: 50%; margin-left: 50px; transform: rotate(7deg); }
+.capa-fotos::after { content: ""; position: absolute; left: 0; right: 0; bottom: -2px; height: 70px; background: linear-gradient(to bottom, transparent, var(--rosa)); z-index: 3; }
+.selos { list-style: none; padding: 0; margin: 16px 0 0; display: flex; justify-content: center; flex-wrap: wrap; gap: 8px 16px; font-size: 14px; font-weight: 700; color: var(--fg); }
+.selos li { display: inline-flex; align-items: center; gap: 6px; }
+.ok { width: 20px; height: 20px; flex: none; border-radius: 50%; background: var(--pink); color: #fff; display: inline-grid; place-items: center; }
+.ok svg { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 3.4; stroke-linecap: round; stroke-linejoin: round; }
+
+/* perguntas */
+.qnum { font-size: 13px; font-weight: 800; letter-spacing: .1em; color: var(--pink); text-transform: uppercase; margin-top: 14px; }
+.ops { display: grid; gap: 12px; margin-top: 22px; }
+.op { width: 100%; display: flex; align-items: center; gap: 14px; text-align: left; background: var(--branco); border: 2px solid var(--line); border-radius: 18px; padding: 15px 16px; font-size: 16.5px; font-weight: 700; line-height: 1.3; cursor: pointer; box-shadow: 0 8px 22px -18px rgba(194,16,106,.5); transition: transform .12s, border-color .15s, background .15s; -webkit-tap-highlight-color: transparent; }
+.op:hover { border-color: #F7A8CF; }
+.op:active { transform: scale(.985); }
+.op .ic { width: 44px; height: 44px; flex: none; border-radius: 14px; background: var(--rosa); display: grid; place-items: center; font-size: 22px; }
+.op .rd { margin-left: auto; width: 24px; height: 24px; flex: none; border-radius: 50%; border: 2px solid #F3B9D6; display: grid; place-items: center; color: transparent; transition: .15s; }
+.op .rd svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 3.4; stroke-linecap: round; stroke-linejoin: round; }
+.op[aria-pressed="true"] { border-color: var(--pink); background: #FFF7FB; }
+.op[aria-pressed="true"] .rd { background: var(--pink); border-color: var(--pink); color: #fff; }
+.ops.travado .op { pointer-events: none; }
+
+/* resultado */
+.result-badge { margin: 22px auto 0; width: 112px; height: 112px; border-radius: 50%; background: var(--grad); display: grid; place-items: center; font-size: 52px; box-shadow: 0 22px 44px -18px rgba(233,30,133,.7); position: relative; }
+.result-badge::before { content: ""; position: absolute; inset: -12px; border-radius: 50%; border: 2px dashed #F7A8CF; animation: gira 18s linear infinite; }
+@keyframes gira { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .result-badge::before { animation: none; } }
+.center { text-align: center; }
+.center .tag { align-self: center; }
+.resumo { margin: 22px 0 0; background: var(--branco); border: 1px solid var(--line); border-radius: 20px; padding: 16px 18px; display: grid; gap: 10px; box-shadow: var(--sh); text-align: left; }
+.resumo p { margin: 0; font-size: 15.5px; line-height: 1.5; color: var(--fg); }
+.resumo p + p { color: var(--muted); }
+
+/* conheça */
+.vitrines { display: grid; grid-auto-flow: column; grid-auto-columns: 58%; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; margin: 22px -20px 0; padding: 6px 20px 14px; scrollbar-width: none; }
+.vitrines::-webkit-scrollbar { display: none; }
+.vitrines figure { margin: 0; scroll-snap-align: center; }
+.vitrines img { width: 100%; aspect-ratio: 1/2; object-fit: cover; object-position: top; border-radius: 26px; border: 6px solid #1E1418; background: #fff; box-shadow: var(--sh); }
+.vitrines figcaption { text-align: center; font-size: 13px; font-weight: 700; color: var(--muted); margin-top: 8px; }
+.dica { text-align: center; font-size: 12.5px; color: var(--muted); font-weight: 600; margin: 0; }
+
+/* benefícios */
+.bens { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+.ben { background: var(--branco); border: 1px solid var(--line); border-radius: 18px; padding: 14px 12px 14px; display: grid; gap: 8px; align-content: start; box-shadow: 0 10px 24px -20px rgba(194,16,106,.55); opacity: 0; animation: sobe .4s cubic-bezier(.2,.8,.2,1) forwards; }
+.ben .bi { width: 38px; height: 38px; border-radius: 12px; background: var(--rosa); display: grid; place-items: center; font-size: 19px; }
+.ben b { font-size: 14px; line-height: 1.3; font-weight: 800; }
+@keyframes sobe { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .ben { animation: none; opacity: 1; } }
+
+/* para quem */
+.quem { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+.qc { position: relative; margin: 0; aspect-ratio: 4/4.4; border-radius: 18px; overflow: hidden; background: var(--grad); box-shadow: 0 10px 24px -18px rgba(194,16,106,.6); }
+.qc img { width: 100%; height: 100%; object-fit: cover; }
+.qc .emo { position: absolute; inset: 0; display: grid; place-items: center; font-size: 46px; padding-bottom: 26px; background: linear-gradient(150deg, #FFC3E0, #FF7DBB 60%, #E91E85); }
+.qc figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 26px 10px 10px; color: #fff; font-size: 13.5px; font-weight: 800; line-height: 1.2; background: linear-gradient(to bottom, transparent, rgba(60,10,35,.78)); }
+.frase { margin: 18px 0 0; text-align: center; font-weight: 700; font-size: 16px; line-height: 1.45; }
+.frase b { color: var(--pink); }
+
+/* vídeo na moldura de celular */
+.tel { position: relative; width: min(250px, 66vw); margin: 20px auto 0; aspect-ratio: 9/18.6; border-radius: 40px; background: #1E1418; padding: 9px; box-shadow: inset 0 0 0 2px #3A2A31, 0 0 0 1px #0D080A, 0 36px 60px -28px rgba(120,10,70,.6); }
+.tel::before { content: ""; position: absolute; left: 50%; top: 17px; width: 70px; height: 20px; margin-left: -35px; border-radius: 20px; background: #0D080A; z-index: 2; pointer-events: none; }
+.tel-tela { width: 100%; height: 100%; border-radius: 32px; overflow: hidden; background: #FBF3F5; position: relative; }
+.tel video { width: 100%; height: 100%; object-fit: cover; object-position: top; background: #FBF3F5; }
+.vazio { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 8px; text-align: center; padding: 24px; color: var(--muted); font-size: 14px; font-weight: 600; background: repeating-linear-gradient(135deg, #FFF0F7 0 14px, #FFE6F2 14px 28px); }
+.vazio b { font-size: 34px; }
+.som { position: absolute; right: 12px; bottom: 58px; z-index: 3; border: 0; border-radius: 99px; padding: 8px 12px; background: rgba(30,20,24,.78); color: #fff; font-size: 12.5px; font-weight: 700; cursor: pointer; }
+.legenda { margin: 14px auto 0; text-align: center; font-size: 13.5px; font-weight: 600; color: var(--muted); max-width: 330px; }
+.passos { list-style: none; counter-reset: p; padding: 0; margin: 16px 0 0; display: grid; gap: 8px; }
+.passos li { counter-increment: p; display: flex; align-items: center; gap: 10px; font-size: 14.5px; font-weight: 600; background: var(--branco); border: 1px solid var(--line); border-radius: 14px; padding: 9px 12px; }
+.passos li::before { content: counter(p); width: 24px; height: 24px; flex: none; border-radius: 50%; background: var(--rosa); color: var(--pink-d); font-size: 12.5px; font-weight: 800; display: grid; place-items: center; }
+
+/* oferta final */
+.oferta { margin: 4px -20px 0; padding: 18px 20px 26px; border-radius: 30px 30px 0 0; background: var(--grad); color: #fff; position: relative; overflow: hidden; }
+.oferta::before { content: ""; position: absolute; width: 320px; height: 320px; border-radius: 50%; right: -150px; top: -150px; background: radial-gradient(circle, rgba(255,255,255,.28), transparent 70%); pointer-events: none; }
+.oferta h2 { color: #fff; font-size: clamp(24px, 7vw, 31px); }
+.oferta .sub { color: rgba(255,255,255,.92); }
+.inclui { background: var(--branco); color: var(--fg); border-radius: 22px; padding: 18px; margin-top: 20px; box-shadow: 0 24px 50px -26px rgba(60,0,30,.6); }
+.inclui h3, .bonus h3 { margin: 0 0 10px; font-size: 13px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--pink); }
+.inclui ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 9px; }
+.inclui li { display: flex; align-items: center; gap: 10px; font-size: 15.5px; font-weight: 700; }
+.bonus { margin-top: 12px; background: rgba(255,255,255,.14); border: 1.5px dashed rgba(255,255,255,.6); border-radius: 22px; padding: 16px 18px; }
+.bonus h3 { color: #fff; }
+.bonus p { margin: 0; display: flex; gap: 10px; font-size: 15px; line-height: 1.4; font-weight: 600; }
+.bonus p + p { margin-top: 10px; }
+.bonus p .gi { font-size: 20px; line-height: 1.1; }
+.preco { margin-top: 18px; background: var(--branco); color: var(--fg); border-radius: 22px; padding: 18px; text-align: center; box-shadow: 0 24px 50px -26px rgba(60,0,30,.6); }
+.preco .de { font-size: 15px; font-weight: 700; color: var(--muted); margin: 0; }
+.preco .de s { color: #B07A95; }
+.preco .por { margin: 2px 0 0; font-size: 14px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--pink-d); }
+.preco .val { margin: 4px 0 0; font-weight: 900; line-height: 1; color: var(--pink); display: flex; justify-content: center; align-items: flex-start; gap: 4px; }
+.preco .val small { font-size: 20px; margin-top: 8px; }
+.preco .val big { font-size: 64px; letter-spacing: -.03em; }
+.preco .val em { font-style: normal; font-size: 22px; margin-top: 8px; }
+.preco .val span { align-self: flex-end; font-size: 17px; margin-bottom: 8px; color: var(--muted); }
+.dia { display: inline-block; margin-top: 12px; background: var(--rosa); color: var(--pink-d); font-weight: 900; font-size: 15px; letter-spacing: .02em; padding: 8px 14px; border-radius: 99px; }
+.chamada { margin: 20px 0 0; text-align: center; font-weight: 700; font-size: 16.5px; line-height: 1.45; }
+.oferta .btn { margin-top: 16px; background: #fff; color: var(--pink-d); font-size: 16.5px; padding: 21px 18px; box-shadow: 0 18px 36px -16px rgba(60,0,30,.7); animation: pulsa 2.4s ease-in-out infinite; }
+@keyframes pulsa { 0%, 100% { transform: none; } 50% { transform: scale(1.025); } }
+@media (prefers-reduced-motion: reduce) { .oferta .btn { animation: none; } }
+.garantias { list-style: none; padding: 0; margin: 16px 0 0; display: grid; gap: 7px; justify-items: center; font-size: 14px; font-weight: 700; }
+.garantias li { display: inline-flex; align-items: center; gap: 8px; }
+.garantias .ok { background: #fff; color: var(--pink); }
+#s11 { min-height: 0; }
+#s11 > .oferta { min-height: calc(100dvh - 96px); }
+
+@media (min-width: 700px) {
+  main { padding-top: 18px; }
+  .oferta { margin: 4px 0 0; border-radius: 30px; }
+}
+</style>
+</head>
+<body>
+<header class="bar">
+  <div class="bar-in">
+    <button class="back" id="voltar" type="button" aria-label="Voltar" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
+    <a class="marca" href="/" aria-label="Zap Catálogo"><img src="/static/logo-zap.webp" width="28" height="28" alt="">Zap Catálogo</a>
+    <span></span>
+  </div>
+  <div class="prog-wrap" id="progWrap" hidden><div class="prog" role="progressbar" aria-label="Progresso" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="progBar"></i></div></div>
+</header>
+
+<main id="funil">
+  <!-- 0. Capa -->
+  <section class="step center" id="s0" data-step="0" aria-labelledby="t0">
+    <div class="capa-fotos" aria-hidden="true">
+      <img class="c2" src="/static/exemplo/topo-doceria.webp" alt="" width="112" height="180" fetchpriority="high">
+      <img class="c1" src="/static/exemplo/topo-boutique.webp" alt="" width="132" height="210" fetchpriority="high">
+      <img class="c3" src="/static/exemplo/topo-acessorios.webp" alt="" width="112" height="180" fetchpriority="high">
+    </div>
+    <h1 id="t0">Sua loja pode estar <em>perdendo oportunidades de venda</em> sem você perceber!</h1>
+    <p class="sub">Descubra em menos de 1 minuto como apresentar seus produtos ou serviços de um jeito mais profissional e facilitar seus pedidos.</p>
+    <div class="fim">
+      <button class="btn" type="button" data-next>Quero descobrir <span class="seta" aria-hidden="true">→</span></button>
+      <ul class="selos">
+        <li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Gratuito</li>
+        <li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Apenas 4 perguntas</li>
+        <li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Resultado imediato</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 1 a 4. Perguntas (avançam sozinhas ao responder) -->
+  <section class="step" id="s1" data-step="1" data-q="vende" aria-labelledby="t1">
+    <p class="qnum">Pergunta 1 de 4</p>
+    <h2 id="t1">O que você vende?</h2>
+    <div class="ops" role="group" aria-labelledby="t1">
+      <button class="op" type="button" data-v="Produtos"><span class="ic" aria-hidden="true">🛍️</span>Produtos<span class="rd"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span></button>
+      <button class="op" type="button" data-v="Serviços"><span class="ic" aria-hidden="true">💅</span>Serviços<span class="rd"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span></button>
+      <button class="op" type="button" data-v="Produtos e serviços"><span class="ic" aria-hidden="true">✨</span>Produtos e serviços<span class="rd"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span></button>
+      <button class="op" type="button" data-v="Estou começando agora"><span class="ic" aria-hidden="true">🌱</span>Estou começando agora<span class="rd"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span></button>
+    </div>
+  </section>
+
+  <section class="step" id="s2" data-step="2" data-q="apresenta" aria-labelledby="t2">
+    <p class="qnum">Pergunta 2 de 4</p>
+    <h2 id="t2">Como você apresenta o que vende para seus clientes?</h2>
+    <div class="ops" role="group" aria-labelledby="t2">
+      <button class="op" type="button" data-v="Pelo Instagram"><span class="ic" aria-hidden="true">📸</span>Pelo Instagram<span class="rd"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span></button>
+      <button class="op" type="button" data-v="Envio fotos pelo WhatsApp"><span class="ic" aria-hidden="true">💬</span>Envio fotos pelo WhatsApp<span class="rd"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span></button>
+      <button class="op" type="button" data-v="Tenho um catálogo ou site"><span class="ic" aria-hidden="true">🗂️</span>Tenho um catálogo ou site<span class="rd"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span></button>
+      <button class="op" type="button" data-v="Ainda não tenho tudo organizado"><span class="ic" aria-hidden="true">🤯</span>Ainda não tenho tudo organizado<span class="rd"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span></button>
+    </div>
+  </section>
+
+  <section class="step" id="s3" data-step="3" data-q="dificuldade" aria-labelledby="t3">
+    <p class="qnum">Pergunta 3 de 4</p>
+    <h2 id="t3">Qual é sua maior dificuldade na hora de vender?</h2>
+    <div class="ops" role="group" aria-labelledby="t3">
+      <button class="op" type="button" data-v="Enviar fotos e preços toda hora"><span class="ic" aria-hidden="true">📤</span>Enviar fotos e preços toda hora<span class="rd"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span></button>
+      <button class="op" type="button" data-v="Deixar meus produtos organizados"><span class="ic" aria-hidden="true">🧺</span>Deixar meus produtos organizados<span class="rd"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span></button>
+      <button class="op" type="button" data-v="Transformar interessados em clientes"><span class="ic" aria-hidden="true">🎯</span>Transformar interessados em clientes<span class="rd"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span></button>
+      <button class="op" type="button" data-v="Apresentar meu negócio profissionalmente"><span class="ic" aria-hidden="true">💼</span>Apresentar meu negócio profissionalmente<span class="rd"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span></button>
+    </div>
+  </section>
+
+  <section class="step" id="s4" data-step="4" data-q="mudaria" aria-labelledby="t4">
+    <p class="qnum">Pergunta 4 de 4</p>
+    <h2 id="t4">Imagine seus clientes vendo tudo o que você vende em <em>um único link.</em> O que isso mudaria?</h2>
+    <div class="ops" role="group" aria-labelledby="t4">
+      <button class="op" type="button" data-v="Economizaria meu tempo"><span class="ic" aria-hidden="true">⏱️</span>Economizaria meu tempo<span class="rd"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span></button>
+      <button class="op" type="button" data-v="Facilitaria meus atendimentos"><span class="ic" aria-hidden="true">🤝</span>Facilitaria meus atendimentos<span class="rd"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span></button>
+      <button class="op" type="button" data-v="Deixaria meu negócio mais profissional"><span class="ic" aria-hidden="true">👑</span>Deixaria meu negócio mais profissional<span class="rd"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span></button>
+      <button class="op" type="button" data-v="Tudo isso!"><span class="ic" aria-hidden="true">💖</span>Tudo isso!<span class="rd"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span></button>
+    </div>
+  </section>
+
+  <!-- 5. Resultado -->
+  <section class="step center" id="s5" data-step="5" aria-labelledby="t5">
+    <div class="result-badge" aria-hidden="true">🏆</div>
+    <span class="tag" style="margin-top:26px">Seu resultado</span>
+    <h2 id="t5">Seu negócio merece uma <em>vitrine profissional!</em> 💖</h2>
+    <div class="resumo">
+      <p>Chega de depender de várias fotos e mensagens para apresentar o que você vende.</p>
+      <p>Existe uma forma mais prática de mostrar seus produtos ou serviços e facilitar a vida dos seus clientes.</p>
+    </div>
+    <div class="fim"><button class="btn" type="button" data-next>Continuar <span class="seta" aria-hidden="true">→</span></button></div>
+  </section>
+
+  <!-- 6. Conheça o Zap Catálogo -->
+  <section class="step" id="s6" data-step="6" aria-labelledby="t6">
+    <span class="tag">Conheça o Zap Catálogo</span>
+    <h2 id="t6">Seu link da bio + sua <em>vitrine digital</em> em um só lugar!</h2>
+    <p class="sub">Tenha sua própria vitrine online, com a identidade da sua marca, disponível 24 horas por dia.</p>
+    <div class="vitrines" aria-label="Exemplos de vitrines">
+      <figure><img src="/static/exemplo/topo-boutique.webp" alt="Vitrine de uma boutique de roupas" width="540" height="1080" loading="lazy"><figcaption>Boutique</figcaption></figure>
+      <figure><img src="/static/exemplo/topo-doceria.webp" alt="Vitrine de uma doceria" width="540" height="1080" loading="lazy"><figcaption>Doceria</figcaption></figure>
+      <figure><img src="/static/exemplo/topo-acessorios.webp" alt="Vitrine de uma loja de acessórios" width="540" height="1080" loading="lazy"><figcaption>Acessórios</figcaption></figure>
+      <figure><img src="/static/exemplo/topo-mentoria.webp" alt="Vitrine de uma mentora" width="540" height="1080" loading="lazy"><figcaption>Mentoria</figcaption></figure>
+    </div>
+    <p class="dica">Arraste para o lado para ver mais →</p>
+    <div class="fim"><button class="btn" type="button" data-next>Continuar <span class="seta" aria-hidden="true">→</span></button></div>
+  </section>
+
+  <!-- 7. Tudo o que você pode ter -->
+  <section class="step" id="s7" data-step="7" aria-labelledby="t7">
+    <h2 id="t7">Olha tudo o que você pode ter na sua vitrine! 😍</h2>
+    <div class="bens">
+      <div class="ben"><span class="bi" aria-hidden="true">♾️</span><b>Produtos e serviços ilimitados</b></div>
+      <div class="ben"><span class="bi" aria-hidden="true">🎬</span><b>Fotos e vídeos dos produtos</b></div>
+      <div class="ben"><span class="bi" aria-hidden="true">🏷️</span><b>Preços e descrições</b></div>
+      <div class="ben"><span class="bi" aria-hidden="true">🗂️</span><b>Categorias organizadas</b></div>
+      <div class="ben"><span class="bi" aria-hidden="true">🎨</span><b>Sua logo e suas cores</b></div>
+      <div class="ben"><span class="bi" aria-hidden="true">🔗</span><b>Link da bio personalizado</b></div>
+      <div class="ben"><span class="bi" aria-hidden="true">💬</span><b>Pedidos enviados ao WhatsApp</b></div>
+      <div class="ben"><span class="bi" aria-hidden="true">📱</span><b>Painel para atualizar sua vitrine</b></div>
+    </div>
+    <div class="fim"><button class="btn" type="button" data-next>Continuar <span class="seta" aria-hidden="true">→</span></button></div>
+  </section>
+
+  <!-- 8. Para quem é -->
+  <section class="step" id="s8" data-step="8" aria-labelledby="t8">
+    <h2 id="t8">Se você vende algum produto ou serviço, <em>o Zap Catálogo é para você!</em></h2>
+    <div class="quem">
+      <figure class="qc"><img src="/static/exemplo/boutique-conj1.webp" alt="" loading="lazy" width="900" height="1125"><figcaption>Lojas de roupas</figcaption></figure>
+      <figure class="qc"><img src="/static/exemplo/salao-unhas.webp" alt="" loading="lazy" width="900" height="1125"><figcaption>Manicures e beleza</figcaption></figure>
+      <figure class="qc"><img src="/static/exemplo/doceria-bolo.webp" alt="" loading="lazy" width="900" height="1200"><figcaption>Confeiteiras</figcaption></figure>
+      <figure class="qc"><img src="/static/exemplo/salao-corte.webp" alt="" loading="lazy" width="900" height="1125"><figcaption>Cabeleireiras</figcaption></figure>
+      <figure class="qc"><img src="/static/exemplo/boutique-bolsa1.webp" alt="" loading="lazy" width="900" height="1125"><figcaption>Lojas de acessórios</figcaption></figure>
+      <figure class="qc"><span class="emo" aria-hidden="true">🎈</span><figcaption>Decoração de festas</figcaption></figure>
+      <figure class="qc"><span class="emo" aria-hidden="true">🧶</span><figcaption>Artesãs</figcaption></figure>
+      <figure class="qc"><img src="/static/exemplo/mentoria-mentoria.webp" alt="" loading="lazy" width="900" height="1125"><figcaption>Prestadores de serviços</figcaption></figure>
+    </div>
+    <p class="frase">Não importa o tamanho do seu negócio. <b>Você também pode ter uma vitrine profissional!</b></p>
+    <div class="fim"><button class="btn" type="button" data-next>Continuar <span class="seta" aria-hidden="true">→</span></button></div>
+  </section>
+
+  <!-- 9. Demonstração da vitrine (vídeo 1: VIDEOS.vitrine) -->
+  <section class="step" id="s9" data-step="9" aria-labelledby="t9">
+    <h2 id="t9">Veja como seu cliente vai enxergar sua vitrine! 😍</h2>
+    <div class="tel"><div class="tel-tela" data-video="vitrine"></div></div>
+    <p class="legenda" data-legenda="vitrine"></p>
+    <div class="fim"><button class="btn" type="button" data-next>Continuar <span class="seta" aria-hidden="true">→</span></button></div>
+  </section>
+
+  <!-- 10. Pedido no WhatsApp (vídeo 2: VIDEOS.pedido) -->
+  <section class="step" id="s10" data-step="10" aria-labelledby="t10">
+    <h2 id="t10">Olha como o pedido chega <em>prontinho</em> no seu WhatsApp! 💚</h2>
+    <p class="sub">Seu cliente escolhe o que deseja e envia o pedido organizado diretamente para você.</p>
+    <div class="tel"><div class="tel-tela" data-video="pedido"></div></div>
+    <p class="legenda" data-legenda="pedido"></p>
+    <div class="fim"><button class="btn" type="button" data-next>Continuar <span class="seta" aria-hidden="true">→</span></button></div>
+  </section>
+
+  <!-- 11. Oferta final -->
+  <section class="step" id="s11" data-step="11" aria-labelledby="t11">
+    <div class="oferta">
+      <h2 id="t11">Chegou a sua vez de ter uma vitrine profissional! 💖</h2>
+      <p class="sub">Pare de perder tempo enviando fotos e preços. Organize seu negócio, facilite os pedidos e tenha mais oportunidades de vender!</p>
+
+      <div class="inclui">
+        <h3>Tudo o que está incluído</h3>
+        <ul>
+          <li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Sua vitrine digital</li>
+          <li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Link da bio personalizado</li>
+          <li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Produtos e serviços ilimitados</li>
+          <li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Fotos e vídeos</li>
+          <li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Personalização com sua marca</li>
+          <li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Pedidos pelo WhatsApp</li>
+          <li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Painel de gerenciamento</li>
+        </ul>
+      </div>
+
+      <div class="bonus">
+        <h3>Bônus</h3>
+        <p><span class="gi" aria-hidden="true">🎁</span><span><b>Bônus 1:</b> Aula para criar banners profissionais em 5 minutos.</span></p>
+        <p><span class="gi" aria-hidden="true">🎁</span><span><b>Bônus 2:</b> Mensagens prontas para divulgar sua vitrine e vender pelo WhatsApp.</span></p>
+      </div>
+
+      <div class="preco">
+        <p class="de" id="precoDe" hidden>De <s>R$ 150,00</s></p>
+        <p class="por" id="precoPor">Por apenas</p>
+        <p class="val" aria-label="R$ 47,00 por mês"><small>R$</small><big>47</big><em>,00</em><span>/mês</span></p>
+        <span class="dia">Menos de R$ 1,60 por dia!</span>
+      </div>
+
+      <p class="chamada">Sua próxima cliente já pode conhecer seu negócio de um jeito muito mais profissional!</p>
+      <a class="btn" id="checkout" href="https://pay.kiwify.com.br/ze66upr" rel="noopener">Sim! Quero minha vitrine e vender mais 💖</a>
+      <ul class="garantias">
+        <li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Garantia de 7 dias</li>
+        <li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Cadastro simples</li>
+        <li><span class="ok"><svg viewBox="0 0 16 16"><path d="M3 8.5l3 3 7-7"/></svg></span>Acesso conforme liberação da plataforma</li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<script>
+/* ===================== CONFIGURAÇÃO (é só mexer aqui) =====================
+   VIDEOS: troque o "src" para trocar o vídeo de cada tela. Deixe src: '' para mostrar o espaço vazio "vídeo em breve".
+     - vitrine: tela "Veja como seu cliente vai enxergar sua vitrine"
+     - pedido:  tela "Olha como o pedido chega prontinho no seu WhatsApp"
+     Coloque o arquivo .mp4 (vertical, 9:16) em public/static/exemplo/ e aponte o caminho aqui.
+   CHECKOUT: link de pagamento da Kiwify do botão final.
+   PRECO_DE: preço "De" riscado. Deixe null para mostrar só "Por apenas R$ 47/mês" (use só se for um preço real). */
+const CONFIG = {
+  VIDEOS: {
+    vitrine: { src: '/static/exemplo/vitrine-video.mp4', poster: '/static/exemplo/vitrine-video-capa.webp',
+      legenda: 'Vitrine real no celular: a marca da loja, as categorias e os produtos com fotos, vídeos e preços.' },
+    pedido: { src: '/static/exemplo/demo-mini-site.mp4', poster: '/static/exemplo/demo-mini-site-capa.webp',
+      legenda: 'Demonstração real: a cliente escolhe, confere o pedido e envia direto para o WhatsApp da loja.' }
+  },
+  CHECKOUT: 'https://pay.kiwify.com.br/ze66upr',
+  PRECO_DE: null
+};
+/* ========================================================================== */
+
+(function () {
+  const steps = [...document.querySelectorAll('.step')];
+  const LAST = steps.length - 1;
+  const KEY = 'zapcat-quiz-v1';
+  const voltar = document.getElementById('voltar');
+  const progWrap = document.getElementById('progWrap');
+  const progBar = document.getElementById('progBar');
+  const prog = progWrap.querySelector('.prog');
+
+  let st = { step: 0, respostas: {} };
+  try { const s = JSON.parse(sessionStorage.getItem(KEY) || 'null'); if (s && typeof s.step === 'number' && s.respostas) st = s; } catch (e) {}
+  const salva = () => { try { sessionStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} };
+
+  // checkout e preço
+  const ck = document.getElementById('checkout');
+  ck.href = CONFIG.CHECKOUT;
+  if (CONFIG.PRECO_DE) {
+    const de = document.getElementById('precoDe');
+    de.querySelector('s').textContent = 'R$ ' + Number(CONFIG.PRECO_DE).toFixed(2).replace('.', ',');
+    de.hidden = false;
+  }
+
+  // vídeos: só carregam quando a tela aparece
+  function montaVideo(box) {
+    if (box.dataset.ok) return;
+    box.dataset.ok = '1';
+    const cfg = CONFIG.VIDEOS[box.dataset.video] || {};
+    const leg = document.querySelector('[data-legenda="' + box.dataset.video + '"]');
+    if (leg) leg.textContent = cfg.src ? (cfg.legenda || '') : '';
+    if (!cfg.src) {
+      box.innerHTML = '<div class="vazio"><b aria-hidden="true">🎬</b>Vídeo em breve</div>';
+      return;
+    }
+    const v = document.createElement('video');
+    v.src = cfg.src; if (cfg.poster) v.poster = cfg.poster;
+    v.muted = true; v.loop = true; v.playsInline = true; v.controls = true; v.preload = 'metadata';
+    v.setAttribute('playsinline', ''); v.setAttribute('muted', '');
+    v.setAttribute('aria-label', cfg.legenda || 'Vídeo de demonstração');
+    box.appendChild(v);
+    // botão de som: só aparece se o vídeo tiver áudio
+    const som = document.createElement('button');
+    som.type = 'button'; som.className = 'som'; som.hidden = true; som.textContent = '🔊 Ativar som';
+    som.onclick = () => { v.muted = !v.muted; if (!v.muted) v.play().catch(() => {}); som.textContent = v.muted ? '🔊 Ativar som' : '🔇 Tirar som'; };
+    v.addEventListener('volumechange', () => { som.textContent = v.muted ? '🔊 Ativar som' : '🔇 Tirar som'; });
+    box.appendChild(som);
+    const temAudio = () => v.mozHasAudio || (v.audioTracks && v.audioTracks.length > 0) || v.webkitAudioDecodedByteCount > 0;
+    v.addEventListener('timeupdate', function chk() { if (v.currentTime > 0.8) { if (temAudio()) som.hidden = false; v.removeEventListener('timeupdate', chk); } });
+  }
+  function tocaVideos(sec) {
+    document.querySelectorAll('video').forEach(v => { if (!sec.contains(v)) v.pause(); });
+    sec.querySelectorAll('[data-video]').forEach(montaVideo);
+    sec.querySelectorAll('video').forEach(v => { v.play().catch(() => {}); });
+  }
+
+  function marcaRespostas() {
+    steps.forEach(s => {
+      const q = s.dataset.q; if (!q) return;
+      s.querySelectorAll('.op').forEach(b => b.setAttribute('aria-pressed', String(st.respostas[q] === b.dataset.v)));
+    });
+  }
+
+  function render(dir) {
+    const n = Math.max(0, Math.min(LAST, st.step));
+    steps.forEach((s, i) => { s.classList.toggle('on', i === n); s.classList.toggle('volta', i === n && dir < 0); });
+    voltar.hidden = n === 0;
+    progWrap.hidden = n === 0;
+    const pct = Math.round((n / LAST) * 100);
+    progBar.style.width = pct + '%';
+    prog.setAttribute('aria-valuenow', String(pct));
+    document.body.classList.toggle('oferta-on', n === LAST);
+    marcaRespostas();
+    const sec = steps[n];
+    sec.querySelector('.ops') && sec.querySelector('.ops').classList.remove('travado');
+    tocaVideos(sec);
+    window.scrollTo(0, 0);
+    const h = sec.querySelector('h1, h2');
+    if (h && dir) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
+  }
+
+  function vaiPara(n, dir) {
+    st.step = Math.max(0, Math.min(LAST, n)); salva();
+    try { history.pushState({ step: st.step }, '', '#' + st.step); } catch (e) {}
+    render(dir);
+  }
+
+  document.querySelectorAll('[data-next]').forEach(b => b.addEventListener('click', () => vaiPara(st.step + 1, 1)));
+  voltar.addEventListener('click', () => { if (history.state && typeof history.state.step === 'number' && history.state.step > 0) history.back(); else vaiPara(st.step - 1, -1); });
+  window.addEventListener('popstate', e => {
+    const n = e.state && typeof e.state.step === 'number' ? e.state.step : 0;
+    const dir = n < st.step ? -1 : 1;
+    st.step = n; salva(); render(dir);
+  });
+
+  // perguntas: escolheu, avança sozinho
+  steps.forEach(s => {
+    const q = s.dataset.q; if (!q) return;
+    const ops = s.querySelector('.ops');
+    ops.addEventListener('click', e => {
+      const b = e.target.closest('.op'); if (!b || ops.classList.contains('travado')) return;
+      st.respostas[q] = b.dataset.v; salva();
+      marcaRespostas();
+      ops.classList.add('travado');
+      setTimeout(() => vaiPara(+s.dataset.step + 1, 1), 380);
+    });
+  });
+
+  // atraso escalonado dos cartões de benefícios
+  document.querySelectorAll('.ben').forEach((b, i) => { b.style.animationDelay = (i * 45) + 'ms'; });
+
+  try { history.replaceState({ step: st.step }, '', st.step ? '#' + st.step : location.pathname + location.search); } catch (e) {}
+  render(0);
+})();
+</script>
+</body>
+</html>

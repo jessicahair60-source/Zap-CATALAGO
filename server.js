@@ -30,7 +30,7 @@ const UPLOADS = path.join(DATA_DIR, 'uploads');
 const DAY = 86400000;
 const now = () => Date.now();
 const PUB = path.join(__dirname, 'public');
-const RESERVED = new Set(['painel', 'entrar', 'cadastro', 'sair', 'api', 'u', 'admin', 'termos', 'privacidade', 'static', 'assets', 'www', 'app', 'planos', 'ajuda', 'suporte', 'login', 'tutoriais', 'ativar']);
+const RESERVED = new Set(['painel', 'entrar', 'cadastro', 'sair', 'api', 'u', 'admin', 'termos', 'privacidade', 'static', 'assets', 'www', 'app', 'planos', 'ajuda', 'suporte', 'login', 'tutoriais', 'ativar', 'quiz']);
 
 const app = express();
 app.set('trust proxy', true);
@@ -290,6 +290,7 @@ app.use((req, res, next) => {
 /* ---------- páginas da plataforma ---------- */
 const page = name => (req, res) => res.sendFile(path.join(PUB, name));
 app.get('/', page('index.html'));
+app.get('/quiz', page('quiz.html')); // funil de vendas em quiz (a página de vendas continua em /)
 app.get('/termos', page('termos.html'));
 // Oferta por tempo limitado da página de vendas. Só aparece com preço, data de fim e link de checkout configurados,
 // e some sozinha quando o prazo acaba. O prazo é o mesmo para todo mundo (não reinicia por visita nem por sessão).
