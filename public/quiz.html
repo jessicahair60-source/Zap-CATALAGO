@@ -345,6 +345,10 @@ h2, .oferta h2 { font-size: clamp(23px, 6.6vw, 29px); }
 .barra-in .btn { min-height: 52px; font-size: 16px; padding: 12px 16px; }
 
 .oferta .btn.cta { white-space: normal; text-wrap: balance; font-size: 16.5px; line-height: 1.25; padding: 16px 18px; }
+
+.crono.curto .crono-t span { min-width: 52px; font-size: 24px; padding: 7px 6px 5px; }
+.crono.curto .crono-t span small { font-size: 9.5px; }
+.crono-t span[hidden] { display: none !important; }
 </style>
 </head>
 <body>
@@ -597,6 +601,8 @@ h2, .oferta h2 { font-size: clamp(23px, 6.6vw, 29px); }
    CHECKOUT: link de pagamento da Kiwify do botão final.
    BONUS_FIM: data e hora em que os bônus acabam (horário de Brasília). O cronômetro conta até essa data, que é a mesma para todo mundo
      e não reinicia. Quando o prazo acaba, o cronômetro e os bônus somem sozinhos. Para uma nova campanha, troque a data. null = sem cronômetro.
+   BONUS_MINUTOS: cronômetro curto por visitante (ex.: 15). Começa quando a pessoa chega na oferta, fica salvo no aparelho dela
+     (recarregar não reinicia) e, quando zera, os bônus saem da oferta para ela. Use null para voltar ao prazo fixo BONUS_FIM.
    PRECO_DE: preço "De" riscado. Deixe null para mostrar só "Por apenas R$ 47/mês" (use só se for um preço real). */
 const CONFIG = {
   VIDEOS: {
@@ -606,6 +612,7 @@ const CONFIG = {
       legenda: 'Demonstração real: a cliente escolhe, confere o pedido e envia direto para o WhatsApp da loja.' }
   },
   CHECKOUT: 'https://pay.kiwify.com.br/ze66upr',
+  BONUS_MINUTOS: 15,
   BONUS_FIM: '2026-11-23T23:59:59-03:00',
   PRECO_DE: null
 };
@@ -673,19 +680,34 @@ const CONFIG = {
 
   // cronômetro dos bônus: prazo fixo (CONFIG.BONUS_FIM), igual para todo mundo; depois do prazo some junto com os bônus
   (function () {
-    const fim = Date.parse(CONFIG.BONUS_FIM || ''); if (!Number.isFinite(fim)) return;
     const cr = document.getElementById('crono'), bn = document.getElementById('bonus');
-    const d = new Date(fim);
-    document.getElementById('cronoData').textContent = 'Até ' + d.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' }) + ', às ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
+    const curto = Number(CONFIG.BONUS_MINUTOS) > 0;
+    let fim;
+    if (curto) {
+      // por visitante: começa na primeira vez que a oferta aparece e fica salvo no aparelho (não reinicia ao recarregar)
+      const K = 'zapcat-bonus-inicio'; let ini = null;
+      try { ini = +localStorage.getItem(K) || null; } catch (e) {}
+      const arma = () => { if (ini) return; ini = Date.now(); try { localStorage.setItem(K, String(ini)); } catch (e) {} };
+      if (!ini) { if (document.body.classList.contains('oferta-on')) arma(); else new MutationObserver((m, o) => { if (document.body.classList.contains('oferta-on')) { arma(); o.disconnect(); } }).observe(document.body, { attributes: true, attributeFilter: ['class'] }); }
+      Object.defineProperty(window, '__bonusFim', { get: () => ini ? ini + CONFIG.BONUS_MINUTOS * 60000 : Date.now() + CONFIG.BONUS_MINUTOS * 60000 });
+      cr.querySelector('b').firstChild.textContent = 'Seus bônus ficam reservados por';
+      document.getElementById('cronoData').textContent = 'Depois desse tempo, os bônus saem da oferta.';
+      cr.querySelectorAll('.crono-t span').forEach((sp, i) => { if (i < 2) sp.hidden = true; });
+      cr.classList.add('curto');
+    } else {
+      fim = Date.parse(CONFIG.BONUS_FIM || ''); if (!Number.isFinite(fim)) return;
+      const d = new Date(fim);
+      document.getElementById('cronoData').textContent = 'Até ' + d.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' }) + ', às ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
+    }
     const z = n => String(n).padStart(2, '0');
     const tick = () => {
-      const t = fim - Date.now();
+      const t = (curto ? window.__bonusFim : fim) - Date.now();
       if (t <= 0) { cr.hidden = true; bn.hidden = true; clearInterval(iv); return; }
       cr.hidden = false;
       const sec = Math.floor(t / 1000);
       document.getElementById('cr-d').textContent = Math.floor(sec / 86400);
       document.getElementById('cr-h').textContent = z(Math.floor(sec % 86400 / 3600));
-      document.getElementById('cr-m').textContent = z(Math.floor(sec % 3600 / 60));
+      document.getElementById('cr-m').textContent = z(curto ? Math.floor(sec / 60) : Math.floor(sec % 3600 / 60));
       document.getElementById('cr-s').textContent = z(sec % 60);
     };
     const iv = setInterval(tick, 1000); tick();
