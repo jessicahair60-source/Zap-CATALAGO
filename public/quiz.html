@@ -248,6 +248,14 @@ h1 em, h2 em { font-style: normal; color: var(--pink); }
 .ad-antes .ad-top b { color: #6E5A63; }
 .ad-seta { flex: none; width: 32px; height: 32px; border-radius: 50%; background: var(--pink); color: #fff; display: grid; place-items: center; font-size: 19px; font-weight: 900; }
 .ad-antes .ad-seta { background: #8A6B78; }
+.ad-tel { width: min(270px, 74%); margin: 16px auto; padding: 8px; border-radius: 38px; background: #1E1418; box-shadow: inset 0 0 0 2px #3A2A31, 0 26px 44px -26px rgba(120,10,70,.6); }
+.ad-tela { position: relative; overflow: hidden; border-radius: 30px; background: #fff; aspect-ratio: 9/17; }
+.ad-tela.ad-fixa { aspect-ratio: auto; background: #EFE7DE; }
+.ad-tela img { display: block; width: 100%; height: auto; }
+.ad-rola { position: absolute; left: 0; right: 0; top: 0; animation: adRola var(--t, 12s) ease-in-out infinite alternate; }
+@keyframes adRola { 0%, 12% { top: 0; transform: translateY(0); } 88%, 100% { top: 100%; transform: translateY(-100%); } }
+@media (prefers-reduced-motion: reduce) { .ad-rola { animation: none; } }
+.ad-card .ad-tel + * { margin-top: 0; }
 .ad-frase { margin: 18px 0 0; text-align: center; font-size: 19px; font-weight: 800; line-height: 1.35; text-wrap: balance; }
 .ad-frase em { font-style: normal; color: var(--pink); }
 .alerta { margin: 18px 0 0; padding: 14px 16px; border-radius: 18px; background: var(--rosa-2); color: var(--pink-d); font-weight: 800; font-size: 17px; line-height: 1.4; text-align: center; }
@@ -558,16 +566,15 @@ p, li, .pensa p, .sub { text-wrap: pretty; }
     <p class="ad-real"><span aria-hidden="true">✓</span>Exemplo real · Jéssica Hair</p>
     <div class="ad-card ad-antes">
       <div class="ad-top"><i>1</i><b>Sem vitrine</b><span class="ad-seta" aria-hidden="true">↓</span></div>
-      <img src="/static/exemplo/ad-antes-whats.webp" width="900" height="979" alt="Fotos de cabelo soltas no WhatsApp, com +9 e sem preço" loading="lazy" decoding="async">
+      <div class="ad-tel"><div class="ad-tela ad-fixa"><img src="/static/exemplo/ad-antes-whats.webp" width="720" height="784" alt="Fotos de cabelo soltas no WhatsApp, com +9 e sem preço" loading="lazy" decoding="async"></div></div>
     </div>
     <div class="ad-card ad-depois">
       <div class="ad-top"><i>2</i><b>Com vitrine</b><span class="ad-seta" aria-hidden="true">↓</span></div>
-      <img src="/static/exemplo/ad-depois-capa.webp" width="900" height="1951" alt="Capa da vitrine Jéssica Hair no celular" loading="lazy" decoding="async">
-      <img src="/static/exemplo/ad-depois-produtos.webp" width="900" height="1951" alt="Vitrine Jéssica Hair com categorias, produtos, preço e botão EU QUERO" loading="lazy" decoding="async">
+      <div class="ad-tel"><div class="ad-tela"><div class="ad-rola" style="--t:16s"><img src="/static/exemplo/ad-depois-vitrine.webp" width="720" height="2829" alt="Vitrine Jéssica Hair: capa, categorias, produtos com preço e botão EU QUERO" loading="lazy" decoding="async"></div></div></div>
     </div>
     <div class="ad-card ad-depois">
       <div class="ad-top"><i>3</i><b>Pedido chega no seu WhatsApp</b><span class="ad-seta" aria-hidden="true">↓</span></div>
-      <img src="/static/exemplo/ad-depois-pedido.webp" width="900" height="1951" alt="Pedido chegando organizado no WhatsApp com produtos e total" loading="lazy" decoding="async">
+      <div class="ad-tel"><div class="ad-tela ad-fixa"><img src="/static/exemplo/ad-depois-pedido.webp" width="720" height="1203" alt="Pedido chegando organizado no WhatsApp com produtos e total" loading="lazy" decoding="async"></div></div>
     </div>
     <p class="ad-frase">A mesma loja. <em>Só mudou a forma de mostrar.</em></p>
     <p class="alerta">Cada dia sem catálogo é cliente perguntando preço no direct e desistindo.</p>
