@@ -113,7 +113,7 @@ h1 em, h2 em { font-style: normal; color: var(--pink); }
 
 .esteira { margin: 22px -20px 8px; overflow: hidden; -webkit-mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent); mask-image: linear-gradient(to right, transparent, #000 8%, #000 92%, transparent); }
 .esteira-trilho { display: flex; gap: 14px; width: max-content; padding: 6px 0 16px; animation: esteira 22s linear infinite; }
-.esteira-trilho img { height: 340px; width: auto; border-radius: 22px; box-shadow: var(--sh); flex: none; background: #F6E3EA; }
+.esteira-trilho img { height: 340px; width: auto; flex: none; filter: drop-shadow(0 16px 22px rgba(194,16,106,.28)); }
 .esteira:hover .esteira-trilho, .esteira:active .esteira-trilho { animation-play-state: paused; }
 @keyframes esteira { to { transform: translateX(calc(-50% - 7px)); } }
 @media (prefers-reduced-motion: reduce) { .esteira { overflow-x: auto; } .esteira-trilho { animation: none; } }
