@@ -240,17 +240,14 @@ h1 em, h2 em { font-style: normal; color: var(--pink); }
 .ad-card img { display: block; width: 100%; height: auto; }
 .ad-antes { border: 2px solid #EBDDE3; }
 .ad-depois { border: 2px solid var(--pink); box-shadow: var(--sh); }
-.ad-top { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #F7EEF2; }
-.ad-depois .ad-top { background: var(--rosa); }
-.ad-top b { font-size: 15.5px; font-weight: 900; letter-spacing: .04em; text-transform: uppercase; color: #8A6B78; }
-.ad-depois .ad-top b { color: var(--pink); }
-.ad-pill { padding: 5px 14px; border-radius: 999px; background: #8A6B78; color: #fff; font-weight: 800; font-size: 15px; text-transform: uppercase; letter-spacing: .04em; }
-.ad-depois .ad-pill { background: var(--pink); }
-.ad-num { margin: 0; display: flex; align-items: center; gap: 10px; padding: 12px 16px; font-size: 15.5px; font-weight: 800; letter-spacing: .03em; text-transform: uppercase; color: var(--fg); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-.ad-num i { font-style: normal; flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--pink); color: #fff; display: grid; place-items: center; font-size: 14px; }
-.ad-leg { margin: 0; padding: 14px 16px; font-size: 17px; line-height: 1.45; font-weight: 500; }
-.ad-antes .ad-leg { background: #F7EEF2; color: #6E5A63; }
-.ad-seta { margin: 10px auto 0; width: 46px; height: 46px; border-radius: 50%; background: var(--pink); color: #fff; display: grid; place-items: center; font-size: 26px; font-weight: 900; box-shadow: var(--sh); }
+.ad-top { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: var(--rosa); }
+.ad-antes .ad-top { background: #F7EEF2; }
+.ad-top i { font-style: normal; flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--pink); color: #fff; display: grid; place-items: center; font: 800 16px/1 "Inter", sans-serif; }
+.ad-antes .ad-top i { background: #8A6B78; }
+.ad-top b { flex: 1; font: 800 17px/1.25 var(--f); text-transform: uppercase; letter-spacing: .02em; color: var(--pink-d); }
+.ad-antes .ad-top b { color: #6E5A63; }
+.ad-seta { flex: none; width: 32px; height: 32px; border-radius: 50%; background: var(--pink); color: #fff; display: grid; place-items: center; font-size: 19px; font-weight: 900; }
+.ad-antes .ad-seta { background: #8A6B78; }
 .ad-frase { margin: 18px 0 0; text-align: center; font-size: 19px; font-weight: 800; line-height: 1.35; text-wrap: balance; }
 .ad-frase em { font-style: normal; color: var(--pink); }
 .alerta { margin: 18px 0 0; padding: 14px 16px; border-radius: 18px; background: var(--rosa-2); color: var(--pink-d); font-weight: 800; font-size: 17px; line-height: 1.4; text-align: center; }
@@ -560,20 +557,16 @@ p, li, .pensa p, .sub { text-wrap: pretty; }
     <h2 id="tVs">Veja a diferença na <em>rotina das suas vendas</em></h2>
     <p class="ad-real"><span aria-hidden="true">✓</span>Exemplo real · Jéssica Hair</p>
     <div class="ad-card ad-antes">
-      <div class="ad-top"><span class="ad-pill">Antes</span><b>Sem vitrine</b></div>
+      <div class="ad-top"><i>1</i><b>Sem vitrine</b><span class="ad-seta" aria-hidden="true">↓</span></div>
       <img src="/static/exemplo/ad-antes-whats.webp" width="900" height="979" alt="Fotos de cabelo soltas no WhatsApp, com +9 e sem preço" loading="lazy" decoding="async">
-      <p class="ad-leg"><b>Sem vitrine:</b> fotos soltas, sem preço, e a cliente ainda tem que perguntar.</p>
     </div>
-    <div class="ad-seta" aria-hidden="true">↓</div>
     <div class="ad-card ad-depois">
-      <div class="ad-top"><span class="ad-pill">Depois</span><b>Com vitrine</b></div>
-      <img src="/static/exemplo/ad-depois-capa.webp" width="900" height="1332" alt="Capa da vitrine Jéssica Hair" loading="lazy" decoding="async">
-      <p class="ad-num"><i>1</i>Capa da vitrine</p>
-      <img src="/static/exemplo/ad-depois-produtos.webp" width="900" height="1368" alt="Categorias e produtos com nome, preço e botão EU QUERO" loading="lazy" decoding="async">
-      <p class="ad-num"><i>2</i>Produtos organizados com preço e botão EU QUERO</p>
+      <div class="ad-top"><i>2</i><b>Com vitrine</b><span class="ad-seta" aria-hidden="true">↓</span></div>
+      <img src="/static/exemplo/ad-depois-produtos.webp" width="900" height="1368" alt="Vitrine Jéssica Hair com categorias, produtos, preço e botão EU QUERO" loading="lazy" decoding="async">
+    </div>
+    <div class="ad-card ad-depois">
+      <div class="ad-top"><i>3</i><b>Pedido chega no seu WhatsApp</b><span class="ad-seta" aria-hidden="true">↓</span></div>
       <img src="/static/exemplo/ad-depois-pedido.webp" width="900" height="1705" alt="Pedido chegando organizado no WhatsApp com produtos e total" loading="lazy" decoding="async">
-      <p class="ad-num"><i>3</i>Pedido pronto no WhatsApp</p>
-      <p class="ad-leg"><b>Com vitrine:</b> organizada, com preço e pedido pronto.</p>
     </div>
     <p class="ad-frase">A mesma loja. <em>Só mudou a forma de mostrar.</em></p>
     <p class="alerta">Cada dia sem catálogo é cliente perguntando preço no direct e desistindo.</p>
