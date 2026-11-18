@@ -432,6 +432,11 @@ body.capa-on .bar { background: transparent; backdrop-filter: none; -webkit-back
 .parab .parab-c .btn { margin-top: 18px; width: 100%; white-space: normal; font-size: 18px; font-weight: 800; letter-spacing: .03em; padding: 14px 16px; }
 #confete { position: fixed; inset: 0; z-index: 51; pointer-events: none; width: 100%; height: 100%; }
 .entrar { justify-self: end; font-size: 15.5px; font-weight: 700; color: var(--pink-d); text-decoration: none; padding: 8px 4px; }
+
+/* quebras de linha mais equilibradas (sem palavra sozinha na última linha) */
+h1, h2, h3, .btn, .capa-selo, .fixo, .dia, .paga, .trava, .garantia, .parab-g, .chamada, .urg, .expira-s, .aviso p, .legenda, .selos li, .op { text-wrap: balance; }
+p, li, .pensa p, .sub { text-wrap: pretty; }
+.center .sub, .parab p, .preco p, .expira p, .aviso p, .trava, .garantia, .paga, .urg { text-wrap: balance; }
 </style>
 </head>
 <body>
@@ -668,7 +673,7 @@ body.capa-on .bar { background: transparent; backdrop-filter: none; -webkit-back
       <div class="comofunc">
         <h3>Como funciona depois</h3>
         <ol>
-          <li>Cria seu acesso com o mesmo e-mail da compra.</li>
+          <li>Cria seu acesso com o mesmo e&#8209;mail da compra.</li>
           <li>Coloca logo, cores, produtos e preços.</li>
           <li>Coloca o link na bio e já recebe pedidos no WhatsApp.</li>
         </ol>
