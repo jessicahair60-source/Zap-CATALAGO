@@ -387,11 +387,14 @@ body.capa-on .bar { background: transparent; backdrop-filter: none; -webkit-back
 #s0 h1 em { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
 
 /* Parabéns com confete (ao chegar na oferta) */
-.parab { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; padding: 20px; background: rgba(40,10,25,.45); opacity: 0; transition: opacity .3s; }
+.parab { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box; background: rgba(40,10,25,.45); opacity: 0; transition: opacity .3s; }
 .parab.on { opacity: 1; }
 .parab[hidden] { display: none; }
-.parab-c { position: relative; width: min(360px, 100%); background: #fff; border-radius: 24px; padding: 30px 22px 22px; text-align: center; box-shadow: 0 30px 60px -20px rgba(120,10,70,.55); transform: scale(.9); transition: transform .35s cubic-bezier(.2,1.4,.4,1); }
+.parab-c { position: relative; box-sizing: border-box; width: min(360px, calc(100vw - 32px)); max-width: 100%; overflow: hidden; margin: 0 auto; background: #fff; border-radius: 24px; padding: 30px 22px 22px; text-align: center; box-shadow: 0 30px 60px -20px rgba(120,10,70,.55); transform: scale(.9); transition: transform .35s cubic-bezier(.2,1.4,.4,1); }
 .parab.on .parab-c { transform: none; }
+#t11 { scroll-margin-top: 96px; }
+.barra-in .btn { min-width: 0; min-height: 50px; padding: 12px 14px; font-size: 15px; }
+@media (max-width: 360px) { .barra-in .btn { font-size: 14px; padding: 12px 10px; gap: 6px; } }
 .parab-x { position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; border: 0; border-radius: 50%; background: var(--rosa); color: var(--fg); font-size: 20px; line-height: 1; cursor: pointer; }
 .parab-ic { font-size: 46px; line-height: 1; }
 .parab h3 { font: 800 21px/1.25 "Montserrat", system-ui, sans-serif; margin: 12px 0 8px; color: var(--fg); }
@@ -403,7 +406,7 @@ body.capa-on .bar { background: transparent; backdrop-filter: none; -webkit-back
 .parab .pz b { color: var(--pink); font: 800 34px/1 "Inter", system-ui, sans-serif; font-variant-numeric: tabular-nums; }
 .parab .pz small { font-size: 15px; color: var(--fg); font-weight: 700; }
 .parab .fixo { display: inline-block; margin-top: 6px; padding: 6px 12px; border-radius: 99px; background: var(--rosa); color: var(--pink-d); font-size: 13px; font-weight: 700; }
-.parab .parab-c .btn { margin-top: 18px; width: 100%; white-space: normal; font-size: 16px; padding: 14px 16px; }
+.parab .parab-c .btn { margin-top: 18px; width: 100%; white-space: normal; font-size: 18px; font-weight: 800; letter-spacing: .03em; padding: 14px 16px; }
 #confete { position: fixed; inset: 0; z-index: 51; pointer-events: none; width: 100%; height: 100%; }
 .entrar { justify-self: end; font-size: 13.5px; font-weight: 700; color: var(--pink-d); text-decoration: none; padding: 8px 4px; }
 </style>
@@ -912,7 +915,7 @@ const CONFIG = {
     <p id="parabTx"></p>
     <div class="pz"><s id="parabDe" hidden></s><b>R$ 47</b><small>/mês</small></div>
     <span class="fixo">🔒 Valor fixo: não aumenta com o tempo</span>
-    <a class="btn cta" href="https://pay.kiwify.com.br/ze66upr" rel="noopener" data-checkout data-fecha-parab>Clique aqui para cadastrar sua vitrine <span class="seta" aria-hidden="true">→</span></a>
+    <button class="btn" type="button" data-fecha-parab>EU QUERO <span class="seta" aria-hidden="true">→</span></button>
   </div>
 </div>
 <canvas id="confete" aria-hidden="true" hidden></canvas>
@@ -934,7 +937,7 @@ const CONFIG = {
   const fecha = () => { clearTimeout(timer); box.classList.remove('on'); setTimeout(() => { box.hidden = true; }, 300); document.removeEventListener('keydown', esc); };
   const esc = e => { if (e.key === 'Escape') fecha(); };
   box.querySelector('.parab-x').onclick = fecha;
-  const go = box.querySelector('[data-fecha-parab]'); if (typeof CONFIG !== 'undefined' && CONFIG.CHECKOUT) go.href = CONFIG.CHECKOUT; go.addEventListener('click', fecha);
+  box.querySelector('[data-fecha-parab]').addEventListener('click', () => { fecha(); const t = document.getElementById('t11'); if (t) setTimeout(() => t.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150); });
   box.addEventListener('click', e => { if (e.target === box) fecha(); });
   function confete() {
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
