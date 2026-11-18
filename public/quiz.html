@@ -316,6 +316,22 @@ h2, .oferta h2 { font-size: clamp(23px, 6.6vw, 29px); }
 .chip.c-b { right: -22px; bottom: 14%; animation-delay: 1.4s; }
 @keyframes flutua { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
 @media (prefers-reduced-motion: reduce) { .chip { animation: none; } }
+
+/* ===== botões sempre à vista: a área do botão gruda no rodapé da tela ===== */
+.step > .fim { position: sticky; bottom: 0; z-index: 4; margin-left: -20px; margin-right: -20px; padding: 26px 20px max(14px, env(safe-area-inset-bottom)); background: linear-gradient(to bottom, rgba(255,240,247,0), var(--rosa) 22px); }
+.btn { min-height: 58px; padding: 16px 20px; border-radius: 16px; font-size: 17px; }
+.btn .seta { transition: transform .2s; }
+.btn:hover .seta { transform: translateX(3px); }
+.selos { margin-top: 10px; gap: 4px 12px; font-size: 13px; }
+.selos .ok { width: 16px; height: 16px; } .selos .ok svg { width: 10px; height: 10px; }
+.op { min-height: 62px; }
+/* barra de compra fixa na oferta: aparece só quando nenhum botão de compra está na tela */
+.barra-compra { position: fixed; left: 0; right: 0; bottom: 0; z-index: 6; padding: 10px 16px max(10px, env(safe-area-inset-bottom)); background: rgba(255,255,255,.96); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); box-shadow: 0 -10px 30px -18px rgba(194,16,106,.5); transform: translateY(110%); transition: transform .3s; }
+.barra-compra.on { transform: none; }
+.barra-in { max-width: 480px; margin: 0 auto; display: flex; align-items: center; gap: 12px; }
+.barra-in p { margin: 0; flex: none; font: 800 18px/1.1 var(--f); color: var(--fg); }
+.barra-in p small { display: block; font: 600 11.5px/1.2 "Inter", sans-serif; color: var(--muted); }
+.barra-in .btn { flex: 1; min-height: 50px; padding: 12px 14px; font-size: 15px; margin: 0; }
 </style>
 </head>
 <body>
@@ -555,6 +571,10 @@ h2, .oferta h2 { font-size: clamp(23px, 6.6vw, 29px); }
   </section>
 </main>
 
+<div class="barra-compra" id="barraCompra" aria-hidden="true">
+  <div class="barra-in"><p>R$ 47<small>por mês</small></p><a class="btn" data-checkout href="https://pay.kiwify.com.br/ze66upr" rel="noopener" tabindex="-1">Quero minha vitrine 💖</a></div>
+</div>
+
 <script>
 /* ===================== CONFIGURAÇÃO (é só mexer aqui) =====================
    VIDEOS: troque o "src" para trocar o vídeo de cada tela. Deixe src: '' para mostrar o espaço vazio "vídeo em breve".
@@ -678,6 +698,16 @@ const CONFIG = {
     box.addEventListener('pointerdown', () => { parado = true; }); box.addEventListener('pointerup', () => { parado = false; }); box.addEventListener('pointerleave', () => { parado = false; });
     setInterval(passo, 1000);
     window.__centraEsteira = centra;
+  })();
+
+  // barra de compra fixa: só na oferta e só quando nenhum botão de compra está visível
+  (function () {
+    const bar = document.getElementById('barraCompra'); if (!bar || !('IntersectionObserver' in window)) return;
+    const ctas = [...document.querySelectorAll('.oferta .btn.cta')]; const vis = new Set();
+    const atualiza = () => { const on = document.body.classList.contains('oferta-on') && vis.size === 0; bar.classList.toggle('on', on); bar.setAttribute('aria-hidden', String(!on)); bar.querySelector('a').tabIndex = on ? 0 : -1; };
+    const io = new IntersectionObserver(es => { es.forEach(e => e.isIntersecting ? vis.add(e.target) : vis.delete(e.target)); atualiza(); });
+    ctas.forEach(c => io.observe(c));
+    new MutationObserver(atualiza).observe(document.body, { attributes: true, attributeFilter: ['class'] });
   })();
 
   // textos personalizados pelas respostas
