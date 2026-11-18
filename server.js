@@ -289,8 +289,10 @@ app.use((req, res, next) => {
 
 /* ---------- páginas da plataforma ---------- */
 const page = name => (req, res) => res.sendFile(path.join(PUB, name));
-app.get('/', page('index.html'));
-app.get('/quiz', page('quiz.html')); // funil de vendas em quiz (a página de vendas continua em /)
+// Página inicial: o funil em quiz. A página de vendas antiga continua em /?site=1.
+// Para voltar a página antiga na inicial, configure HOME_PAGINA=vendas no Dokploy.
+app.get('/', (req, res) => res.sendFile(path.join(PUB, (req.query.site || process.env.HOME_PAGINA === 'vendas') ? 'index.html' : 'quiz.html')));
+app.get('/quiz', page('quiz.html'));
 app.get('/termos', page('termos.html'));
 // Oferta por tempo limitado da página de vendas. Só aparece com preço, data de fim e link de checkout configurados,
 // e some sozinha quando o prazo acaba. O prazo é o mesmo para todo mundo (não reinicia por visita nem por sessão).

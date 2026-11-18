@@ -31,7 +31,7 @@ img, video { display: block; max-width: 100%; }
 /* topo: voltar + marca + barra de progresso */
 .bar { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--rosa) 88%, transparent); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: max(10px, env(safe-area-inset-top)) 16px 10px; }
 
-.bar-in { max-width: 480px; margin: 0 auto; display: grid; grid-template-columns: 40px 1fr 40px; align-items: center; }
+.bar-in { max-width: 480px; margin: 0 auto; display: grid; grid-template-columns: 64px 1fr 64px; align-items: center; }
 .back { width: 40px; height: 40px; border: 0; background: transparent; border-radius: 12px; display: grid; place-items: center; cursor: pointer; color: var(--pink-d); }
 .back:hover { background: var(--rosa-2); }
 .back svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
@@ -385,6 +385,30 @@ body.capa-on .bar { background: transparent; backdrop-filter: none; -webkit-back
 .capa-selo { align-self: center; margin-top: -26px; position: relative; z-index: 2; display: inline-flex; align-items: center; gap: 6px; background: var(--grad); color: #fff; font: 700 12.5px/1 "Inter", sans-serif; letter-spacing: .02em; padding: 8px 14px; border-radius: 99px; box-shadow: 0 10px 22px -10px rgba(233,30,133,.7); }
 #s0 h1 { margin-top: 12px; }
 #s0 h1 em { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+/* Parabéns com confete (ao chegar na oferta) */
+.parab { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 16px; box-sizing: border-box; background: rgba(40,10,25,.45); opacity: 0; transition: opacity .3s; }
+.parab.on { opacity: 1; }
+.parab[hidden] { display: none; }
+.parab-c { position: relative; box-sizing: border-box; width: min(360px, calc(100vw - 32px)); max-width: 100%; overflow: hidden; margin: 0 auto; background: #fff; border-radius: 24px; padding: 30px 22px 22px; text-align: center; box-shadow: 0 30px 60px -20px rgba(120,10,70,.55); transform: scale(.9); transition: transform .35s cubic-bezier(.2,1.4,.4,1); }
+.parab.on .parab-c { transform: none; }
+#t11 { scroll-margin-top: 96px; }
+.barra-in .btn { min-width: 0; min-height: 50px; padding: 12px 14px; font-size: 15px; }
+@media (max-width: 360px) { .barra-in .btn { font-size: 14px; padding: 12px 10px; gap: 6px; } }
+.parab-x { position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; border: 0; border-radius: 50%; background: var(--rosa); color: var(--fg); font-size: 20px; line-height: 1; cursor: pointer; }
+.parab-ic { font-size: 46px; line-height: 1; }
+.parab h3 { font: 800 21px/1.25 "Montserrat", system-ui, sans-serif; margin: 12px 0 8px; color: var(--fg); }
+.parab h3 em { font-style: normal; color: var(--pink); }
+.parab p { margin: 0; color: var(--muted); font-size: 15px; }
+.parab .pz { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; column-gap: 8px; row-gap: 2px; margin: 14px 0 6px; white-space: nowrap; }
+.parab .pz s { flex-basis: 100%; }
+.parab .pz s { color: var(--muted); font-size: 17px; }
+.parab .pz b { color: var(--pink); font: 800 34px/1 "Inter", system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+.parab .pz small { font-size: 15px; color: var(--fg); font-weight: 700; }
+.parab .fixo { display: inline-block; margin-top: 6px; padding: 6px 12px; border-radius: 99px; background: var(--rosa); color: var(--pink-d); font-size: 13px; font-weight: 700; }
+.parab .parab-c .btn { margin-top: 18px; width: 100%; white-space: normal; font-size: 18px; font-weight: 800; letter-spacing: .03em; padding: 14px 16px; }
+#confete { position: fixed; inset: 0; z-index: 51; pointer-events: none; width: 100%; height: 100%; }
+.entrar { justify-self: end; font-size: 13.5px; font-weight: 700; color: var(--pink-d); text-decoration: none; padding: 8px 4px; }
 </style>
 </head>
 <body>
@@ -392,7 +416,7 @@ body.capa-on .bar { background: transparent; backdrop-filter: none; -webkit-back
   <div class="bar-in">
     <button class="back" id="voltar" type="button" aria-label="Voltar" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg></button>
     <a class="marca" href="/" aria-label="Zap Catálogo"><img src="/static/logo-zap.webp" width="28" height="28" alt="">Zap Catálogo</a>
-    <span></span>
+    <a class="entrar" href="/entrar">Entrar</a>
   </div>
   <div class="prog-wrap" id="progWrap" hidden><div class="prog" role="progressbar" aria-label="Progresso" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="progBar"></i></div></div>
 </header>
@@ -651,7 +675,7 @@ const CONFIG = {
   CHECKOUT: 'https://pay.kiwify.com.br/ze66upr',
   BONUS_MINUTOS: 15,
   BONUS_FIM: '2026-11-23T23:59:59-03:00',
-  PRECO_DE: null
+  PRECO_DE: 150
 };
 /* ========================================================================== */
 
@@ -880,6 +904,64 @@ const CONFIG = {
 
   try { history.replaceState({ step: st.step }, '', URL_LIMPA); } catch (e) {}
   render(0);
+})();
+</script>
+
+<div class="parab" id="parab" role="dialog" aria-modal="true" aria-labelledby="parabT" hidden>
+  <div class="parab-c">
+    <button class="parab-x" type="button" aria-label="Fechar">×</button>
+    <div class="parab-ic" aria-hidden="true">🎉</div>
+    <h3 id="parabT"></h3>
+    <p id="parabTx"></p>
+    <div class="pz"><s id="parabDe" hidden></s><b>R$ 47</b><small>/mês</small></div>
+    <span class="fixo">🔒 Valor fixo: não aumenta com o tempo</span>
+    <button class="btn" type="button" data-fecha-parab>EU QUERO <span class="seta" aria-hidden="true">→</span></button>
+  </div>
+</div>
+<canvas id="confete" aria-hidden="true" hidden></canvas>
+<script>
+(function () {
+  const box = document.getElementById('parab'); if (!box) return;
+  const KEY = 'zapcat-parabens';
+  const de = (typeof CONFIG !== 'undefined' && CONFIG.PRECO_DE) ? Number(CONFIG.PRECO_DE) : 0;
+  const brl = v => 'R$ ' + (Number.isInteger(v) ? String(v) : v.toFixed(2).replace('.', ','));
+  if (de > 47) {
+    document.getElementById('parabT').innerHTML = 'Você ganhou <em>' + brl(de - 47) + ' de desconto!</em>';
+    document.getElementById('parabTx').textContent = 'Para criar a vitrine da sua loja agora:';
+    const s = document.getElementById('parabDe'); s.textContent = 'De ' + 'R$ ' + de.toFixed(2).replace('.', ','); s.hidden = false; document.querySelector('.parab .pz small').textContent = '/mês';
+  } else {
+    document.getElementById('parabT').innerHTML = 'Parabéns! <em>Sua vitrine está liberada!</em>';
+    document.getElementById('parabTx').textContent = 'Crie agora a vitrine da sua loja por apenas:';
+  }
+  let timer, raf;
+  const fecha = () => { clearTimeout(timer); box.classList.remove('on'); setTimeout(() => { box.hidden = true; }, 300); document.removeEventListener('keydown', esc); };
+  const esc = e => { if (e.key === 'Escape') fecha(); };
+  box.querySelector('.parab-x').onclick = fecha;
+  box.querySelector('[data-fecha-parab]').addEventListener('click', () => { fecha(); const t = document.getElementById('t11'); if (t) setTimeout(() => t.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150); });
+  box.addEventListener('click', e => { if (e.target === box) fecha(); });
+  function confete() {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const c = document.getElementById('confete'), x = c.getContext('2d'), dpr = Math.min(devicePixelRatio || 1, 2);
+    c.hidden = false; c.width = innerWidth * dpr; c.height = innerHeight * dpr; x.scale(dpr, dpr);
+    const cores = ['#E91E85', '#FF4FA6', '#FFC83D', '#2EC4B6', '#7B61FF', '#FFFFFF'];
+    const ps = Array.from({ length: 140 }, () => ({ x: innerWidth / 2 + (Math.random() - .5) * 80, y: innerHeight * .35, vx: (Math.random() - .5) * 14, vy: -Math.random() * 14 - 4, r: Math.random() * 6 + 4, a: Math.random() * 6, va: (Math.random() - .5) * .4, c: cores[(Math.random() * cores.length) | 0] }));
+    const t0 = performance.now();
+    (function loop(t) {
+      x.clearRect(0, 0, innerWidth, innerHeight);
+      ps.forEach(p => { p.vy += .32; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.a += p.va; x.save(); x.translate(p.x, p.y); x.rotate(p.a); x.fillStyle = p.c; x.fillRect(-p.r / 2, -p.r / 4, p.r, p.r / 2); x.restore(); });
+      if (t - t0 < 3500) raf = requestAnimationFrame(loop); else { x.clearRect(0, 0, innerWidth, innerHeight); c.hidden = true; }
+    })(t0);
+  }
+  function abre() {
+    try { if (sessionStorage.getItem(KEY)) return; sessionStorage.setItem(KEY, '1'); } catch (e) {}
+    box.hidden = false; requestAnimationFrame(() => box.classList.add('on'));
+    box.querySelector('.parab-x').focus({ preventScroll: true });
+    document.addEventListener('keydown', esc);
+    confete();
+    timer = setTimeout(fecha, 60000);
+  }
+  if (document.body.classList.contains('oferta-on')) setTimeout(abre, 400);
+  else new MutationObserver((m, o) => { if (document.body.classList.contains('oferta-on')) { o.disconnect(); setTimeout(abre, 400); } }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
 })();
 </script>
 </body>
