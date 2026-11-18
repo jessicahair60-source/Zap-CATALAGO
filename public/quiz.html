@@ -911,7 +911,7 @@ const CONFIG = {
     <p id="parabTx"></p>
     <div class="pz"><s id="parabDe" hidden></s><b>R$ 47</b><small>/mês</small></div>
     <span class="fixo">🔒 Valor fixo: não aumenta com o tempo</span>
-    <button class="btn" type="button" data-fecha-parab>Ver minha oferta <span class="seta" aria-hidden="true">→</span></button>
+    <a class="btn cta" href="https://pay.kiwify.com.br/ze66upr" rel="noopener" data-checkout data-fecha-parab>Clique aqui para cadastrar sua vitrine <span class="seta" aria-hidden="true">→</span></a>
   </div>
 </div>
 <canvas id="confete" aria-hidden="true" hidden></canvas>
@@ -933,7 +933,7 @@ const CONFIG = {
   const fecha = () => { clearTimeout(timer); box.classList.remove('on'); setTimeout(() => { box.hidden = true; }, 300); document.removeEventListener('keydown', esc); };
   const esc = e => { if (e.key === 'Escape') fecha(); };
   box.querySelector('.parab-x').onclick = fecha;
-  box.querySelector('[data-fecha-parab]').onclick = fecha;
+  const go = box.querySelector('[data-fecha-parab]'); if (typeof CONFIG !== 'undefined' && CONFIG.CHECKOUT) go.href = CONFIG.CHECKOUT; go.addEventListener('click', fecha);
   box.addEventListener('click', e => { if (e.target === box) fecha(); });
   function confete() {
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
