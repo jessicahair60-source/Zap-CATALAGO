@@ -148,10 +148,10 @@ h1 em, h2 em { font-style: normal; color: var(--pink); }
 .vazio { position: absolute; inset: 0; display: grid; place-items: center; align-content: center; gap: 8px; text-align: center; padding: 24px; color: var(--muted); font-size: 14px; font-weight: 600; background: repeating-linear-gradient(135deg, #FFF0F7 0 14px, #FFE6F2 14px 28px); }
 .vazio b { font-size: 34px; }
 .som { position: absolute; right: 12px; bottom: 58px; z-index: 3; border: 0; border-radius: 99px; padding: 8px 12px; background: rgba(30,20,24,.78); color: #fff; font-size: 12.5px; font-weight: 700; cursor: pointer; }
-.vid { position: relative; width: min(300px, 78vw); margin: 18px auto 0; aspect-ratio: 1/2; border-radius: 26px; overflow: hidden; background: #FBEFF5; box-shadow: 0 0 0 1px rgba(194,16,106,.12), 0 30px 50px -26px rgba(120,10,70,.5); }
+.vid { position: relative; height: clamp(300px, calc(100vh - 270px), 600px); height: clamp(300px, calc(100svh - 270px), 600px); aspect-ratio: 1/2; max-width: 100%; margin: 14px auto 0; border-radius: 18px; overflow: hidden; background: #FBEFF5; }
 .vid-tela { position: absolute; inset: 0; }
 .vid video { width: 100%; height: 100%; object-fit: cover; display: block; background: #FBEFF5; }
-.vid .som { bottom: 52px; }
+.vid .som { top: 10px; bottom: auto; right: 10px; padding: 6px 10px; font-size: 12px; }
 .pedido-fotos { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px -6px 0; }
 .pedido-fotos figure { margin: 0; text-align: center; }
 .pedido-fotos img { width: 100%; height: auto; display: block; filter: drop-shadow(0 14px 18px rgba(194,16,106,.24)); }
@@ -637,7 +637,7 @@ body.capa-on .bar { background: transparent; backdrop-filter: none; -webkit-back
 const CONFIG = {
   VIDEOS: {
     vitrine: { src: '/static/exemplo/tour-cliente.mp4', poster: '/static/exemplo/tour-cliente-capa.webp',
-      legenda: 'A cliente navega na vitrine, escolhe o produto e o pedido chega prontinho no seu WhatsApp.' },
+      legenda: '' },
     pedido: { src: '/static/exemplo/demo-mini-site.mp4', poster: '/static/exemplo/demo-mini-site-capa.webp',
       legenda: 'Demonstração real: a cliente escolhe, confere o pedido e envia direto para o WhatsApp da loja.' }
   },
