@@ -349,6 +349,26 @@ h2, .oferta h2 { font-size: clamp(23px, 6.6vw, 29px); }
 .crono.curto .crono-t span { min-width: 52px; font-size: 24px; padding: 7px 6px 5px; }
 .crono.curto .crono-t span small { font-size: 9.5px; }
 .crono-t span[hidden] { display: none !important; }
+
+/* números com fonte limpa e alinhada (Inter), em vez da Montserrat */
+.qnum, .crono-t span, .preco .val, .dia, .comofunc li::before, .passos li::before, .risco .sel, .barra-in p, .diag-l small { font-family: "Inter", system-ui, sans-serif; font-variant-numeric: tabular-nums lining-nums; }
+.preco .val { font-weight: 800; letter-spacing: -.04em; }
+.crono-t span { font-weight: 800; }
+.qnum { font-weight: 700; letter-spacing: .04em; text-transform: none; font-size: 14px; }
+
+.crono-t i, .crono-t span i { font-style: normal; }
+
+/* capa: foto de ponta a ponta com degradê, sem selos por cima */
+body.capa-on { background: linear-gradient(180deg, #FFE1F0 0%, var(--rosa) 55%, #FFFFFF 100%) fixed; }
+body.capa-on .bar { background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
+.capa-dona { width: auto; margin: -8px -20px 0; position: relative; }
+.capa-dona img { width: 100%; height: auto; aspect-ratio: 16/11; object-fit: cover; object-position: center 25%; border-radius: 0; box-shadow: none; display: block;
+  -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent 100%); mask-image: linear-gradient(to bottom, #000 62%, transparent 100%); }
+.capa-dona::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(160deg, rgba(233,30,133,.22) 0%, rgba(233,30,133,0) 45%), radial-gradient(120% 70% at 50% 0%, rgba(255,255,255,0) 60%, rgba(255,225,240,.35) 100%); }
+.capa-dona::before { display: none; }
+.capa-selo { align-self: center; margin-top: -26px; position: relative; z-index: 2; display: inline-flex; align-items: center; gap: 6px; background: var(--grad); color: #fff; font: 700 12.5px/1 "Inter", sans-serif; letter-spacing: .02em; padding: 8px 14px; border-radius: 99px; box-shadow: 0 10px 22px -10px rgba(233,30,133,.7); }
+#s0 h1 { margin-top: 12px; }
+#s0 h1 em { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
 </style>
 </head>
 <body>
@@ -366,10 +386,9 @@ h2, .oferta h2 { font-size: clamp(23px, 6.6vw, 29px); }
   <section class="step center" id="s0" data-step="0" aria-labelledby="t0">
     <div class="capa-dona">
       <img src="/static/exemplo/quiz-capa-empreendedoras.webp" alt="Empreendedoras de vários negócios sorrindo: confeiteira, manicure, cabeleireira, maquiadora, loja de roupas, costureira e decoradora de festas" width="900" height="600" fetchpriority="high">
-      <span class="chip c-a" aria-hidden="true">🔗 Link da bio</span>
-      <span class="chip c-b" aria-hidden="true">💬 Pedidos no WhatsApp</span>
     </div>
-    <h1 id="t0" style="margin-top:26px">Seus clientes podem estar <em>desistindo de comprar</em> sem você perceber!</h1>
+    <span class="capa-selo">Quiz gratuito · 1 minuto</span>
+    <h1 id="t0">Seus clientes podem estar <em>desistindo de comprar</em> sem você perceber!</h1>
     <p class="sub">Descubra em menos de 1 minuto como apresentar seus produtos ou serviços de um jeito mais profissional e facilitar seus pedidos.</p>
     <div class="fim">
       <button class="btn" type="button" data-next>Quero descobrir <span class="seta" aria-hidden="true">→</span></button>
@@ -622,6 +641,7 @@ const CONFIG = {
   const steps = [...document.querySelectorAll('.step')];
   const LAST = steps.length - 1;
   const KEY = 'zapcat-quiz-v2';
+  const URL_LIMPA = location.pathname + location.search; // sem #número no endereço
   const voltar = document.getElementById('voltar');
   const progWrap = document.getElementById('progWrap');
   const progBar = document.getElementById('progBar');
@@ -789,12 +809,13 @@ const CONFIG = {
     progBar.style.width = pct + '%';
     prog.setAttribute('aria-valuenow', String(pct));
     document.body.classList.toggle('oferta-on', n === LAST);
+    document.body.classList.toggle('capa-on', n === 0);
     marcaRespostas();
     personaliza();
     const sec = steps[n];
     clearTimeout(autoT);
     if (sec.dataset.auto) {
-      if (dir < 0) { st.step = n - 1; salva(); try { history.replaceState({ step: st.step }, '', '#' + st.step); } catch (e) {} return render(-1); }
+      if (dir < 0) { st.step = n - 1; salva(); try { history.replaceState({ step: st.step }, '', URL_LIMPA); } catch (e) {} return render(-1); }
       const lis = sec.querySelectorAll('.anal-list li'); const ms = +sec.dataset.auto;
       lis.forEach((li, i) => { li.classList.remove('feito'); setTimeout(() => li.classList.add('feito'), (i + 1) * ms / (lis.length + 1)); });
       autoT = setTimeout(() => { if (st.step === n) vaiPara(n + 1, 1, true); }, ms);
@@ -809,7 +830,7 @@ const CONFIG = {
 
   function vaiPara(n, dir, troca) {
     st.step = Math.max(0, Math.min(LAST, n)); salva();
-    try { history[troca ? 'replaceState' : 'pushState']({ step: st.step }, '', '#' + st.step); } catch (e) {}
+    try { history[troca ? 'replaceState' : 'pushState']({ step: st.step }, '', URL_LIMPA); } catch (e) {}
     render(dir);
   }
 
@@ -838,7 +859,7 @@ const CONFIG = {
   document.querySelectorAll('.ben').forEach((b, i) => { b.style.animationDelay = (i * 45) + 'ms'; });
   document.querySelectorAll('.nichos li').forEach((b, i) => { b.style.animationDelay = (i * 30) + 'ms'; });
 
-  try { history.replaceState({ step: st.step }, '', st.step ? '#' + st.step : location.pathname + location.search); } catch (e) {}
+  try { history.replaceState({ step: st.step }, '', URL_LIMPA); } catch (e) {}
   render(0);
 })();
 </script>
